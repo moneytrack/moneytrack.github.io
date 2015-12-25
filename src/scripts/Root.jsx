@@ -14,11 +14,19 @@ class Root extends React.Component {
 
     render () {
         const {store} = this.context
-        const newWordList = store.getState()
-        console.log("state",newWordList)
+
+        console.log(store);
 
         return (
-            <h1>Hi!</h1>
+            <div>
+                <input></input>
+                <button>Add</button>
+                <div>
+                    {store.getState().map((payment) => (
+                        <div key={payment.date}>{payment.amount}: payment.comment</div>
+                    ))}
+                </div>
+            </div>
         )
     }
 }

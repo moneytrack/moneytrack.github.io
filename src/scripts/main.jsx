@@ -26,11 +26,18 @@ import {createStore} from 'redux'
 import {Provider} from 'react-redux'
 
 import Root from './Root.jsx'
-const newWordList = (state = state, action) => {
+
+const paymentsHistoryInit = [
+    {amount:290.0, comment:"Lunch", date: 1451126739340},
+    {amount:860.0, comment:"Some food", date: 1450983139340},
+    {amount:390.0, comment:"Lunch (teremok)", date: 1451041813860}
+]
+
+const paymentsHistory = (state = paymentsHistoryInit, action) => {
     return state
 }
 
-const store = createStore(newWordList)
+const store = createStore(paymentsHistory)
 
 ReactDOM.render(
     <Provider store={store}>
