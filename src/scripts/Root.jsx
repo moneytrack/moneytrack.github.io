@@ -23,7 +23,7 @@ class Root extends React.Component {
                 <button>Add</button>
                 <div>
                     {store.getState().map((payment) => (
-                        <div key={payment.date}>{payment.amount}: payment.comment</div>
+                        <div key={payment.date}>{payment.amount}: {payment.comment}</div>
                     ))}
                 </div>
             </div>
