@@ -9,6 +9,7 @@
     <artifactId>backend</artifactId>
 
     <properties>
+        <kotlin.version>1.0.0-beta-4584</kotlin.version>
         <app.id>ru-koluch-moneytrack-backend</app.id>
         <app.version>1</app.version>
         <appengine.version>1.9.30</appengine.version>
@@ -52,6 +53,11 @@
             <artifactId>appengine-api-stubs</artifactId>
             <version>${appengine.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
 
@@ -123,6 +129,35 @@
               <configuration>
                 <set_default>true</set_default>
               </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/main/java</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs></sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
