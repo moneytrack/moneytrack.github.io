@@ -23,7 +23,8 @@
     "gulp-watch": "^4.3.5",
     "reactify": "^1.1.1",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.6.0"
+    "watchify": "^3.6.0",
+    "node-notifier": "^4.4.0"
   },
   "dependencies": {
     "react": "^0.14.3",

@@ -115,6 +115,11 @@ gulp.task('debug_scripts', function(){
     function onError(err) {
         anybar('red');
         gutil.log(gutil.colors.red(err.message));
+        var notifier = require('node-notifier');
+        notifier.notify({
+          'title': 'ERROR',
+          'message': err.message
+        });        
     }
 
     function rebundle() {

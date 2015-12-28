@@ -27,17 +27,50 @@ import {Provider} from 'react-redux'
 
 import Root from './Root.jsx'
 
-const paymentsHistoryInit = [
-    {amount:290.0, comment:"Lunch", date: 1451126739340},
-    {amount:860.0, comment:"Some food", date: 1450983139340},
-    {amount:390.0, comment:"Lunch (teremok)", date: 1451041813860}
-]
+const initState = {
+    seq: 9,
+    categoryList: [
+        {id:0,title:"Other"},
+        {id:1,title:"Lunch"},
+        {id:2,title:"Grocery"},
+        {id:6,title:"Home",children:[
+            {id:7,title:"Electricity"},
+            {id:8,title:"Internet"}
+        ]},
+    ],
+    history: [
+        {id:3, amount:290.0, comment:"KFC", date: 1451126739340, categoryId:1},
+        {id:4, amount:860.0, comment:"Some food", date: 1450983139340, categoryId:2},
+        {id:5, amount:390.0, comment:"Teremok", date: 1451041813860, categoryId:1}
+    ]
+}
 
-const paymentsHistory = (state = paymentsHistoryInit, action) => {
+const reducer = (state = initState, action) => {
+    switch(action.type) {
+        case 'NEW_EXPENSE': {
+            const amount = parseFloat(action.amount)
+            const categoryId = parseInt(action.categoryId)
+            const comment = action.comment;
+
+            const valid = !isNaN(amount) && state.categoryList.filter((x) => x.id === categoryId).length > 0;
+            if(valid) {
+                state = update(state, {
+                    history: {$push: [{
+                        id: state.seq,
+                        amount:parseFloat(amount),
+                        categoryId,
+                        comment
+                    }]},
+                    seq: {$set: state.seq + 1}
+                })
+            }
+        };
+        default: ;
+    }
     return state
 }
 
-const store = createStore(paymentsHistory)
+const store = createStore(reducer)
 
 ReactDOM.render(
     <Provider store={store}>
