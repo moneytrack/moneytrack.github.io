@@ -36,11 +36,14 @@ class DispatchServlet : HttpServlet() {
             val comment = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).nullString
             NewExpenseAction(amount, categoryId, comment)
         }
-        throw JsonParseException("Only JsonObject could be parsed")
+        else {
+            throw JsonParseException("Only JsonObject could be parsed")
+        }
     }
     val gson = gsonBuilder.create()
 
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
+
         val datastoreService = DatastoreServiceFactory.getDatastoreService();
 
         val userPrincipal = req.userPrincipal
@@ -66,33 +69,70 @@ class DispatchServlet : HttpServlet() {
             return
         }
 
-        val actionJson: JsonObject = gson.fromJson(body)
-        if(!actionJson.has("type")) {
-            res.writer.write("Missing action type")
+        val action: Action
+        try {
+            action = parseAction(body)
+        } catch(e: ActionParseException) {
+            res.writer.write("Unable to parse action JSON: ${e.message}")
             res.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
-
-        val type: String = actionJson.getAsJsonPrimitive("type").asString;
-        if("NEW_EXPENSE".equals(type)) {
-
-            val newExpenseEntity = Entity(EXPENSE_KIND, userEntity.key)
-            newExpenseEntity.setProperty(EXPENSE_PROP_AMOUNT, actionJson.get(EXPENSE_PROP_AMOUNT).asString);
-            newExpenseEntity.setProperty(EXPENSE_PROP_CATEGORY_ID, actionJson.get(EXPENSE_PROP_CATEGORY_ID).asInt);
-            if (actionJson.has(EXPENSE_PROP_COMMENT)) {
-                newExpenseEntity.setProperty(EXPENSE_PROP_COMMENT, actionJson.get(EXPENSE_PROP_COMMENT).asString)
-            };
-
-            datastoreService.put(newExpenseEntity);
-            res.setStatus(HttpServletResponse.SC_OK)
+        when (action) {
+            is NewExpenseAction -> {
+                val newExpenseEntity = Entity(EXPENSE_KIND, userEntity.key)
+                newExpenseEntity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
+                newExpenseEntity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
+                if (action.comment != null) {
+                    newExpenseEntity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
+                };
+                datastoreService.put(newExpenseEntity);
+                res.setStatus(HttpServletResponse.SC_OK)
+            }
+            else -> {
+                res.writer.write("Unknown action type: ${action.type}")
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                return
+            }
         }
-        else {
-            res.writer.write("Unknown action type: " + type)
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+
+    }
+
+    fun parseAction(body: String): Action  {
+        val actionJson: JsonObject
+        try {
+            actionJson = gson.fromJson(body)
+        } catch(e: Exception) {
+            throw ActionParseException(e)
         }
+        if(!actionJson.has("type")) {
+            throw ActionParseException("Action type is not specified")
+        }
+        val type = actionJson.get("type").string
+        if(type == "NEW_EXPENSE") {
+            try {
+                return gson.fromJson<NewExpenseAction>(body);
+            } catch(e: Exception) {
+                throw ActionParseException(e)
+            }
+        }
+        throw ActionParseException("Unknown action type: " + type)
+
     }
 }
 
-data class NewExpenseAction(val amount: Int, val categoryId: Int, val comment: String?)
+class ActionParseException : Exception {
+    constructor() : super()
 
+    constructor(message: String?) : super(message)
+
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
+
+    constructor(cause: Throwable?) : super(cause)
+
+    constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace)
+}
+
+
+abstract class Action(val type: String)
+class NewExpenseAction(val amount: Int, val categoryId: Int, val comment: String?) : Action("NEW_EXPENSE")
 

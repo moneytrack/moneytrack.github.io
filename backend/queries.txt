@@ -1,0 +1,1 @@
+http --debug POST http://localhost:8080/dispatch type="NEW_EXPENSE" amount:=1488 categoryId:=1 Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701
