@@ -1,4 +1,4 @@
-http --debug POST http://localhost:8080/dispatch type="NEW_EXPENSE" amount:=1488 categoryId:=1 Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701
 http --debug POST http://localhost:8080/dispatch type="NEW_CATEGORY" title='Other' Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701
-http --debug POST http://localhost:8080/dispatch type="NEW_CATEGORY" title='Home' Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701 -> 6333186975989760
-http --debug POST http://localhost:8080/dispatch type="NEW_CATEGORY" title='Internet' parentId:=6333186975989760 Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701 -> 4925812092436480
+http --debug POST http://localhost:8080/dispatch type="NEW_CATEGORY" title='Home' Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701
+http --debug POST http://localhost:8080/dispatch type="NEW_CATEGORY" title='Internet' parentId:=6614661952700416 Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701
+http --debug POST http://localhost:8080/dispatch type="NEW_EXPENSE" amount:=45000 categoryId:=4573968371548160 Cookie:dev_appserver_login=koluch@koluch.ru:false:123324402982261261701

@@ -25,7 +25,7 @@ val EXPENSE_PROP_AMOUNT = "amount"
 val EXPENSE_PROP_CATEGORY_ID = "categoryId"
 val EXPENSE_PROP_COMMENT = "comment"
 
-val CATEGORY_KIND = "Expense";
+val CATEGORY_KIND = "Category";
 val CATEGORY_PROP_TITLE = "title";
 val CATEGORY_PROP_PARENT_ID = "parentId";
 
@@ -43,7 +43,7 @@ class DispatchServlet : HttpServlet() {
             val jsonObject = jsonElement as JsonObject
             val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
             val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).long
-            val comment = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).nullString
+            val comment = jsonObject.get(EXPENSE_PROP_COMMENT).nullString
             NewExpenseAction(amount, categoryId, comment)
         }
         else {
@@ -99,6 +99,12 @@ class DispatchServlet : HttpServlet() {
         }
         when (action) {
             is NewExpenseAction -> {
+                if(!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
+                    res.writer.println("Category with id '${action.categoryId}' doesn't exists")
+                    res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                    return
+                }
+
                 val entity = Entity(EXPENSE_KIND, userEntity.key)
                 entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
                 entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
@@ -113,7 +119,7 @@ class DispatchServlet : HttpServlet() {
                 val entity = Entity(CATEGORY_KIND, userEntity.key)
                 entity.setProperty(CATEGORY_PROP_TITLE, action.title);
                 if (action.parentId != null) {
-                    if(!datastore.exists(KeyFactory.createKey(CATEGORY_KIND, action.parentId))) {
+                    if(!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
                         res.writer.println("Parent category with id '${action.parentId}' doesn't exists")
                         res.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
