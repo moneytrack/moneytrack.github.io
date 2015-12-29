@@ -1,9 +1,10 @@
 package ru.koluch.wordlist
 
+import com.github.salomonbrys.kotson.*
 import com.google.appengine.api.datastore.DatastoreServiceFactory
 import com.google.appengine.api.datastore.Entity
-import com.google.gson.Gson
-import com.google.gson.JsonObject
+import com.google.gson.*
+import java.lang.reflect.Type
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -24,25 +25,36 @@ val EXPENSE_PROP_COMMENT = "comment"
 class DispatchServlet : HttpServlet() {
 
 
+    val gsonBuilder: GsonBuilder = GsonBuilder().deserialize<NewExpenseAction> { jsonElement, type, context ->
+        if (jsonElement.isJsonObject) {
+            val jsonObject = jsonElement as JsonObject
+            val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
+            val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).int
+            val comment = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).nullString
+            NewExpenseAction(amount, categoryId, comment)
+        }
+        throw JsonParseException("Only JsonObject could be parsed")
+    }
+    val gson = gsonBuilder.create()
+
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
-        val actionJsonString = req.reader.readText()
-        if(!actionJsonString.equals("")) {
-            val gson = Gson()
-            val actionJson = gson.fromJson(actionJsonString, JsonObject::class.java)
+        val body = req.reader.readText()
+        if(!body.equals("")) {
+            val actionJson: JsonObject = gson.fromJson(body)
             if(actionJson.has("type")) {
                 val type: String = actionJson.getAsJsonPrimitive("type").asString;
                 if("NEW_EXPENSE".equals(type)) {
 
                     // Create expense object and save
-                    val newExpense = Entity(EXPENSE_KIND)
-                    newExpense.setProperty(EXPENSE_PROP_AMOUNT, actionJson.get(EXPENSE_PROP_AMOUNT).asString);
-                    newExpense.setProperty(EXPENSE_PROP_CATEGORY_ID, actionJson.get(EXPENSE_PROP_CATEGORY_ID).asInt);
+                    val newExpenseEntity = Entity(EXPENSE_KIND)
+                    newExpenseEntity.setProperty(EXPENSE_PROP_AMOUNT, actionJson.get(EXPENSE_PROP_AMOUNT).asString);
+                    newExpenseEntity.setProperty(EXPENSE_PROP_CATEGORY_ID, actionJson.get(EXPENSE_PROP_CATEGORY_ID).asInt);
                     if (actionJson.has(EXPENSE_PROP_COMMENT)) {
-                        newExpense.setProperty(EXPENSE_PROP_COMMENT, actionJson.get(EXPENSE_PROP_COMMENT).asString)
+                        newExpenseEntity.setProperty(EXPENSE_PROP_COMMENT, actionJson.get(EXPENSE_PROP_COMMENT).asString)
                     };
 
                     val datastoreService = DatastoreServiceFactory.getDatastoreService();
-                    datastoreService.put(newExpense);
+                    datastoreService.put(newExpenseEntity);
                     res.setStatus(HttpServletResponse.SC_OK)
                 }
                 else {
@@ -61,3 +73,7 @@ class DispatchServlet : HttpServlet() {
         }
     }
 }
+
+data class NewExpenseAction(val amount: Int, val categoryId: Int, val comment: String?)
+
+
