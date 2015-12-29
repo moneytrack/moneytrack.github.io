@@ -38,7 +38,8 @@ class NewCategoryAction(val title: String, val parentId: Long?) : Action("NEW_CA
 class DispatchServlet : HttpServlet() {
 
 
-    val gsonBuilder: GsonBuilder = GsonBuilder().deserialize<NewExpenseAction> { jsonElement, type, context ->
+    val gsonBuilder: GsonBuilder = GsonBuilder()
+    .deserialize { jsonElement, type, context ->
         if (jsonElement.isJsonObject) {
             val jsonObject = jsonElement as JsonObject
             val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
@@ -49,7 +50,7 @@ class DispatchServlet : HttpServlet() {
         else {
             throw JsonParseException("Only JsonObject could be parsed")
         }
-    }.deserialize { jsonElement, type, context ->
+    } deserialize { jsonElement, type, context ->
         if (jsonElement.isJsonObject) {
             val jsonObject = jsonElement as JsonObject
             val title = jsonObject.get(CATEGORY_PROP_TITLE).string
@@ -84,7 +85,7 @@ class DispatchServlet : HttpServlet() {
 
         val body = req.reader.readText()
         if(body.equals("")) {
-            res.writer.println("Missing parameter 'action'")
+            res.writer.println("Missing request body")
             res.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
