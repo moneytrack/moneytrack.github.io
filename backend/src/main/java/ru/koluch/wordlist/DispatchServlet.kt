@@ -25,6 +25,16 @@ val EXPENSE_PROP_AMOUNT = "amount"
 val EXPENSE_PROP_CATEGORY_ID = "categoryId"
 val EXPENSE_PROP_COMMENT = "comment"
 
+val CATEGORY_KIND = "Expense";
+val CATEGORY_PROP_TITLE = "title";
+val CATEGORY_PROP_PARENT_ID = "parentId";
+
+abstract class Action(val type: String)
+class NewExpenseAction(val amount: Int, val categoryId: Long, val comment: String?) : Action("NEW_EXPENSE")
+class NewCategoryAction(val title: String, val parentId: Long?) : Action("NEW_CATEGORY")
+
+
+
 class DispatchServlet : HttpServlet() {
 
 
@@ -32,9 +42,19 @@ class DispatchServlet : HttpServlet() {
         if (jsonElement.isJsonObject) {
             val jsonObject = jsonElement as JsonObject
             val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
-            val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).int
+            val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).long
             val comment = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).nullString
             NewExpenseAction(amount, categoryId, comment)
+        }
+        else {
+            throw JsonParseException("Only JsonObject could be parsed")
+        }
+    }.deserialize { jsonElement, type, context ->
+        if (jsonElement.isJsonObject) {
+            val jsonObject = jsonElement as JsonObject
+            val title = jsonObject.get(CATEGORY_PROP_TITLE).string
+            val parentId = jsonObject.get(CATEGORY_PROP_PARENT_ID).nullLong
+            NewCategoryAction(title, parentId)
         }
         else {
             throw JsonParseException("Only JsonObject could be parsed")
@@ -44,27 +64,27 @@ class DispatchServlet : HttpServlet() {
 
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
 
-        val datastoreService = DatastoreServiceFactory.getDatastoreService();
+        val datastore = DatastoreServiceFactory.getDatastoreService();
 
         val userPrincipal = req.userPrincipal
         if(userPrincipal == null) {
-            res.writer.write("User is not authorized")
+            res.writer.println("User is not authorized")
             res.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
         val userEntity: Entity
         try {
-            userEntity = datastoreService.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
+            userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
         } catch(e: EntityNotFoundException) {
-            res.writer.write("User account info not found. Try to log out and then sign in again.")
+            res.writer.println("User account info not found. Try to log out and then sign in again.")
             res.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
         val body = req.reader.readText()
         if(body.equals("")) {
-            res.writer.write("Missing parameter 'action'")
+            res.writer.println("Missing parameter 'action'")
             res.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
@@ -73,23 +93,39 @@ class DispatchServlet : HttpServlet() {
         try {
             action = parseAction(body)
         } catch(e: ActionParseException) {
-            res.writer.write("Unable to parse action JSON: ${e.message}")
+            res.writer.println("Unable to parse action JSON: ${e.message}")
             res.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
         when (action) {
             is NewExpenseAction -> {
-                val newExpenseEntity = Entity(EXPENSE_KIND, userEntity.key)
-                newExpenseEntity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
-                newExpenseEntity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
+                val entity = Entity(EXPENSE_KIND, userEntity.key)
+                entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
+                entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
                 if (action.comment != null) {
-                    newExpenseEntity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
+                    entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 };
-                datastoreService.put(newExpenseEntity);
+                val key = datastore.put(entity);
+                res.writer.println(key.id)
+                res.setStatus(HttpServletResponse.SC_OK)
+            }
+            is NewCategoryAction -> {
+                val entity = Entity(CATEGORY_KIND, userEntity.key)
+                entity.setProperty(CATEGORY_PROP_TITLE, action.title);
+                if (action.parentId != null) {
+                    if(!datastore.exists(KeyFactory.createKey(CATEGORY_KIND, action.parentId))) {
+                        res.writer.println("Parent category with id '${action.parentId}' doesn't exists")
+                        res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                        return
+                    }
+                    entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
+                };
+                val key = datastore.put(entity);
+                res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
             else -> {
-                res.writer.write("Unknown action type: ${action.type}")
+                res.writer.println("Unknown action type: ${action.type}")
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST)
                 return
             }
@@ -115,6 +151,13 @@ class DispatchServlet : HttpServlet() {
                 throw ActionParseException(e)
             }
         }
+        else if(type == "NEW_CATEGORY") {
+            try {
+                return gson.fromJson<NewCategoryAction>(body);
+            } catch(e: Exception) {
+                throw ActionParseException(e)
+            }
+        }
         throw ActionParseException("Unknown action type: " + type)
 
     }
@@ -132,7 +175,4 @@ class ActionParseException : Exception {
     constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace)
 }
 
-
-abstract class Action(val type: String)
-class NewExpenseAction(val amount: Int, val categoryId: Int, val comment: String?) : Action("NEW_EXPENSE")
 
