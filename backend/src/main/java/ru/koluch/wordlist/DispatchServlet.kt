@@ -59,10 +59,9 @@ class DispatchServlet : HttpServlet() {
         }
     val gson = gsonBuilder.create()
 
-    override fun service(req: HttpServletRequest, res: HttpServletResponse) {
-
+    override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
         val datastore = DatastoreServiceFactory.getDatastoreService();
-
+        
         val userPrincipal = req.userPrincipal
         if (userPrincipal == null) {
             res.writer.println("User is not authorized")
@@ -122,6 +121,35 @@ class DispatchServlet : HttpServlet() {
 
             res.writer.println(gson.toJson(stateJson))
             res.setStatus(HttpServletResponse.SC_OK)
+            return
+        }
+
+    }
+
+    override fun doPost(req: HttpServletRequest, res: HttpServletResponse) {
+
+        val datastore = DatastoreServiceFactory.getDatastoreService();
+
+        val userPrincipal = req.userPrincipal
+        if (userPrincipal == null) {
+            res.writer.println("User is not authorized")
+            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            return;
+        }
+
+        val userEntity: Entity
+        try {
+            userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
+        } catch(e: EntityNotFoundException) {
+            res.writer.println("User account info not found. Try to log out and then sign in again.")
+            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            return;
+        }
+
+        val body = req.reader.readText()
+        if (body.equals("")) {
+            res.writer.println("Missing request body")
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
 
