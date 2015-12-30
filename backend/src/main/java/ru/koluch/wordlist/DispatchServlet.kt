@@ -18,18 +18,9 @@ import kotlin.collections.map
  * Created: 29.12.2015 02:30
  */
 
-val EXPENSE_KIND = "Expense";
-val EXPENSE_PROP_AMOUNT = "amount"
-val EXPENSE_PROP_CATEGORY_ID = "categoryId"
-val EXPENSE_PROP_COMMENT = "comment"
-
-val CATEGORY_KIND = "Category";
-val CATEGORY_PROP_TITLE = "title";
-val CATEGORY_PROP_PARENT_ID = "parentId";
-
 abstract class Action(val type: String)
-class NewExpenseAction(val amount: Int, val categoryId: Long, val comment: String?) : Action("NEW_EXPENSE")
-class NewCategoryAction(val title: String, val parentId: Long?) : Action("NEW_CATEGORY")
+class NewExpenseAction(val amount: Int, val categoryId: Long, val comment: String?) : Action(ACTION_NEW_EXPENSE)
+class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 
 
 class DispatchServlet : HttpServlet() {
@@ -106,7 +97,7 @@ class DispatchServlet : HttpServlet() {
                 val categoryJsonList = categoryList.map { categoryEntity ->
                     jsonObject(
                         CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
-                        "children" to collectCategories(categoryEntity.key.id)
+                        CATEGORY_PROP_CHILDREN to collectCategories(categoryEntity.key.id)
                     )
                 }
                 val result = jsonArray()
@@ -115,8 +106,8 @@ class DispatchServlet : HttpServlet() {
             }
 
             val stateJson = jsonObject(
-                "history" to collectExpenses(),
-                "categoryList" to collectCategories(null)
+                STATE_HISTORY to collectExpenses(),
+                STATE_CATEGORY_LIST to collectCategories(null)
             )
 
             res.writer.println(gson.toJson(stateJson))
@@ -208,17 +199,17 @@ class DispatchServlet : HttpServlet() {
         } catch(e: Exception) {
             throw ActionParseException(e)
         }
-        if (!actionJson.has("type")) {
+        if (!actionJson.has(ACTION_TYPE)) {
             throw ActionParseException("Action type is not specified")
         }
-        val type = actionJson.get("type").string
-        if (type == "NEW_EXPENSE") {
+        val type = actionJson.get(ACTION_TYPE).string
+        if (type == ACTION_NEW_EXPENSE) {
             try {
                 return gson.fromJson<NewExpenseAction>(body);
             } catch(e: Exception) {
                 throw ActionParseException(e)
             }
-        } else if (type == "NEW_CATEGORY") {
+        } else if (type == ACTION_NEW_CATEGORY) {
             try {
                 return gson.fromJson<NewCategoryAction>(body);
             } catch(e: Exception) {
