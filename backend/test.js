@@ -44,22 +44,59 @@ post({
         'action':'Log In'
     }
 })
-.catch((err) => console.error(err))
 .then((result) => {
     var cookie = result.response.headers['set-cookie'];
     if(!cookie) throw new Error("No auth cookie");
-    console.log(cookie);
     var loginCookieValue = cookie[0].split(";")[0].split("=")[1]; // ["dev_appserver_login=test@example.com:false:185804764220139124118;Path=/"] => test@example.com:false:185804764220139124118
 
-    return post({
+    var cookies = {
+        "Cookie": "dev_appserver_login=" + loginCookieValue
+    };
+    return get({
         url: "http://localhost:8080/auth",
-        json: true,
-        "headers": {
-            "Cookie": "dev_appserver_login=" + loginCookieValue
-        }
+        "headers": cookies
     })
+    .catch((err) => console.error(err))
+    .then(() => {
+        return post({
+            url: "http://localhost:8080/dispatch",
+            json: true,
+            headers: cookies,
+            body: {
+                type:"NEW_CATEGORY",
+                title:"Home"
+            }
+        })
+    })
+    .then((result) => {
+        var homeCategory = parseFloat(result.body);
+        return post({
+            url: "http://localhost:8080/dispatch",
+            json: true,
+            headers: cookies,
+            body: {
+                type:"NEW_CATEGORY",
+                title:"Internet",
+                parentId:homeCategory
+            }
+        })
+    })
+    .then((result) => {
+        var internetCategory = parseFloat(result.body);
+        return post({
+            url: "http://localhost:8080/dispatch",
+            json: true,
+            headers: cookies,
+            body: {
+                type:"NEW_EXPENSE",
+                amount:45000,
+                categoryId: internetCategory,
+                comment:"My comment"
+            }
+        })
+    })
+    .catch((err) => console.error(err));
 })
-.then((response) => console.log(response))
 .catch((err) => console.error(err));
 
 
