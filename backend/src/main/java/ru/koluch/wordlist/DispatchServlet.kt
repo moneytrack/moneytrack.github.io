@@ -1,16 +1,14 @@
 package ru.koluch.wordlist
 
 import com.github.salomonbrys.kotson.*
-import com.google.appengine.api.datastore.DatastoreServiceFactory
-import com.google.appengine.api.datastore.Entity
-import com.google.appengine.api.datastore.EntityNotFoundException
-import com.google.appengine.api.datastore.KeyFactory
+import com.google.appengine.api.datastore.*
 import com.google.gson.*
 import java.lang.reflect.Type
 import java.security.Principal
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.collections.map
 
 /**
  * Copyright (c) 2015 Nikolai Mavrenkov <koluch@koluch.ru>
@@ -50,7 +48,8 @@ class DispatchServlet : HttpServlet() {
         else {
             throw JsonParseException("Only JsonObject could be parsed")
         }
-    } deserialize { jsonElement, type, context ->
+    }
+    .deserialize { jsonElement, type, context ->
         if (jsonElement.isJsonObject) {
             val jsonObject = jsonElement as JsonObject
             val title = jsonObject.get(CATEGORY_PROP_TITLE).string
@@ -85,8 +84,47 @@ class DispatchServlet : HttpServlet() {
 
         val body = req.reader.readText()
         if(body.equals("")) {
-            res.writer.println("Missing request body")
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+
+            fun collectExpenses(): JsonArray {
+                val query = Query(EXPENSE_KIND, userEntity.key)
+                val preparedQuery = datastore.prepare(query)
+                val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                val expenseJsonList = expenseList.map { categoryEntity ->
+                    jsonObject(
+                            EXPENSE_PROP_AMOUNT to categoryEntity.getProperty(EXPENSE_PROP_AMOUNT),
+                            EXPENSE_PROP_CATEGORY_ID to categoryEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                            EXPENSE_PROP_COMMENT to categoryEntity.getProperty(EXPENSE_PROP_COMMENT)
+                    )
+                }
+                val result = jsonArray()
+                result.addAll(expenseJsonList)
+                return result
+            }
+
+            fun collectCategories(parentId: Long?): JsonArray {
+                val query = Query(CATEGORY_KIND, userEntity.key).setFilter(
+                        Query.FilterPredicate(CATEGORY_PROP_PARENT_ID, Query.FilterOperator.EQUAL, parentId)
+                )
+                val preparedQuery = datastore.prepare(query)
+                val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                val categoryJsonList = categoryList.map { categoryEntity ->
+                    jsonObject(
+                            CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
+                            "children" to collectCategories(categoryEntity.key.id)
+                    )
+                }
+                val result = jsonArray()
+                result.addAll(categoryJsonList)
+                return result
+            }
+
+            val stateJson = jsonObject(
+                    "history" to collectExpenses(),
+                    "categoryList" to collectCategories(null)
+            )
+
+            res.writer.println(gson.toJson(stateJson))
+            res.setStatus(HttpServletResponse.SC_OK)
             return
         }
 
@@ -109,9 +147,7 @@ class DispatchServlet : HttpServlet() {
                 val entity = Entity(EXPENSE_KIND, userEntity.key)
                 entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
                 entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
-                if (action.comment != null) {
-                    entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
-                };
+                entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 val key = datastore.put(entity);
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
@@ -125,8 +161,8 @@ class DispatchServlet : HttpServlet() {
                         res.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
                     }
-                    entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
                 };
+                entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
                 val key = datastore.put(entity);
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
