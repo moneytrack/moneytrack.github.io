@@ -4,7 +4,11 @@ import com.google.appengine.api.datastore.*
 import com.google.appengine.api.datastore.Query.FilterOperator.EQUAL
 
 /**
- * Created by Nikolai_Mavrenkov on 29/12/15.
+ * Copyright (c) 2015 Nikolai Mavrenkov <koluch@koluch.ru>
+ *
+ * Distributed under the MIT License (See accompanying file LICENSE or copy at http://opensource.org/licenses/MIT).
+ *
+ * Created: 29.12.2015 02:30
  */
 fun DatastoreService.exists(key: Key): Boolean {
     val keyPredicate = Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, EQUAL, key)

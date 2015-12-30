@@ -32,34 +32,31 @@ class NewExpenseAction(val amount: Int, val categoryId: Long, val comment: Strin
 class NewCategoryAction(val title: String, val parentId: Long?) : Action("NEW_CATEGORY")
 
 
-
 class DispatchServlet : HttpServlet() {
 
 
     val gsonBuilder: GsonBuilder = GsonBuilder()
-    .deserialize { jsonElement, type, context ->
-        if (jsonElement.isJsonObject) {
-            val jsonObject = jsonElement as JsonObject
-            val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
-            val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).long
-            val comment = jsonObject.get(EXPENSE_PROP_COMMENT).nullString
-            NewExpenseAction(amount, categoryId, comment)
+        .deserialize { jsonElement, type, context ->
+            if (jsonElement.isJsonObject) {
+                val jsonObject = jsonElement as JsonObject
+                val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
+                val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).long
+                val comment = jsonObject.get(EXPENSE_PROP_COMMENT).nullString
+                NewExpenseAction(amount, categoryId, comment)
+            } else {
+                throw JsonParseException("Only JsonObject could be parsed")
+            }
         }
-        else {
-            throw JsonParseException("Only JsonObject could be parsed")
+        .deserialize { jsonElement, type, context ->
+            if (jsonElement.isJsonObject) {
+                val jsonObject = jsonElement as JsonObject
+                val title = jsonObject.get(CATEGORY_PROP_TITLE).string
+                val parentId = jsonObject.get(CATEGORY_PROP_PARENT_ID).nullLong
+                NewCategoryAction(title, parentId)
+            } else {
+                throw JsonParseException("Only JsonObject could be parsed")
+            }
         }
-    }
-    .deserialize { jsonElement, type, context ->
-        if (jsonElement.isJsonObject) {
-            val jsonObject = jsonElement as JsonObject
-            val title = jsonObject.get(CATEGORY_PROP_TITLE).string
-            val parentId = jsonObject.get(CATEGORY_PROP_PARENT_ID).nullLong
-            NewCategoryAction(title, parentId)
-        }
-        else {
-            throw JsonParseException("Only JsonObject could be parsed")
-        }
-    }
     val gson = gsonBuilder.create()
 
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
@@ -67,7 +64,7 @@ class DispatchServlet : HttpServlet() {
         val datastore = DatastoreServiceFactory.getDatastoreService();
 
         val userPrincipal = req.userPrincipal
-        if(userPrincipal == null) {
+        if (userPrincipal == null) {
             res.writer.println("User is not authorized")
             res.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
@@ -83,7 +80,7 @@ class DispatchServlet : HttpServlet() {
         }
 
         val body = req.reader.readText()
-        if(body.equals("")) {
+        if (body.equals("")) {
 
             fun collectExpenses(): JsonArray {
                 val query = Query(EXPENSE_KIND, userEntity.key)
@@ -91,9 +88,9 @@ class DispatchServlet : HttpServlet() {
                 val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
                 val expenseJsonList = expenseList.map { categoryEntity ->
                     jsonObject(
-                            EXPENSE_PROP_AMOUNT to categoryEntity.getProperty(EXPENSE_PROP_AMOUNT),
-                            EXPENSE_PROP_CATEGORY_ID to categoryEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
-                            EXPENSE_PROP_COMMENT to categoryEntity.getProperty(EXPENSE_PROP_COMMENT)
+                        EXPENSE_PROP_AMOUNT to categoryEntity.getProperty(EXPENSE_PROP_AMOUNT),
+                        EXPENSE_PROP_CATEGORY_ID to categoryEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                        EXPENSE_PROP_COMMENT to categoryEntity.getProperty(EXPENSE_PROP_COMMENT)
                     )
                 }
                 val result = jsonArray()
@@ -103,14 +100,14 @@ class DispatchServlet : HttpServlet() {
 
             fun collectCategories(parentId: Long?): JsonArray {
                 val query = Query(CATEGORY_KIND, userEntity.key).setFilter(
-                        Query.FilterPredicate(CATEGORY_PROP_PARENT_ID, Query.FilterOperator.EQUAL, parentId)
+                    Query.FilterPredicate(CATEGORY_PROP_PARENT_ID, Query.FilterOperator.EQUAL, parentId)
                 )
                 val preparedQuery = datastore.prepare(query)
                 val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
                 val categoryJsonList = categoryList.map { categoryEntity ->
                     jsonObject(
-                            CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
-                            "children" to collectCategories(categoryEntity.key.id)
+                        CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
+                        "children" to collectCategories(categoryEntity.key.id)
                     )
                 }
                 val result = jsonArray()
@@ -119,8 +116,8 @@ class DispatchServlet : HttpServlet() {
             }
 
             val stateJson = jsonObject(
-                    "history" to collectExpenses(),
-                    "categoryList" to collectCategories(null)
+                "history" to collectExpenses(),
+                "categoryList" to collectCategories(null)
             )
 
             res.writer.println(gson.toJson(stateJson))
@@ -138,7 +135,7 @@ class DispatchServlet : HttpServlet() {
         }
         when (action) {
             is NewExpenseAction -> {
-                if(!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
+                if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
                     res.writer.println("Category with id '${action.categoryId}' doesn't exists")
                     res.sendError(HttpServletResponse.SC_BAD_REQUEST)
                     return
@@ -156,7 +153,7 @@ class DispatchServlet : HttpServlet() {
                 val entity = Entity(CATEGORY_KIND, userEntity.key)
                 entity.setProperty(CATEGORY_PROP_TITLE, action.title);
                 if (action.parentId != null) {
-                    if(!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
+                    if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
                         res.writer.println("Parent category with id '${action.parentId}' doesn't exists")
                         res.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
@@ -176,25 +173,24 @@ class DispatchServlet : HttpServlet() {
 
     }
 
-    fun parseAction(body: String): Action  {
+    fun parseAction(body: String): Action {
         val actionJson: JsonObject
         try {
             actionJson = gson.fromJson(body)
         } catch(e: Exception) {
             throw ActionParseException(e)
         }
-        if(!actionJson.has("type")) {
+        if (!actionJson.has("type")) {
             throw ActionParseException("Action type is not specified")
         }
         val type = actionJson.get("type").string
-        if(type == "NEW_EXPENSE") {
+        if (type == "NEW_EXPENSE") {
             try {
                 return gson.fromJson<NewExpenseAction>(body);
             } catch(e: Exception) {
                 throw ActionParseException(e)
             }
-        }
-        else if(type == "NEW_CATEGORY") {
+        } else if (type == "NEW_CATEGORY") {
             try {
                 return gson.fromJson<NewCategoryAction>(body);
             } catch(e: Exception) {

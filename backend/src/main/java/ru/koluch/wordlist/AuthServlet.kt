@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse
 val USER_KIND = "User";
 val USER_PROP_NAME = "name"
 
-class AuthServlet: HttpServlet() {
+class AuthServlet : HttpServlet() {
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
         val userService = UserServiceFactory.getUserService();
 
@@ -32,13 +32,13 @@ class AuthServlet: HttpServlet() {
         val userPrincipal = req.userPrincipal
         if (userPrincipal != null) {
             res.writer.println("<p>Hello, " +
-                    userPrincipal.name +
-                    "!  You can <a href=\"" +
-                    userService.createLogoutURL(thisURL) +
-                    "\">sign out</a>.</p>");
+                userPrincipal.name +
+                "!  You can <a href=\"" +
+                userService.createLogoutURL(thisURL) +
+                "\">sign out</a>.</p>");
 
             val datastore = DatastoreServiceFactory.getDatastoreService()
-            if(!datastore.exists(KeyFactory.createKey(USER_KIND, userPrincipal.name))) {
+            if (!datastore.exists(KeyFactory.createKey(USER_KIND, userPrincipal.name))) {
                 val newUserEntity = Entity(USER_KIND, userPrincipal.name)
                 newUserEntity.key
                 datastore.put(newUserEntity)
@@ -47,8 +47,8 @@ class AuthServlet: HttpServlet() {
 
         } else {
             res.writer.println("<p>Please <a href=\"" +
-                    userService.createLoginURL(thisURL) +
-                    "\">sign in</a>.</p>");
+                userService.createLoginURL(thisURL) +
+                "\">sign in</a>.</p>");
         }
     }
 }
