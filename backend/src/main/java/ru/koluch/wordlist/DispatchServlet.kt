@@ -20,6 +20,7 @@ import kotlin.collections.map
 
 abstract class Action(val type: String)
 class NewExpenseAction(val amount: Int, val categoryId: Long, val comment: String?) : Action(ACTION_NEW_EXPENSE)
+class DeleteExpenseAction(val id: Long) : Action(ACTION_DELETE_EXPENSE)
 class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 
 
@@ -44,6 +45,14 @@ class DispatchServlet : HttpServlet() {
                 val title = jsonObject.get(CATEGORY_PROP_TITLE).string
                 val parentId = jsonObject.get(CATEGORY_PROP_PARENT_ID).nullLong
                 NewCategoryAction(title, parentId)
+            } else {
+                throw JsonParseException("Only JsonObject could be parsed")
+            }
+        } .deserialize { jsonElement, type, context ->
+            if (jsonElement.isJsonObject) {
+                val jsonObject = jsonElement as JsonObject
+                val id = jsonObject.get(PROP_ID).long
+                DeleteExpenseAction(id)
             } else {
                 throw JsonParseException("Only JsonObject could be parsed")
             }
@@ -76,11 +85,12 @@ class DispatchServlet : HttpServlet() {
                 val query = Query(EXPENSE_KIND, userEntity.key)
                 val preparedQuery = datastore.prepare(query)
                 val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val expenseJsonList = expenseList.map { categoryEntity ->
+                val expenseJsonList = expenseList.map { expenseEntry ->
                     jsonObject(
-                        EXPENSE_PROP_AMOUNT to categoryEntity.getProperty(EXPENSE_PROP_AMOUNT),
-                        EXPENSE_PROP_CATEGORY_ID to categoryEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
-                        EXPENSE_PROP_COMMENT to categoryEntity.getProperty(EXPENSE_PROP_COMMENT)
+                        PROP_ID to expenseEntry.key.id,
+                        EXPENSE_PROP_AMOUNT to expenseEntry.getProperty(EXPENSE_PROP_AMOUNT),
+                        EXPENSE_PROP_CATEGORY_ID to expenseEntry.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                        EXPENSE_PROP_COMMENT to expenseEntry.getProperty(EXPENSE_PROP_COMMENT)
                     )
                 }
                 val result = jsonArray()
@@ -96,6 +106,7 @@ class DispatchServlet : HttpServlet() {
                 val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
                 val categoryJsonList = categoryList.map { categoryEntity ->
                     jsonObject(
+                        PROP_ID to categoryEntity.key.id,
                         CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
                         CATEGORY_PROP_CHILDREN to collectCategories(categoryEntity.key.id)
                     )
@@ -183,6 +194,10 @@ class DispatchServlet : HttpServlet() {
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
+            is DeleteExpenseAction -> {
+                datastore.delete(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+                res.setStatus(HttpServletResponse.SC_OK)
+            }
             else -> {
                 res.writer.println("Unknown action type: ${action.type}")
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST)
@@ -212,6 +227,12 @@ class DispatchServlet : HttpServlet() {
         } else if (type == ACTION_NEW_CATEGORY) {
             try {
                 return gson.fromJson<NewCategoryAction>(body);
+            } catch(e: Exception) {
+                throw ActionParseException(e)
+            }
+        } else if (type == ACTION_DELETE_EXPENSE) {
+            try {
+                return gson.fromJson<DeleteExpenseAction>(body);
             } catch(e: Exception) {
                 throw ActionParseException(e)
             }

@@ -3,7 +3,8 @@ import React from 'react'
 const CategoryPicker = React.createClass({
 
     onChange: function(category) {
-        this.props.onChange(category);
+        console.log(category)
+        this.props.onChange(category)
     },
 
     renderRecurse: function(list, level) {

@@ -36,7 +36,7 @@ var gulp = require('gulp'),
     babelPresetReact = require('babel-preset-react');
 
 
-var DEBUG_ROOT = './debug';
+var DEBUG_ROOT = 'D:/dev/moneytrack/backend/target/backend-1.0-SNAPSHOT';
 var SRC_ROOT = './src';
 var PROD_ROOT = './public';
 

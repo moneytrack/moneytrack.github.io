@@ -24,57 +24,100 @@ import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
 import {createStore} from 'redux'
 import {Provider} from 'react-redux'
+import Q from 'kew'
 
+import ajax from './ajax'
 import Root from './Root.jsx'
 
-const initState = {
-    seq: 9,
-    categoryList: [
-        {id:0,title:"Other"},
-        {id:1,title:"Lunch"},
-        {id:2,title:"Grocery"},
-        {id:6,title:"Home",children:[
-            {id:7,title:"Electricity"},
-            {id:8,title:"Internet"}
-        ]},
-    ],
-    history: [
-        {id:3, amount:290.0, comment:"KFC", date: 1451126739340, categoryId:1},
-        {id:4, amount:860.0, comment:"Some food", date: 1450983139340, categoryId:2},
-        {id:5, amount:390.0, comment:"Teremok", date: 1451041813860, categoryId:1}
-    ]
-}
+const DISPATCH_URL = "http://localhost:8080/dispatch"
 
-const reducer = (state = initState, action) => {
-    switch(action.type) {
-        case 'NEW_EXPENSE': {
-            const amount = parseFloat(action.amount)
-            const categoryId = parseInt(action.categoryId)
-            const comment = action.comment;
-
-            const valid = !isNaN(amount) && state.categoryList.filter((x) => x.id === categoryId).length > 0;
-            if(valid) {
-                state = update(state, {
-                    history: {$push: [{
-                        id: state.seq,
-                        amount:parseFloat(amount),
-                        categoryId,
-                        comment
-                    }]},
-                    seq: {$set: state.seq + 1}
-                })
-            }
-        };
-        default: ;
+//todo: get rid of this function
+function flatCategoryTree(categoryList) {
+    const result = []
+    for(var i = 0; i<categoryList.length; ++i) {
+        const category = categoryList[i];
+        result.push(category)
+        var flattenChildren = flatCategoryTree(category.children)
+        for(var j = 0; j<flattenChildren.length; ++j) {
+            result.push(flattenChildren[j])
+        }
     }
-    return state
+    return result
 }
 
-const store = createStore(reducer)
 
-ReactDOM.render(
-    <Provider store={store}>
-        <Root />
-    </Provider>,
-    document.getElementById("react")
-)
+ajax.get(DISPATCH_URL)
+.then((response) => {
+    return response
+}, (err) => {
+    console.error(err)
+    console.error("Failed to load state, use default state");
+    return Q.resolve({
+        history: [],
+        categoryList: []
+    });
+})
+.then((initState) => {
+    const reducer = (state = initState, action) => {
+        console.log(action)
+        switch(action.type) {
+            case 'NEW_EXPENSE': {
+                const amount = parseFloat(action.amount)
+                const categoryId = parseInt(action.categoryId)
+                const comment = action.comment;
+
+                const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
+                if(valid) {
+                    ajax.post(DISPATCH_URL, action).then(() => {
+
+                    }, (err) => {
+                        console.error(err); //todo: properly handle error
+                    })
+
+                    state = update(state, {
+                        history: {$push: [{
+                            id: state.seq,
+                            amount:parseFloat(amount),
+                            categoryId,
+                            comment
+                        }]}
+                    })
+                }
+                else {
+                    console.error("Invalid action", action)
+                }
+            };
+
+            case 'DELETE_EXPENSE': {
+                const id = parseFloat(action.id)
+                if(state.history.filter(expense => expense.id === id).length > 0) {
+                    ajax.post(DISPATCH_URL, action).then(() => {
+
+                    }, (err) => {
+                        console.error(err); //todo: properly handle error
+                    })
+                    state = update(state, {
+                        history: {$set: state.history.filter(expense => expense.id !== id)}
+                    })
+                }
+                else {
+                    console.error("Expense not found", action)
+                }
+            };
+
+            default: ;
+        }
+        return state
+    }
+
+    const store = createStore(reducer)
+
+    ReactDOM.render(
+        <Provider store={store}>
+            <Root />
+        </Provider>,
+        document.getElementById("react")
+    )
+}, (err) => {
+    console.log(err)
+})

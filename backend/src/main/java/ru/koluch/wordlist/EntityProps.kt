@@ -6,9 +6,16 @@ package ru.koluch.wordlist
 const val ACTION_TYPE = "type"
 const val ACTION_NEW_EXPENSE = "NEW_EXPENSE"
 const val ACTION_NEW_CATEGORY = "NEW_CATEGORY"
+const val ACTION_DELETE_EXPENSE = "DELETE_EXPENSE"
+
 
 const val STATE_HISTORY = "history"
 const val STATE_CATEGORY_LIST = "categoryList"
+
+/*
+	Common props
+*/
+const val PROP_ID = "id"
 
 /*
     Expense props
