@@ -24,6 +24,7 @@ import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
 import {createStore, applyMiddleware} from 'redux'
 import createLogger from 'redux-logger'
+import thunkMiddleware from 'redux-thunk'
 import {Provider} from 'react-redux'
 import Q from 'kew'
 
@@ -89,13 +90,14 @@ ajax.get(DISPATCH_URL)
 
 
     const reducer = (state = initState, action) => {
-        const {type} = action
+        const {type, status} = action
         switch(type) {
             case 'NEW_EXPENSE': {
-                return confirm(state, action, (id) => {
+                if(status === "success") {
                     const amount = parseFloat(action.amount)
                     const categoryId = parseInt(action.categoryId)
                     const comment = action.comment;
+                    const id = action.result
 
                     const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
                     if(valid) {
@@ -111,17 +113,18 @@ ajax.get(DISPATCH_URL)
                     else {
                         console.error("Invalid action", action)
                     }
-                })
+                }
+                //todo: handle "failed" case
                 break;
             };
 
             case 'DELETE_EXPENSE': {
-                return confirm(state, action, () => {
+                if(status === "success") {
                     return update(state, {
                         history: {$set: state.history.filter(expense => expense.id !== action.id)}
                     })
-                })
-                break;
+                }
+                //todo: handle "failed" case
             };
 
             default: ;
@@ -129,7 +132,7 @@ ajax.get(DISPATCH_URL)
         return state
     }
 
-    const store = applyMiddleware(createLogger())(createStore)(reducer)
+    const store = applyMiddleware(thunkMiddleware, createLogger())(createStore)(reducer)
     // const store = createStore(reducer)
 
     ReactDOM.render(
