@@ -61,34 +61,6 @@ ajax.get(DISPATCH_URL)
 })
 .then((initState) => {
 
-    function confirm(state, action, cb, cbe) {
-        if(action.status === "success") {
-            return cb(action.result)
-        }
-        else if(action.status === "failed") {
-            const cbe = cbe ? cbe : (err) => {
-                console.error(err)
-                return state
-            }
-            return cbe(action.result)
-        }
-        else {
-            ajax.post(DISPATCH_URL, action).then((result) => {
-                store.dispatch(Object.assign({}, action, {
-                    status: "success",
-                    result: result
-                }))
-            }, (err) => {
-                store.dispatch(Object.assign({}, action, {
-                    status: "failed",
-                    result: err
-                }))                
-            })
-            return state
-        }
-    }
-
-
     const reducer = (state = initState, action) => {
         const {type, status} = action
         switch(type) {
