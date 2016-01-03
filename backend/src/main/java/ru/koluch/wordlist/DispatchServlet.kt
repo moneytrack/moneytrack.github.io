@@ -121,6 +121,7 @@ class DispatchServlet : HttpServlet() {
                 STATE_CATEGORY_LIST to collectCategories(null)
             )
 
+            res.characterEncoding = "UTF-8";
             res.writer.println(gson.toJson(stateJson))
             res.setStatus(HttpServletResponse.SC_OK)
             return

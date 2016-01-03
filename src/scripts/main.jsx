@@ -22,7 +22,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
-import {createStore} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
+import createLogger from 'redux-logger'
 import {Provider} from 'react-redux'
 import Q from 'kew'
 
@@ -128,7 +129,8 @@ ajax.get(DISPATCH_URL)
         return state
     }
 
-    const store = createStore(reducer)
+    const store = applyMiddleware(createLogger())(createStore)(reducer)
+    // const store = createStore(reducer)
 
     ReactDOM.render(
         <Provider store={store}>

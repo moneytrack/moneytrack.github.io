@@ -1,3 +1,4 @@
+"use strict"
 var Q = require('kew');
 
 module.exports.get = (url) => {

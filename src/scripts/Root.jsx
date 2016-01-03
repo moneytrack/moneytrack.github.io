@@ -3,8 +3,8 @@
 import React from 'react'
 
 import NumberInput from './NumberInput.jsx'
-
 import NewExpense from './NewExpense.jsx'
+import {newExpense, deleteExpense} from './action-creators.js'
 
 const Root = React.createClass({
 
@@ -18,20 +18,12 @@ const Root = React.createClass({
         this.unsubscribe();
     },
 
-    onAdd: function({amount, categoryId, comment}) {
-        this.context.store.dispatch({
-            type: 'NEW_EXPENSE',
-            amount,
-            categoryId,
-            comment
-        })
+    onAdd: function(attrs) {
+        this.context.store.dispatch(newExpense(attrs))
     },
 
     onDelete: function(id) {
-        this.context.store.dispatch({
-            type: 'DELETE_EXPENSE',
-            id 
-        })
+        this.context.store.dispatch(deleteExpense(id))
     },
 
 

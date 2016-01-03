@@ -1,3 +1,4 @@
+"use strict"
 import React from 'react'
 
 import NumberInput from './NumberInput.jsx'
@@ -22,7 +23,6 @@ const NewExpense = React.createClass({
         e.preventDefault();
         
         this.props.onAdd({
-            type: 'NEW_EXPENSE',
             amount: NumberInput.unwrapState(this.state.amount),
             categoryId: this.state.categoryId,
             comment: this.state.comment
