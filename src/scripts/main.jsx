@@ -58,51 +58,69 @@ ajax.get(DISPATCH_URL)
     });
 })
 .then((initState) => {
+
+    function confirm(state, action, cb, cbe) {
+        if(action.status === "success") {
+            return cb(action.result)
+        }
+        else if(action.status === "failed") {
+            const cbe = cbe ? cbe : (err) => {
+                console.error(err)
+                return state
+            }
+            return cbe(action.result)
+        }
+        else {
+            ajax.post(DISPATCH_URL, action).then((result) => {
+                store.dispatch(Object.assign({}, action, {
+                    status: "success",
+                    result: result
+                }))
+            }, (err) => {
+                store.dispatch(Object.assign({}, action, {
+                    status: "failed",
+                    result: err
+                }))                
+            })
+            return state
+        }
+    }
+
+
     const reducer = (state = initState, action) => {
-        console.log(action)
-        switch(action.type) {
+        const {type} = action
+        switch(type) {
             case 'NEW_EXPENSE': {
-                const amount = parseFloat(action.amount)
-                const categoryId = parseInt(action.categoryId)
-                const comment = action.comment;
+                return confirm(state, action, (id) => {
+                    const amount = parseFloat(action.amount)
+                    const categoryId = parseInt(action.categoryId)
+                    const comment = action.comment;
 
-                const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
-                if(valid) {
-                    ajax.post(DISPATCH_URL, action).then(() => {
-
-                    }, (err) => {
-                        console.error(err); //todo: properly handle error
-                    })
-
-                    state = update(state, {
-                        history: {$push: [{
-                            id: state.seq,
-                            amount:parseFloat(amount),
-                            categoryId,
-                            comment
-                        }]}
-                    })
-                }
-                else {
-                    console.error("Invalid action", action)
-                }
+                    const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
+                    if(valid) {
+                        return update(state, {
+                            history: {$push: [{
+                                id,
+                                amount,
+                                categoryId,
+                                comment
+                            }]}
+                        })
+                    }
+                    else {
+                        console.error("Invalid action", action)
+                    }
+                })
+                break;
             };
 
             case 'DELETE_EXPENSE': {
-                const id = parseFloat(action.id)
-                if(state.history.filter(expense => expense.id === id).length > 0) {
-                    ajax.post(DISPATCH_URL, action).then(() => {
-
-                    }, (err) => {
-                        console.error(err); //todo: properly handle error
+                return confirm(state, action, () => {
+                    return update(state, {
+                        history: {$set: state.history.filter(expense => expense.id !== action.id)}
                     })
-                    state = update(state, {
-                        history: {$set: state.history.filter(expense => expense.id !== id)}
-                    })
-                }
-                else {
-                    console.error("Expense not found", action)
-                }
+                })
+                break;
             };
 
             default: ;
