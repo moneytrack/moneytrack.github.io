@@ -29,7 +29,7 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {history, categoryList} = store.getState()
+        const {history, categoryList, waiting} = store.getState()
 
         function flatCategoryTree(categoryList) {
             const result = []
@@ -49,6 +49,7 @@ const Root = React.createClass({
 
         return (
             <div>
+                <h1>Waiting: {waiting ? "waiting" : "no."}</h1>
                 <NewExpense onAdd={this.onAdd} />
                 <div>
                     {history.map((expense) => {

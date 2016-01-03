@@ -19,6 +19,9 @@
  * Author:  Nikolay Mavrenkov <koluch@koluch.ru>
  * Created: 01.11.2015 23:04
  */
+require('es6-promise').polyfill(); // polyfill for promises
+
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
@@ -26,7 +29,6 @@ import {createStore, applyMiddleware} from 'redux'
 import createLogger from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
 import {Provider} from 'react-redux'
-import Q from 'kew'
 
 import ajax from './ajax'
 import Root from './Root.jsx'
@@ -54,7 +56,7 @@ ajax.get(DISPATCH_URL)
 }, (err) => {
     console.error(err)
     console.error("Failed to load state, use default state");
-    return Q.resolve({
+    return Promise.resolve({
         history: [],
         categoryList: []
     });
@@ -64,40 +66,45 @@ ajax.get(DISPATCH_URL)
     const reducer = (state = initState, action) => {
         const {type, status} = action
         switch(type) {
+            case 'WAIT': {
+                return update(state, {waiting: {$set:true} })
+            }
+
+            case 'STOP_WAIT': {
+                return update(state, {waiting: {$set:false} })
+            }
+
             case 'NEW_EXPENSE': {
-                if(status === "success") {
-                    const amount = parseFloat(action.amount)
-                    const categoryId = parseInt(action.categoryId)
-                    const comment = action.comment;
-                    const id = action.result
+                const amount = parseFloat(action.amount)
+                const categoryId = parseInt(action.categoryId)
+                const comment = action.comment;
+                const id = action.id
 
-                    const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
-                    if(valid) {
-                        return update(state, {
-                            history: {$push: [{
-                                id,
-                                amount,
-                                categoryId,
-                                comment
-                            }]}
-                        })
-                    }
-                    else {
-                        console.error("Invalid action", action)
-                    }
-                }
-                //todo: handle "failed" case
-                break;
-            };
-
-            case 'DELETE_EXPENSE': {
-                if(status === "success") {
+                const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
+                if(valid) {
                     return update(state, {
-                        history: {$set: state.history.filter(expense => expense.id !== action.id)}
+                        history: {$push: [{
+                            id,
+                            amount,
+                            categoryId,
+                            comment
+                        }]}
                     })
                 }
+                else {
+                    console.error("Invalid action", action)
+                }
                 //todo: handle "failed" case
-            };
+            }
+            break;
+
+            case 'DELETE_EXPENSE': {
+                return update(state, {
+                    history: {$set: state.history.filter(expense => expense.id !== action.id)}
+                })
+                //todo: handle "failed" case
+            }
+            break;
 
             default: ;
         }
