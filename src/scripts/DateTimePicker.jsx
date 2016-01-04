@@ -6,6 +6,22 @@ import _moment from 'moment'
 
 const DateTimePicker = React.createClass({
 
+    getInitialState: function() {
+        return {
+            visible: false
+        }
+    },
+
+    onClick: function() {
+        this.setState(update(this.state, {
+            visible: {$set: !this.state.visible}
+        }))
+        var resetMoment = _moment(this.props.value.timestamp)
+        this.props.onChange(update(this.props.value, {
+            moment: {$set: resetMoment}
+        }))
+    },
+
     onChangeDate: function(moment) {
         this.props.onChange(update(this.props.value, {
             moment: {$set: moment}
@@ -17,17 +33,23 @@ const DateTimePicker = React.createClass({
         this.props.onChange(update(this.props.value, {
             timestamp: {$set: newTimestamp}
         }))
+        this.setState(update(this.state, {
+            visible: {$set: false}
+        }))
     },
 
     render: function () {
         const {timestamp, moment} = this.props.value
         return (
             <div>
-                <input value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
-                <InputMoment
+                <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
+                {  this.state.visible
+                   ? <InputMoment
                       moment={moment}
                       onChange={this.onChangeDate}
-                      onSave={this.onSaveDate}  />
+                      onSave={this.onSaveDate} />
+                   : <span/>  
+                }
             </div>
         )
     }
