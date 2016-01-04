@@ -27,6 +27,7 @@ import {createStore, applyMiddleware} from 'redux'
 import createLogger from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
 import {Provider} from 'react-redux'
+import moment from 'moment'
 
 import ajax from './ajax'
 import Root from './Root.jsx'
@@ -77,6 +78,7 @@ ajax.get(DISPATCH_URL)
                 const categoryId = parseInt(action.categoryId)
                 const comment = action.comment;
                 const id = action.id
+                const date = moment(action.date)
 
                 const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
                 if(valid) {
@@ -85,7 +87,8 @@ ajax.get(DISPATCH_URL)
                             id,
                             amount,
                             categoryId,
-                            comment
+                            comment,
+                            date
                         }]}
                     })
                 }
@@ -119,5 +122,8 @@ ajax.get(DISPATCH_URL)
         document.getElementById("react")
     )
 }, (err) => {
-    console.log(err)
+    console.error(err)
+})
+.catch((err) => {
+    console.error(err)  
 })

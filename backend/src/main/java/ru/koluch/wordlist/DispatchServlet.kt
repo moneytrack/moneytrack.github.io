@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.collections.map
+import java.util.Date
 
 /**
  * Copyright (c) 2015 Nikolai Mavrenkov <koluch@koluch.ru>
@@ -19,7 +20,7 @@ import kotlin.collections.map
  */
 
 abstract class Action(val type: String)
-class NewExpenseAction(val amount: Int, val categoryId: Long, val comment: String?) : Action(ACTION_NEW_EXPENSE)
+class NewExpenseAction(val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
 class DeleteExpenseAction(val id: Long) : Action(ACTION_DELETE_EXPENSE)
 class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 
@@ -59,6 +60,7 @@ class DispatchServlet : HttpServlet() {
                         PROP_ID to expenseEntry.key.id,
                         EXPENSE_PROP_AMOUNT to expenseEntry.getProperty(EXPENSE_PROP_AMOUNT),
                         EXPENSE_PROP_CATEGORY_ID to expenseEntry.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                        EXPENSE_PROP_DATE to (expenseEntry.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
                         EXPENSE_PROP_COMMENT to expenseEntry.getProperty(EXPENSE_PROP_COMMENT)
                     )
                 }
@@ -144,6 +146,7 @@ class DispatchServlet : HttpServlet() {
                 val entity = Entity(EXPENSE_KIND, userEntity.key)
                 entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
                 entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
+                entity.setProperty(EXPENSE_PROP_DATE, action.date)
                 entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 val key = datastore.put(entity);
                 res.writer.println(key.id)
@@ -192,8 +195,9 @@ class DispatchServlet : HttpServlet() {
             if (type == ACTION_NEW_EXPENSE) {
                 val amount = actionJson.get(EXPENSE_PROP_AMOUNT).int
                 val categoryId = actionJson.get(EXPENSE_PROP_CATEGORY_ID).long
+                val date = Date(actionJson.get(EXPENSE_PROP_DATE).long)
                 val comment = actionJson.get(EXPENSE_PROP_COMMENT).nullString
-                return NewExpenseAction(amount, categoryId, comment)
+                return NewExpenseAction(amount, categoryId, date, comment)
             } else if (type == ACTION_NEW_CATEGORY) {
                 val title = actionJson.get(CATEGORY_PROP_TITLE).string
                 val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong

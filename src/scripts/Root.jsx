@@ -5,6 +5,7 @@ import React from 'react'
 import NumberInput from './NumberInput.jsx'
 import NewExpense from './NewExpense.jsx'
 import {newExpense, deleteExpense} from './action-creators.js'
+import moment from 'moment'
 
 const Root = React.createClass({
 
@@ -56,7 +57,7 @@ const Root = React.createClass({
                         const category = flatCategoryTree(categoryList).filter(x => x.id === expense.categoryId)[0]
                         return (
                             <div key={expense.id}>
-                                {expense.amount} ({category.title}): {expense.comment} 
+                                {expense.amount} ({category.title}): {expense.comment} (at {moment(expense.date).format("MM.DD HH:mm:ss")})
                                 <button onClick={() => this.onDelete(expense.id)}>Delete</button>
                             </div>
                         )

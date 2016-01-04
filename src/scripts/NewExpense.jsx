@@ -2,9 +2,10 @@
 import React from 'react'
 import update from 'react-addons-update'
 
-
 import NumberInput from './NumberInput.jsx'
 import CategoryPicker from './CategoryPicker.jsx'
+import DateTimePicker from './DateTimePicker.jsx'
+import moment from 'moment'
 
 const NewExpense = React.createClass({
 
@@ -14,7 +15,7 @@ const NewExpense = React.createClass({
         return {
             amount: NumberInput.wrapState(0),
             categoryId: firstCategoryId,
-            date: Date.now(),
+            date: DateTimePicker.wrapState(moment().valueOf()),
             comment: ''
         }
     },
@@ -23,9 +24,10 @@ const NewExpense = React.createClass({
         e.preventDefault();
         
         this.props.onAdd({
-            amount: NumberInput.unwrapState(this.state.amount),
+            amount: Math.floor(NumberInput.unwrapState(this.state.amount) * 100),
             categoryId: this.state.categoryId,
-            comment: this.state.comment
+            comment: this.state.comment,
+            date: DateTimePicker.unwrapState(this.state.date)
         })
 
         this.setState(this.getInitialState())
@@ -43,9 +45,10 @@ const NewExpense = React.createClass({
         }))
     },
 
-    onChangeDate: function(e) {
+    onChangeDate: function(date) {
+        console.log('change', moment(date.timestamp).format("MM.DD HH:mm:ss"))
         this.setState(update(this.state, {
-            date: {$set:e.target.value}
+            date: {$set:date}
         }))
     },
 
@@ -67,6 +70,10 @@ const NewExpense = React.createClass({
                     </label>
                 </div>
                 <div>Comment: <input value={this.state.comment} onChange={this.onChangeComment}/></div>
+                <div>Date: <DateTimePicker 
+                    value={this.state.date} 
+                    onChange={this.onChangeDate} />
+                </div>
                 <div><button type="submit" >Add</button></div>
             </form>
         )

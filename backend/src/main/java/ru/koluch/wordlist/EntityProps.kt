@@ -23,7 +23,9 @@ const val PROP_ID = "id"
 const val EXPENSE_KIND = "Expense";
 const val EXPENSE_PROP_AMOUNT = "amount"
 const val EXPENSE_PROP_CATEGORY_ID = "categoryId"
+const val EXPENSE_PROP_DATE = "date"
 const val EXPENSE_PROP_COMMENT = "comment"
+
 
 /*
     Category props

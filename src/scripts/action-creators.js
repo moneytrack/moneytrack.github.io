@@ -18,14 +18,15 @@ function asyncDispatch(cb) {
 	}
 }
 
-export const newExpense = ({amount, categoryId, comment}) => {
+export const newExpense = ({amount, categoryId, comment, date}) => {
 	return asyncDispatch((id) => {
     	return {
 	        type: 'NEW_EXPENSE',
 	        amount,
 	        categoryId,
 	        comment,
-	        id
+	        id,
+	        date
 	    }
     })
 }
