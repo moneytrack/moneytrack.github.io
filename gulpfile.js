@@ -139,20 +139,6 @@ gulp.task('debug_html', function(){
         .pipe(gulp.dest(DEBUG_ROOT))
 });
 
-
-var libs = [
-    "es6-promise",
-    "input-moment",
-    "moment",
-    "react" ,
-    "react-addons-update",
-    "react-dom",
-    "react-redux",
-    "redux",
-    "redux-logger",
-    "redux-thunk"
-];
-
 gulp.task('debug_vendor', function(){
     var bundler = browserify('./.noop.js', {
         debug: true,
@@ -162,11 +148,6 @@ gulp.task('debug_vendor', function(){
         extensions: [".js", ".jsx"],
         require: Object.keys(packageJson.dependencies)
     });
-
-    // Register all dependencies as external (they are loaded via vendor bundle)
-    Object.keys(packageJson.dependencies).forEach((dep) => {
-        bundler.external(dep)
-    })
 
     bundler = bundler.transform(babelify, {
         global: true,
