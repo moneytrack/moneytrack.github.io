@@ -26,38 +26,7 @@ class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_
 
 class DispatchServlet : HttpServlet() {
 
-
-    val gsonBuilder: GsonBuilder = GsonBuilder()
-        .deserialize { jsonElement, type, context ->
-            if (jsonElement.isJsonObject) {
-                val jsonObject = jsonElement as JsonObject
-                val amount = jsonObject.get(EXPENSE_PROP_AMOUNT).int
-                val categoryId = jsonObject.get(EXPENSE_PROP_CATEGORY_ID).long
-                val comment = jsonObject.get(EXPENSE_PROP_COMMENT).nullString
-                NewExpenseAction(amount, categoryId, comment)
-            } else {
-                throw JsonParseException("Only JsonObject could be parsed")
-            }
-        }
-        .deserialize { jsonElement, type, context ->
-            if (jsonElement.isJsonObject) {
-                val jsonObject = jsonElement as JsonObject
-                val title = jsonObject.get(CATEGORY_PROP_TITLE).string
-                val parentId = jsonObject.get(CATEGORY_PROP_PARENT_ID).nullLong
-                NewCategoryAction(title, parentId)
-            } else {
-                throw JsonParseException("Only JsonObject could be parsed")
-            }
-        } .deserialize { jsonElement, type, context ->
-            if (jsonElement.isJsonObject) {
-                val jsonObject = jsonElement as JsonObject
-                val id = jsonObject.get(PROP_ID).long
-                DeleteExpenseAction(id)
-            } else {
-                throw JsonParseException("Only JsonObject could be parsed")
-            }
-        }
-    val gson = gsonBuilder.create()
+    val gson = Gson()
 
     override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
         val datastore = DatastoreServiceFactory.getDatastoreService();
@@ -219,27 +188,24 @@ class DispatchServlet : HttpServlet() {
             throw ActionParseException("Action type is not specified")
         }
         val type = actionJson.get(ACTION_TYPE).string
-        if (type == ACTION_NEW_EXPENSE) {
-            try {
-                return gson.fromJson<NewExpenseAction>(body);
-            } catch(e: Exception) {
-                throw ActionParseException(e)
+        try {
+            if (type == ACTION_NEW_EXPENSE) {
+                val amount = actionJson.get(EXPENSE_PROP_AMOUNT).int
+                val categoryId = actionJson.get(EXPENSE_PROP_CATEGORY_ID).long
+                val comment = actionJson.get(EXPENSE_PROP_COMMENT).nullString
+                return NewExpenseAction(amount, categoryId, comment)
+            } else if (type == ACTION_NEW_CATEGORY) {
+                val title = actionJson.get(CATEGORY_PROP_TITLE).string
+                val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong
+                return NewCategoryAction(title, parentId)
+            } else if (type == ACTION_DELETE_EXPENSE) {
+                val id = actionJson.get(PROP_ID).long
+                return DeleteExpenseAction(id)
             }
-        } else if (type == ACTION_NEW_CATEGORY) {
-            try {
-                return gson.fromJson<NewCategoryAction>(body);
-            } catch(e: Exception) {
-                throw ActionParseException(e)
-            }
-        } else if (type == ACTION_DELETE_EXPENSE) {
-            try {
-                return gson.fromJson<DeleteExpenseAction>(body);
-            } catch(e: Exception) {
-                throw ActionParseException(e)
-            }
+        } catch(e: Exception) {
+            throw ActionParseException(e)
         }
         throw ActionParseException("Unknown action type: " + type)
-
     }
 }
 

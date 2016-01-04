@@ -1,10 +1,11 @@
 "use strict"
+import {Promise} from 'es6-promise'
 
 module.exports.get = (url) => {
     var xmlhttp;
 
     return new Promise((resolve, reject) => {
-
+        
         if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest();

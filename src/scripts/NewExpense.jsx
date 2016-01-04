@@ -1,11 +1,10 @@
 "use strict"
 import React from 'react'
+import update from 'react-addons-update'
+
 
 import NumberInput from './NumberInput.jsx'
 import CategoryPicker from './CategoryPicker.jsx'
-
-import update from 'react-addons-update'
-
 
 const NewExpense = React.createClass({
 
@@ -15,6 +14,7 @@ const NewExpense = React.createClass({
         return {
             amount: NumberInput.wrapState(0),
             categoryId: firstCategoryId,
+            date: Date.now(),
             comment: ''
         }
     },
@@ -43,6 +43,12 @@ const NewExpense = React.createClass({
         }))
     },
 
+    onChangeDate: function(e) {
+        this.setState(update(this.state, {
+            date: {$set:e.target.value}
+        }))
+    },
+
     onChangeCategory: function(category) {
         this.setState(update(this.state, {
             categoryId: {$set:category.id}
@@ -52,7 +58,7 @@ const NewExpense = React.createClass({
     render: function () {
         return (
             <form onSubmit={this.onAdd}>
-                <div><label>Amount: <NumberInput ref="amount" value={this.state.amount} onChange={this.onAmountChange}/></label></div>
+                <div><label>Amount: <NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></label></div>
                 <div>
                     <label>Category: 
                         <CategoryPicker categoryList={this.context.store.getState().categoryList} 
@@ -60,7 +66,7 @@ const NewExpense = React.createClass({
                                         onChange={this.onChangeCategory}/>
                     </label>
                 </div>
-                <div>Comment: <input ref="comment" value={this.state.comment} onChange={this.onChangeComment}/></div>
+                <div>Comment: <input value={this.state.comment} onChange={this.onChangeComment}/></div>
                 <div><button type="submit" >Add</button></div>
             </form>
         )

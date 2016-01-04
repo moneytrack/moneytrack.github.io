@@ -19,9 +19,7 @@
  * Author:  Nikolay Mavrenkov <koluch@koluch.ru>
  * Created: 01.11.2015 23:04
  */
-require('es6-promise').polyfill(); // polyfill for promises
-
-
+import Promise from 'es6-promise'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
