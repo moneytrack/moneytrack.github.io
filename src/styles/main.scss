@@ -95,3 +95,53 @@ a {
         padding: 1rem;
     }
 }
+
+@mixin expense__inline {
+    margin: 0.5rem;
+    display: inline;
+}
+
+.history {
+
+    $expense: #{&}__expense;
+
+    $expense {
+        display: flex;
+        padding: 0 0 1rem 0;
+
+        &__first-line {
+        }
+
+        &__time {
+            margin: 0rem 1rem;
+        }
+
+        &__amount {
+            font-style: italic;
+            font-weight: bold;
+            display: inline;
+        }
+
+        &__category {
+            font-size: 1rem;
+            display: inline;
+        }
+
+        &__comment {
+            color: #ABABAB;
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+
+        &__controls {
+            display: none;
+            padding-left: 1rem;
+        }
+    }
+
+    $expense:hover {
+        #{$expense}__controls {
+            display: block;
+        }
+    }
+}

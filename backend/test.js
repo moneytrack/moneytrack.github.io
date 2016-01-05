@@ -124,7 +124,7 @@ function time(str) {
 }
 
 function money(rubels) {
-    return Math.floor(rubels / 100)
+    return Math.floor(rubels * 100)
 }
 
 sender.get('http://localhost:8080/clean')

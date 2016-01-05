@@ -55,6 +55,7 @@ class DispatchServlet : HttpServlet() {
 
             fun collectExpenses(): JsonArray {
                 val query = Query(EXPENSE_KIND, userEntity.key)
+                query.addSort(EXPENSE_PROP_DATE, Query.SortDirection.DESCENDING)
                 val preparedQuery = datastore.prepare(query)
                 val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
                 val result = jsonArray()

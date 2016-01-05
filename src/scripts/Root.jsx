@@ -10,6 +10,7 @@ import NumberInput from './NumberInput.jsx'
 import NewExpense from './NewExpense.jsx'
 import TabsContainer from './TabsContainer.jsx'
 import WaitIndicator from './WaitIndicator.jsx'
+import History from './History.jsx'
 
 const Root = React.createClass({
 
@@ -60,15 +61,7 @@ const Root = React.createClass({
                     </div>
 
                     <div>
-                        {history.map((expense) => {
-                            const category = categoryList.filter(x => x.id === expense.categoryId)[0]
-                            return (
-                                <div key={expense.id}>
-                                    {expense.amount} ({category.title}): {expense.comment} (at {moment(expense.date).format("MM.DD HH:mm:ss")})
-                                    <button onClick={() => this.onDelete(expense.id)}>Delete</button>
-                                </div>
-                            )
-                        })}
+                        <History onDelete={this.onDelete}/>
                     </div>
                 </TabsContainer>
                 <WaitIndicator waiting={waiting}/>

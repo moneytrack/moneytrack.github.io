@@ -31,8 +31,6 @@ const TabsContainer = React.createClass({
 
         var activeTabIndex = this.props.titleList.indexOf(this.props.active)
 
-        console.log("active",activeTabIndex)
-
         return  (
             <div className="tabs-container">
                 <div className="tabs-container__labels">
