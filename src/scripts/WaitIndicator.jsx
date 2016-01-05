@@ -8,7 +8,6 @@ const WaitIndicator = React.createClass({
         ? (
             <div className="wait-indicator">Please, wait...</div>      
         )
-
         : (
             null
         )

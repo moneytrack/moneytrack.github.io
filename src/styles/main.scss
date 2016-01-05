@@ -5,6 +5,12 @@ html {
     font-family: 'PT Sans';
 }
 
+a {
+    color: #006DCE;
+    text-decoration: none;
+    border-bottom: 1px solid #006DCE;
+}
+
 .new-expense {
 	> table > tbody > tr > td {
 		vertical-align: top;
@@ -75,4 +81,17 @@ html {
     color: white;
     font-weight: bold;
     opacity: 0.65;
+    padding: 0.25rem 0;
+}
+
+.tabs-container {
+    &__labels {
+        a {
+            border-bottom-style: dashed;
+        }
+    }
+
+    &__content {
+        padding: 1rem;
+    }
 }
