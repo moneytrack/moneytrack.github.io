@@ -34,20 +34,6 @@ import Root from './Root.jsx'
 
 const DISPATCH_URL = "http://localhost:8080/dispatch"
 
-//todo: get rid of this function
-function flatCategoryTree(categoryList) {
-    const result = []
-    for(var i = 0; i<categoryList.length; ++i) {
-        const category = categoryList[i];
-        result.push(category)
-        var flattenChildren = flatCategoryTree(category.children)
-        for(var j = 0; j<flattenChildren.length; ++j) {
-            result.push(flattenChildren[j])
-        }
-    }
-    return result
-}
-
 
 ajax.get(DISPATCH_URL)
 .then((response) => {
@@ -80,16 +66,16 @@ ajax.get(DISPATCH_URL)
                 const id = action.id
                 const date = moment(action.date)
 
-                const valid = !isNaN(amount) && flatCategoryTree(state.categoryList).filter((x) => x.id === categoryId).length > 0;
+                const valid = !isNaN(amount) && (categoryId in state.categoryMap)
                 if(valid) {
                     return update(state, {
-                        history: {$push: [{
+                        [id]: {$set: {
                             id,
                             amount,
                             categoryId,
                             comment,
                             date
-                        }]}
+                        }}
                     })
                 }
                 else {
@@ -100,6 +86,14 @@ ajax.get(DISPATCH_URL)
             break;
 
             case 'DELETE_EXPENSE': {
+
+                const keys = Object.keys(state.history).filter(key => key !== action.id).map(key => state)
+
+
+
+                const newHistory = Object.assign({}, state.history)
+                newHistory.remove(aciton.id)
+
                 return update(state, {
                     history: {$set: state.history.filter(expense => expense.id !== action.id)}
                 })

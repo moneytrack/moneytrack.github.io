@@ -4,15 +4,15 @@ import React from 'react'
 const CategoryPicker = React.createClass({
 
     onChange: function(category) {
-        console.log(category)
         this.props.onChange(category)
     },
 
     renderRecurse: function(list, level) {
         return list.map((category) => {
-            const children = category.children ? this.renderRecurse(category.children, level+1) : ""
+            const childList = category.childIdList.map(id => this.props.categoryMap[id])
+            const children = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
             const classes = this.props.value === category.id ? ["selected"] : []
-            if(category.children) {
+            if(childList.length > 0) {
                 return [
                     <div key={category.id} className={classes} onClick={() => this.onChange(category)}>{category.title}</div>,
                     <div key={category.id + '-children'} className={["children"]}>{children}</div>
@@ -28,7 +28,8 @@ const CategoryPicker = React.createClass({
     },
 
     render: function() {
-        const children = this.renderRecurse(this.props.categoryList, 0)
+        const rootCategoryList = this.props.rootCategoryIdList.map(id => this.props.categoryMap[id])
+        const children = this.renderRecurse(rootCategoryList, 0)
         return  (
             <div>
                 {children}

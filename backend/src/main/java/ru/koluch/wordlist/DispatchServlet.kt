@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.collections.map
 import java.util.Date
+import kotlin.collections.fold
+import kotlin.collections.forEach
 
 /**
  * Copyright (c) 2015 Nikolai Mavrenkov <koluch@koluch.ru>
@@ -51,45 +53,55 @@ class DispatchServlet : HttpServlet() {
         val body = req.reader.readText()
         if (body.equals("")) {
 
-            fun collectExpenses(): JsonArray {
+            fun collectExpenses(): JsonObject {
                 val query = Query(EXPENSE_KIND, userEntity.key)
                 val preparedQuery = datastore.prepare(query)
                 val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val expenseJsonList = expenseList.map { expenseEntry ->
-                    jsonObject(
-                        PROP_ID to expenseEntry.key.id,
-                        EXPENSE_PROP_AMOUNT to expenseEntry.getProperty(EXPENSE_PROP_AMOUNT),
-                        EXPENSE_PROP_CATEGORY_ID to expenseEntry.getProperty(EXPENSE_PROP_CATEGORY_ID),
-                        EXPENSE_PROP_DATE to (expenseEntry.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
-                        EXPENSE_PROP_COMMENT to expenseEntry.getProperty(EXPENSE_PROP_COMMENT)
-                    )
+                val result = jsonObject()
+                expenseList.forEach { expenseEntity ->
+                    result.add(expenseEntity.key.id.toString(), jsonObject (
+                            PROP_ID to expenseEntity.key.id.toString(),
+                            EXPENSE_PROP_AMOUNT to expenseEntity.getProperty(EXPENSE_PROP_AMOUNT),
+                            EXPENSE_PROP_CATEGORY_ID to expenseEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                            EXPENSE_PROP_DATE to (expenseEntity.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
+                            EXPENSE_PROP_COMMENT to expenseEntity.getProperty(EXPENSE_PROP_COMMENT)
+                    ))
                 }
-                val result = jsonArray()
-                result.addAll(expenseJsonList)
                 return result
             }
 
-            fun collectCategories(parentId: Long?): JsonArray {
+            fun collectCategoryIdList(parent: Long?): JsonArray {
                 val query = Query(CATEGORY_KIND, userEntity.key).setFilter(
-                    Query.FilterPredicate(CATEGORY_PROP_PARENT_ID, Query.FilterOperator.EQUAL, parentId)
+                    Query.FilterPredicate(CATEGORY_PROP_PARENT_ID, Query.FilterOperator.EQUAL, parent)
                 )
                 val preparedQuery = datastore.prepare(query)
                 val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val categoryJsonList = categoryList.map { categoryEntity ->
-                    jsonObject(
-                        PROP_ID to categoryEntity.key.id,
-                        CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
-                        CATEGORY_PROP_CHILDREN to collectCategories(categoryEntity.key.id)
-                    )
-                }
+                val idList = categoryList.map { categoryEntity -> categoryEntity.key.id.toString() }
                 val result = jsonArray()
-                result.addAll(categoryJsonList)
+                result.addAll(idList)
+                return result
+            }
+
+            fun collectCategories(): JsonObject {
+                val query = Query(CATEGORY_KIND, userEntity.key)
+                val preparedQuery = datastore.prepare(query)
+                val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                val result = jsonObject()
+                categoryList.forEach { categoryEntity ->
+                    result.add(categoryEntity.key.id.toString(), jsonObject(
+                            PROP_ID to categoryEntity.key.id.toString(),
+                            CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
+                            CATEGORY_PROP_PARENT_ID to categoryEntity.getProperty(CATEGORY_PROP_PARENT_ID),
+                            CATEGORY_PROP_CHILD_ID_LIST to collectCategoryIdList(categoryEntity.key.id)
+                    ))
+                }
                 return result
             }
 
             val stateJson = jsonObject(
                 STATE_HISTORY to collectExpenses(),
-                STATE_CATEGORY_LIST to collectCategories(null)
+                STATE_ROOT_CATEGORY_ID_LIST to collectCategoryIdList(null),
+                STATE_CATEGORY_MAP to collectCategories()
             )
 
             res.characterEncoding = "UTF-8";
@@ -149,7 +161,7 @@ class DispatchServlet : HttpServlet() {
                 entity.setProperty(EXPENSE_PROP_DATE, action.date)
                 entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 val key = datastore.put(entity);
-                res.writer.println(key.id)
+                res.writer.println(key.id.toString())
                 res.setStatus(HttpServletResponse.SC_OK)
             }
             is NewCategoryAction -> {
@@ -164,7 +176,7 @@ class DispatchServlet : HttpServlet() {
                 };
                 entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
                 val key = datastore.put(entity);
-                res.writer.println(key.id)
+                res.writer.println(key.id.toString())
                 res.setStatus(HttpServletResponse.SC_OK)
             }
             is DeleteExpenseAction -> {

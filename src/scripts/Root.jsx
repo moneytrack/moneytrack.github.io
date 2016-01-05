@@ -30,20 +30,7 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {history, categoryList, waiting} = store.getState()
-
-        function flatCategoryTree(categoryList) {
-            const result = []
-            for(var i = 0; i<categoryList.length; ++i) {
-                const category = categoryList[i];
-                result.push(category)
-                var flattenChildren = flatCategoryTree(category.children)
-                for(var j = 0; j<flattenChildren.length; ++j) {
-                    result.push(flattenChildren[j])
-                }
-            }
-            return result
-        }
+        const {history, categoryMap, waiting} = store.getState()
 
         var input;
         var prevValue = 0;
@@ -53,8 +40,9 @@ const Root = React.createClass({
                 <h1>Waiting: {waiting ? "waiting" : "no."}</h1>
                 <NewExpense onAdd={this.onAdd} />
                 <div>
-                    {history.map((expense) => {
-                        const category = flatCategoryTree(categoryList).filter(x => x.id === expense.categoryId)[0]
+                    {Object.keys(history).map((key) => {
+                        const expense = history[key]
+                        const category = categoryMap[expense.categoryId]
                         return (
                             <div key={expense.id}>
                                 {expense.amount} ({category.title}): {expense.comment} (at {moment(expense.date).format("MM.DD HH:mm:ss")})

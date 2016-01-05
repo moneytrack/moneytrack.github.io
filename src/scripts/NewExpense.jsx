@@ -10,8 +10,8 @@ import moment from 'moment'
 const NewExpense = React.createClass({
 
     getInitialState: function(){
-        const {categoryList} = this.context.store.getState()
-        var firstCategoryId = categoryList.length > 0 ? categoryList[0].id : -1;
+        const {rootCategoryIdList} = this.context.store.getState()
+        var firstCategoryId = rootCategoryIdList.length > 0 ? rootCategoryIdList[0] : -1;
         return {
             amount: NumberInput.wrapState(0),
             categoryId: firstCategoryId,
@@ -46,7 +46,6 @@ const NewExpense = React.createClass({
     },
 
     onChangeDate: function(date) {
-        console.log('change', moment(date.timestamp).format("MM.DD HH:mm:ss"))
         this.setState(update(this.state, {
             date: {$set:date}
         }))
@@ -64,7 +63,8 @@ const NewExpense = React.createClass({
                 <div><label>Amount: <NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></label></div>
                 <div>
                     <label>Category: 
-                        <CategoryPicker categoryList={this.context.store.getState().categoryList} 
+                        <CategoryPicker categoryMap={this.context.store.getState().categoryMap} 
+                                        rootCategoryIdList={this.context.store.getState().rootCategoryIdList} 
                                         value={this.state.categoryId}
                                         onChange={this.onChangeCategory}/>
                     </label>

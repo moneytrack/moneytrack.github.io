@@ -91,7 +91,8 @@ post({
                 type:"NEW_EXPENSE",
                 amount:45000,
                 categoryId: internetCategory,
-                comment:"My comment"
+                comment:"My comment",
+                date: 1451872749936
             }
         })
     })
