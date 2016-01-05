@@ -25,6 +25,7 @@
     "node-notifier": "^4.4.0",
     "reactify": "^1.1.1",
     "request": "^2.67.0",
+    "sync-request": "^2.1.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.6.0"
   },
