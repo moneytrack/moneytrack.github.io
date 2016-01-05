@@ -11,7 +11,7 @@ const val ACTION_DELETE_EXPENSE = "DELETE_EXPENSE"
 
 const val STATE_HISTORY = "history"
 const val STATE_ROOT_CATEGORY_ID_LIST = "rootCategoryIdList"
-const val STATE_CATEGORY_MAP = "categoryMap"
+const val STATE_CATEGORY_LIST = "categoryList"
 
 /*
 	Common props

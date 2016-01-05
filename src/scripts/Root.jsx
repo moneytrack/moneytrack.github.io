@@ -30,7 +30,7 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {history, categoryMap, waiting} = store.getState()
+        const {history, categoryList, waiting} = store.getState()
 
         var input;
         var prevValue = 0;
@@ -40,9 +40,8 @@ const Root = React.createClass({
                 <h1>Waiting: {waiting ? "waiting" : "no."}</h1>
                 <NewExpense onAdd={this.onAdd} />
                 <div>
-                    {Object.keys(history).map((key) => {
-                        const expense = history[key]
-                        const category = categoryMap[expense.categoryId]
+                    {history.map((expense) => {
+                        const category = categoryList.filter(x => x.id === expense.categoryId)[0]
                         return (
                             <div key={expense.id}>
                                 {expense.amount} ({category.title}): {expense.comment} (at {moment(expense.date).format("MM.DD HH:mm:ss")})

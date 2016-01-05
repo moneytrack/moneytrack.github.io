@@ -63,7 +63,7 @@ const NewExpense = React.createClass({
                 <div><label>Amount: <NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></label></div>
                 <div>
                     <label>Category: 
-                        <CategoryPicker categoryMap={this.context.store.getState().categoryMap} 
+                        <CategoryPicker categoryList={this.context.store.getState().categoryList} 
                                         rootCategoryIdList={this.context.store.getState().rootCategoryIdList} 
                                         value={this.state.categoryId}
                                         onChange={this.onChangeCategory}/>

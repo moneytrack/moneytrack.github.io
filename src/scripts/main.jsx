@@ -34,7 +34,6 @@ import Root from './Root.jsx'
 
 const DISPATCH_URL = "http://localhost:8080/dispatch"
 
-
 ajax.get(DISPATCH_URL)
 .then((response) => {
     return response
@@ -66,16 +65,16 @@ ajax.get(DISPATCH_URL)
                 const id = action.id
                 const date = moment(action.date)
 
-                const valid = !isNaN(amount) && (categoryId in state.categoryMap)
+                const valid = !isNaN(amount) && state.categoryList.filter((x) => x.id === categoryId).length > 0;
                 if(valid) {
                     return update(state, {
-                        [id]: {$set: {
+                        history: {$push: [{
                             id,
                             amount,
                             categoryId,
                             comment,
                             date
-                        }}
+                        }]}
                     })
                 }
                 else {
@@ -86,14 +85,6 @@ ajax.get(DISPATCH_URL)
             break;
 
             case 'DELETE_EXPENSE': {
-
-                const keys = Object.keys(state.history).filter(key => key !== action.id).map(key => state)
-
-
-
-                const newHistory = Object.assign({}, state.history)
-                newHistory.remove(aciton.id)
-
                 return update(state, {
                     history: {$set: state.history.filter(expense => expense.id !== action.id)}
                 })

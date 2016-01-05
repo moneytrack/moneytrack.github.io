@@ -53,18 +53,18 @@ class DispatchServlet : HttpServlet() {
         val body = req.reader.readText()
         if (body.equals("")) {
 
-            fun collectExpenses(): JsonObject {
+            fun collectExpenses(): JsonArray {
                 val query = Query(EXPENSE_KIND, userEntity.key)
                 val preparedQuery = datastore.prepare(query)
                 val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val result = jsonObject()
+                val result = jsonArray()
                 expenseList.forEach { expenseEntity ->
-                    result.add(expenseEntity.key.id.toString(), jsonObject (
-                            PROP_ID to expenseEntity.key.id.toString(),
-                            EXPENSE_PROP_AMOUNT to expenseEntity.getProperty(EXPENSE_PROP_AMOUNT),
-                            EXPENSE_PROP_CATEGORY_ID to expenseEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
-                            EXPENSE_PROP_DATE to (expenseEntity.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
-                            EXPENSE_PROP_COMMENT to expenseEntity.getProperty(EXPENSE_PROP_COMMENT)
+                    result.add(jsonObject (
+                        PROP_ID to expenseEntity.key.id,
+                        EXPENSE_PROP_AMOUNT to expenseEntity.getProperty(EXPENSE_PROP_AMOUNT),
+                        EXPENSE_PROP_CATEGORY_ID to expenseEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                        EXPENSE_PROP_DATE to (expenseEntity.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
+                        EXPENSE_PROP_COMMENT to expenseEntity.getProperty(EXPENSE_PROP_COMMENT)
                     ))
                 }
                 return result
@@ -76,23 +76,23 @@ class DispatchServlet : HttpServlet() {
                 )
                 val preparedQuery = datastore.prepare(query)
                 val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val idList = categoryList.map { categoryEntity -> categoryEntity.key.id.toString() }
+                val idList = categoryList.map { categoryEntity -> categoryEntity.key.id }
                 val result = jsonArray()
                 result.addAll(idList)
                 return result
             }
 
-            fun collectCategories(): JsonObject {
+            fun collectCategories(): JsonArray {
                 val query = Query(CATEGORY_KIND, userEntity.key)
                 val preparedQuery = datastore.prepare(query)
                 val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val result = jsonObject()
+                val result = jsonArray()
                 categoryList.forEach { categoryEntity ->
-                    result.add(categoryEntity.key.id.toString(), jsonObject(
-                            PROP_ID to categoryEntity.key.id.toString(),
-                            CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
-                            CATEGORY_PROP_PARENT_ID to categoryEntity.getProperty(CATEGORY_PROP_PARENT_ID),
-                            CATEGORY_PROP_CHILD_ID_LIST to collectCategoryIdList(categoryEntity.key.id)
+                    result.add( jsonObject(
+                        PROP_ID to categoryEntity.key.id,
+                        CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
+                        CATEGORY_PROP_PARENT_ID to categoryEntity.getProperty(CATEGORY_PROP_PARENT_ID),
+                        CATEGORY_PROP_CHILD_ID_LIST to collectCategoryIdList(categoryEntity.key.id)
                     ))
                 }
                 return result
@@ -101,7 +101,7 @@ class DispatchServlet : HttpServlet() {
             val stateJson = jsonObject(
                 STATE_HISTORY to collectExpenses(),
                 STATE_ROOT_CATEGORY_ID_LIST to collectCategoryIdList(null),
-                STATE_CATEGORY_MAP to collectCategories()
+                STATE_CATEGORY_LIST to collectCategories()
             )
 
             res.characterEncoding = "UTF-8";
@@ -161,7 +161,7 @@ class DispatchServlet : HttpServlet() {
                 entity.setProperty(EXPENSE_PROP_DATE, action.date)
                 entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 val key = datastore.put(entity);
-                res.writer.println(key.id.toString())
+                res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
             is NewCategoryAction -> {
@@ -176,7 +176,7 @@ class DispatchServlet : HttpServlet() {
                 };
                 entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
                 val key = datastore.put(entity);
-                res.writer.println(key.id.toString())
+                res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
             is DeleteExpenseAction -> {
