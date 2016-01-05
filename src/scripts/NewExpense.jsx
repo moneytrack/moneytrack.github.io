@@ -59,22 +59,36 @@ const NewExpense = React.createClass({
 
     render: function () {
         return (
-            <form onSubmit={this.onAdd}>
-                <div><label>Amount: <NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></label></div>
-                <div>
-                    <label>Category: 
-                        <CategoryPicker categoryList={this.context.store.getState().categoryList} 
-                                        rootCategoryIdList={this.context.store.getState().rootCategoryIdList} 
-                                        value={this.state.categoryId}
-                                        onChange={this.onChangeCategory}/>
-                    </label>
-                </div>
-                <div>Comment: <input value={this.state.comment} onChange={this.onChangeComment}/></div>
-                <div>Date: <DateTimePicker 
-                    value={this.state.date} 
-                    onChange={this.onChangeDate} />
-                </div>
-                <div><button type="submit" >Add</button></div>
+            <form onSubmit={this.onAdd} className="new-expense">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td className="new-expense__field__label">Amount: </td>
+                            <td><NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></td>
+                        </tr>
+                        <tr>
+                            <td className="new-expense__field__label">Category: </td> 
+                            <td><CategoryPicker categoryList={this.context.store.getState().categoryList} 
+                                            rootCategoryIdList={this.context.store.getState().rootCategoryIdList} 
+                                            value={this.state.categoryId}
+                                            onChange={this.onChangeCategory}/></td>
+                        </tr>
+                        <tr>
+                            <td className="new-expense__field__label">Date:</td>
+                            <td><DateTimePicker 
+                                                value={this.state.date} 
+                                                onChange={this.onChangeDate} /></td>
+                        </tr>
+                        <tr>
+                            <td className="new-expense__field__label">Comment:</td> 
+                            <td><input value={this.state.comment} onChange={this.onChangeComment}/></td>
+                        </tr>
+                        <tr>
+                            <td><button type="submit" >Add</button></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </form>
         )
     }

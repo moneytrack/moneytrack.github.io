@@ -1,11 +1,12 @@
 "use strict"
 
 import React from 'react'
+import moment from 'moment'
 
 import NumberInput from './NumberInput.jsx'
 import NewExpense from './NewExpense.jsx'
+import WaitIndicator from './WaitIndicator.jsx'
 import {newExpense, deleteExpense} from './action-creators.js'
-import moment from 'moment'
 
 const Root = React.createClass({
 
@@ -37,7 +38,7 @@ const Root = React.createClass({
 
         return (
             <div>
-                <h1>Waiting: {waiting ? "waiting" : "no."}</h1>
+                <WaitIndicator waiting={waiting}/>
                 <NewExpense onAdd={this.onAdd} />
                 <div>
                     {history.map((expense) => {

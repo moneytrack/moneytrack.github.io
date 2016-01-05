@@ -112,7 +112,7 @@ Sender.prototype.post = function(url, params) {
 
 var sender = new Sender();
 
-function action(json)  {
+function dispatch(json)  {
     var result = sender.post('http://localhost:8080/dispatch', { json: json})
     if(result.body) {
         return JSON.parse(result.body)
@@ -149,45 +149,62 @@ sender.get('http://localhost:8080/auth')
 */
 
 // Categories
-var homeCategoryId = action({
+var homeCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Home"
 })
 
-var paymentsCategoryId = action({
+var paymentsCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Payments",
     parentId:homeCategoryId
 })
 
-var rentCategoryId = action({
+var rentCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Rent",
     parentId:paymentsCategoryId
 })
 
-var internetCategoryId = action({
+var internetCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Internet",
     parentId:paymentsCategoryId
 })
 
-var foodCategoryId = action({
+var foodCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Food"
 })
 
-var atWorkCategoryId = action({
+var atWorkCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Work",
     parentId:foodCategoryId
 })
 
-var atHomeCategoryId = action({
+var atHomeCategoryId = dispatch({
     type:"NEW_CATEGORY",
     title:"Home",
     parentId:foodCategoryId
 })
+
+var transportCategoryId = dispatch({
+    type:"NEW_CATEGORY",
+    title:"Transport"
+})
+
+var familyCategoryId = dispatch({
+    type:"NEW_CATEGORY",
+    title:"Family"
+})
+
+var presentsCategoryId = dispatch({
+    type:"NEW_CATEGORY",
+    title:"Presents",
+    parentId:familyCategoryId
+})
+
 
 // Expenses
 /*
@@ -196,7 +213,7 @@ var atHomeCategoryId = action({
         15:17 - 20000 - Home/Payments/Rent
         20:52 - 1053.56 - Food/Home - Some goods (Okay)
 */
-action({
+dispatch({
     type:"NEW_EXPENSE",
     amount: money(315),
     categoryId: atWorkCategoryId,
@@ -204,7 +221,7 @@ action({
     date: time("2016-11-26 12:46")
 })
 
-action({
+dispatch({
     type:"NEW_EXPENSE",
     amount: money(20000),
     categoryId: rentCategoryId,
@@ -212,7 +229,7 @@ action({
 })
 
 
-action({
+dispatch({
     type:"NEW_EXPENSE",
     amount: money(20000),
     categoryId: atHomeCategoryId,
@@ -226,7 +243,7 @@ action({
         21:12 - 293.10 - Food/Home - Diksi
 
 */
-action({
+dispatch({
     type:"NEW_EXPENSE",
     amount: money(400),
     categoryId: atWorkCategoryId,
@@ -234,7 +251,7 @@ action({
     date: time("2016-11-27 13:10")
 })
 
-action({
+dispatch({
     type:"NEW_EXPENSE",
     amount: money(293.10),
     categoryId: atHomeCategoryId,
@@ -246,76 +263,77 @@ action({
     November 28, 2015:
         18:31 - 1574.56 - Some goods from Okay
 */
-action({
+dispatch({
     type:"NEW_EXPENSE",
-    amount: money(293.10),
+    amount: money(1574.56),
     categoryId: atHomeCategoryId,
     comment:"Some goods from Okay",
     date: time("2016-11-28 18:31")
 })
 
+/*
+    November 30, 2015:
+        10:34 - 500 - Transport - Podoroznik
+        12:15 - 326 - Food/Work - Lunch (KFC)
+        16:12 - 4210 - Family/Presents - Present for papa
+*/
+dispatch({
+    type:"NEW_EXPENSE",
+    amount: money(500),
+    categoryId: transportCategoryId,
+    comment:"Podoroznik",
+    date: time("2016-11-30 10:34")
+})
+
+dispatch({
+    type:"NEW_EXPENSE",
+    amount: money(326),
+    categoryId: atWorkCategoryId,
+    comment:"Lunch (KFC)",
+    date: time("2016-11-30 12:15")
+})
+
+dispatch({
+    type:"NEW_EXPENSE",
+    amount: money(4210),
+    categoryId: presentsCategoryId,
+    comment:"Present for papa",
+    date: time("2016-11-30 16:12")
+})
+
+
+/*
+    December 01, 2015:
+        12:37 - 336 - Food/Work - Lunch (Teremok)
+        21:32 - 502.90 - Home/Payments/Internet - Interzet
+*/
+dispatch({
+    type:"NEW_EXPENSE",
+    amount: money(336),
+    categoryId: atWorkCategoryId,
+    comment:"Lunch (Teremok)",
+    date: time("2016-12-01 12:37")
+})
+
+dispatch({
+    type:"NEW_EXPENSE",
+    amount: money(502.90),
+    categoryId: internetCategoryId,
+    comment:"Interzet",
+    date: time("2016-12-01 21:32")
+})
 
 
 
+/*
+    December 02, 2015:
+        13:06 - 297 - Food/Work - Lunch (Teremok)
+*/
+dispatch({
+    type:"NEW_EXPENSE",
+    amount: money(297),
+    categoryId: atWorkCategoryId,
+    comment:"Lunch (Teremok)",
+    date: time("2016-12-01 13:06")
+})
 
-// get({url:"http://localhost:8080/clean"})
-// .then(() => post({
-//     url:"http://localhost:8080/_ah/login",
-//     form:{
-//         'email':'test@example.com',
-//         'continue':'/auth',
-//         'action':'Log In'
-//     }
-// }))
-// .then((result) => {
-//     var cookie = result.response.headers['set-cookie'];
-//     if(!cookie) throw new Error("No auth cookie");
-//     var loginCookieValue = cookie[0].split(";")[0].split("=")[1]; // ["dev_appserver_login=test@example.com:false:185804764220139124118;Path=/"] => test@example.com:false:185804764220139124118
-
-//     var cookies = {
-//         "Cookie": "dev_appserver_login=" + loginCookieValue
-//     };
-
-//     var sender = new Sender(cookies);
-
-//     return get({
-//         url: "http://localhost:8080/auth",
-//         "headers": cookies
-//     })
-//     .catch((err) => console.error(err))
-//     .then(() => sender.sendAction({
-//         type:"NEW_CATEGORY",
-//         title:"Home"
-//     }))
-//     .then((result) => sender.sendAction({
-//         type:"NEW_CATEGORY",
-//         title:"Internet",
-//         parentId:parseFloat(result.body)
-//     }))
-//     .then((result) => {
-//         const categoryId = parseFloat(result.body);
-//         return sender.sendAction({
-//             type:"NEW_EXPENSE",
-//             amount:45000,
-//             categoryId: categoryId,
-//             comment:"InterZet",
-//             date: 1451872749936
-//         })
-//         .then((result) => sender.sendAction({
-//             type:"NEW_EXPENSE",
-//             amount:14999,
-//             categoryId: categoryId,
-//             comment:"Mobile",
-//             date: 1451872749936
-//         }))
-//         .then((result) => sender.sendAction({
-//             type:"NEW_EXPENSE",
-//             amount:35000,
-//             categoryId: categoryId,
-//             comment:"For parents (in Olenegorsk)",
-//             date: 1451872749936
-//         }))
-//     })
-//     .catch((err) => console.error(err));
-// })
-// .catch((err) => console.error(err));

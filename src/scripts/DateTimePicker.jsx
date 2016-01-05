@@ -4,6 +4,8 @@ import update from 'react-addons-update'
 import InputMoment from 'input-moment'
 import _moment from 'moment'
 
+import ModalContainer from './ModalContainer'
+
 const DateTimePicker = React.createClass({
 
     getInitialState: function() {
@@ -44,10 +46,12 @@ const DateTimePicker = React.createClass({
             <div>
                 <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
                 {  this.state.visible
-                   ? <InputMoment
-                      moment={moment}
-                      onChange={this.onChangeDate}
-                      onSave={this.onSaveDate} />
+                   ? <ModalContainer>
+                        <InputMoment
+                            moment={moment}
+                            onChange={this.onChangeDate}
+                            onSave={this.onSaveDate} />
+                     </ModalContainer>
                    : <span/>  
                 }
             </div>

@@ -247,12 +247,16 @@ gulp.task('debug_scripts', function(){
     return rebundle();
 });
 
-gulp.task('debug_styles', function(){
+gulp.task('__debug_styles', function(){
     var files = SRC_ROOT + '/styles/**.scss';
     return gulp.src(files)
-        .pipe(watch(files))
         .pipe(sass().on('error', sass.logError))
         .pipe(gulp.dest(DEBUG_ROOT + '/styles'))
+});
+
+gulp.task('debug_styles', ['__debug_styles'], function(){
+    var files = SRC_ROOT + '/styles/**.scss';
+    return gulp.watch(files, ['__debug_styles'])
 });
 
 gulp.task('debug_images', function(){
