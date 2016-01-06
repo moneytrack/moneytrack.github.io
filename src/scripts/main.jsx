@@ -63,7 +63,7 @@ ajax.get(DISPATCH_URL)
                 const categoryId = parseInt(action.categoryId)
                 const comment = action.comment;
                 const id = action.id
-                const date = moment(action.date)
+                const date = moment(action.date).valueOf()
 
                 const valid = !isNaN(amount) && state.categoryList.filter((x) => x.id === categoryId).length > 0;
                 if(valid) {
@@ -83,6 +83,30 @@ ajax.get(DISPATCH_URL)
                 //todo: handle "failed" case
             }
             break;
+
+            case 'EDIT_EXPENSE': {
+                const id = action.id
+                const amount = parseFloat(action.amount)
+                const categoryId = parseInt(action.categoryId)
+                const comment = action.comment;
+                const date = moment(action.date).valueOf()
+
+                var newHistory = state.history.map((expense) => {
+                    if(expense.id === id) {
+                        return {id, amount, categoryId, comment, date}
+                    }
+                    else {
+                        return expense
+                    }
+                })
+
+                return update(state, {
+                    history: {$set: newHistory}
+                })
+                //todo: handle "failed" case
+            }
+            break;
+
 
             case 'DELETE_EXPENSE': {
                 return update(state, {

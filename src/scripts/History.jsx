@@ -5,8 +5,36 @@ import InputMoment from 'input-moment'
 import moment from 'moment'
 
 import ModalContainer from './ModalContainer'
+import EditExpense from './EditExpense'
+import {editExpense} from './action-creators'
 
 const History = React.createClass({
+
+    getInitialState: function() {
+        return {
+            editingExpense: false
+        }
+    },
+
+    onEdit: function(id) {
+        this.setState(update(this.state, {
+            editingExpense: {$set: true},
+            editingExpenseId: {$set: id}
+        }))
+    },
+
+    onExpenseSave: function(data) {
+        this.context.store.dispatch(editExpense(data));
+        this.setState(update(this.state, {
+            editingExpense: {$set: false},
+        }))  
+    },
+
+    onExpenseEditCancel: function() {
+        this.setState(update(this.state, {
+            editingExpense: {$set: false},
+        }))  
+    },
 
     render: function () {
         const {store} = this.context
@@ -29,21 +57,40 @@ const History = React.createClass({
             return result;
         }
 
+        function collectCategoryAncestors(category) {
+            var parentId = category.parentId;
+            const result = [category];
+            while(parentId) {
+                var parent = categoryList.filter(x => x.id === parentId)[0];
+                result.unshift(parent)
+                parentId = parent.parentId;
+            }
+            return result;
+        }
 
+        const sortedHistory = history.sort((e1, e2) => e2.date - e1.date)
         const expensesByDays = groupBy(history, (expense) => moment(expense.date).format('YYYY MM DD'))
 
 
 
         return (
             <div className="history">
+                <ModalContainer visible={this.state.editingExpense}>
+                    <EditExpense expenseId={this.state.editingExpenseId}
+                                 onSave={this.onExpenseSave}
+                                 onCancel={this.onExpenseEditCancel}/>
+                </ModalContainer>
                 {
                     expensesByDays.map((group) => {
-                        var day = moment(group[0].date).format('dddd, MMMM Do YYYY')
-                        return (<div key={day}>
-                            <p><b>{day}</b></p>
+                        var day = moment(group[0].date).format('MMMM Do YYYY (dddd)')
+                        return (<div key={day} className="history__group">
+                            <div className="history__group__title">{day}</div>
                             {
                                 group.map((expense) => {
                                     const category = categoryList.filter(x => x.id === expense.categoryId)[0]
+
+                                    const cats = collectCategoryAncestors(category).map(cat => cat.title).join(" / ")
+
                                     return (
                                         <div key={expense.id} className="history__expense">
                                             <div className="history__expense__time">
@@ -55,7 +102,7 @@ const History = React.createClass({
                                                         {expense.amount / 100} &#8381;
                                                     </div>
                                                     <div  className="history__expense__category">
-                                                       {' '} — {category.title}
+                                                       {' '} — {cats}
                                                     </div>
                                                 </div>
                                                 <div  className="history__expense__comment">
@@ -63,7 +110,8 @@ const History = React.createClass({
                                                 </div>
                                             </div>
                                             <div  className="history__expense__controls" >
-                                                <button onClick={() => this.props.onDelete(expense.id)}>Delete</button>
+                                                <a href="#" className="pseudo warning" onClick={(e) => {e.preventDefault(); this.props.onDelete(expense.id)}}>Delete</a>
+                                                <a href="#" className="pseudo" onClick={(e) => {e.preventDefault(); this.onEdit(expense.id); }}>Edit</a>
                                             </div>
                                         </div>
                                     )

@@ -7,7 +7,7 @@ import update from 'react-addons-update'
 import {newExpense, deleteExpense} from './action-creators.js'
 
 import NumberInput from './NumberInput.jsx'
-import NewExpense from './NewExpense.jsx'
+import EditExpense from './EditExpense.jsx'
 import TabsContainer from './TabsContainer.jsx'
 import WaitIndicator from './WaitIndicator.jsx'
 import History from './History.jsx'
@@ -57,7 +57,7 @@ const Root = React.createClass({
                                active={this.state.activeTab}
                                onSwitch={this.onSwitchTab}>
                     <div>
-                        <NewExpense onAdd={this.onAdd} />
+                        <EditExpense onAdd={this.onAdd} />
                     </div>
 
                     <div>

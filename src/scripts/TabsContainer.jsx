@@ -37,8 +37,8 @@ const TabsContainer = React.createClass({
                 {
                     this.props.titleList.map((title) => (
                         title === this.props.active
-                        ? <span key={title}>{title}{' '}</span>
-                        : <span key={title}><a href="http://ya.ru" onClick={this.onClick(title)}>{title}</a>{' '}</span>
+                        ? <span key={title} className="tabs-container__labels__label tabs-container__labels__label--active">{title}</span>
+                        : <span key={title} className="tabs-container__labels__label"><a href="#" className="pseudo" onClick={this.onClick(title)}>{title}</a></span>
                     ))
                 }
                 </div>

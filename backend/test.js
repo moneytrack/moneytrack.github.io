@@ -218,14 +218,14 @@ dispatch({
     amount: money(315),
     categoryId: atWorkCategoryId,
     comment:"Lunch (Teremok)",
-    date: time("2016-11-26 12:46")
+    date: time("2015-11-26 12:46")
 })
 
 dispatch({
     type:"NEW_EXPENSE",
     amount: money(20000),
     categoryId: rentCategoryId,
-    date: time("2016-11-26 15:17")
+    date: time("2015-11-26 15:17")
 })
 
 
@@ -234,7 +234,7 @@ dispatch({
     amount: money(20000),
     categoryId: atHomeCategoryId,
     comment:"Some goods (Okay))",
-    date: time("2016-11-26 20:52")
+    date: time("2015-11-26 20:52")
 })
 
 /*
@@ -248,7 +248,7 @@ dispatch({
     amount: money(400),
     categoryId: atWorkCategoryId,
     comment:"Lunch, sushi",
-    date: time("2016-11-27 13:10")
+    date: time("2015-11-27 13:10")
 })
 
 dispatch({
@@ -256,7 +256,7 @@ dispatch({
     amount: money(293.10),
     categoryId: atHomeCategoryId,
     comment:"Diksi",
-    date: time("2016-11-27 21:12")
+    date: time("2015-11-27 21:12")
 })
 
 /*
@@ -268,7 +268,7 @@ dispatch({
     amount: money(1574.56),
     categoryId: atHomeCategoryId,
     comment:"Some goods from Okay",
-    date: time("2016-11-28 18:31")
+    date: time("2015-11-28 18:31")
 })
 
 /*
@@ -282,7 +282,7 @@ dispatch({
     amount: money(500),
     categoryId: transportCategoryId,
     comment:"Podoroznik",
-    date: time("2016-11-30 10:34")
+    date: time("2015-11-30 10:34")
 })
 
 dispatch({
@@ -290,7 +290,7 @@ dispatch({
     amount: money(326),
     categoryId: atWorkCategoryId,
     comment:"Lunch (KFC)",
-    date: time("2016-11-30 12:15")
+    date: time("2015-11-30 12:15")
 })
 
 dispatch({
@@ -298,7 +298,7 @@ dispatch({
     amount: money(4210),
     categoryId: presentsCategoryId,
     comment:"Present for papa",
-    date: time("2016-11-30 16:12")
+    date: time("2015-11-30 16:12")
 })
 
 
@@ -312,7 +312,7 @@ dispatch({
     amount: money(336),
     categoryId: atWorkCategoryId,
     comment:"Lunch (Teremok)",
-    date: time("2016-12-01 12:37")
+    date: time("2015-12-01 12:37")
 })
 
 dispatch({
@@ -320,7 +320,7 @@ dispatch({
     amount: money(502.90),
     categoryId: internetCategoryId,
     comment:"Interzet",
-    date: time("2016-12-01 21:32")
+    date: time("2015-12-01 21:32")
 })
 
 
@@ -334,6 +334,6 @@ dispatch({
     amount: money(297),
     categoryId: atWorkCategoryId,
     comment:"Lunch (Teremok)",
-    date: time("2016-12-01 13:06")
+    date: time("2015-12-01 13:06")
 })
 

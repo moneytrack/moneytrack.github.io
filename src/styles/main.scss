@@ -11,7 +11,19 @@ a {
     border-bottom: 1px solid #006DCE;
 }
 
+a.pseudo {
+    border-bottom-style: dashed;
+}
+
+a.pseudo.warning {
+    color: red;
+    border-bottom-color: red;
+}
+
 .new-expense {
+
+    background: white;
+
 	> table > tbody > tr > td {
 		vertical-align: top;
 	    padding: 0.25rem 0.5rem;	
@@ -86,8 +98,14 @@ a {
 
 .tabs-container {
     &__labels {
-        a {
-            border-bottom-style: dashed;
+        &__label {
+            padding: 0.5rem 1rem;
+            background: #EEEFEE;
+            display: inline-block;
+        }
+
+        &__label--active {
+            background: #EEEFAA;
         }
     }
 
@@ -96,16 +114,19 @@ a {
     }
 }
 
-@mixin expense__inline {
-    margin: 0.5rem;
-    display: inline;
-}
 
 .history {
 
     $expense: #{&}__expense;
 
-    $expense {
+    &__group {
+        &__title {
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+    }
+
+    #{$expense} {
         display: flex;
         padding: 0 0 1rem 0;
 
@@ -114,6 +135,10 @@ a {
 
         &__time {
             margin: 0rem 1rem;
+            color: #ABABAB;
+            font-size: 0.5rem;
+            font-style: italic;
+            line-height: 1.5rem;
         }
 
         &__amount {
@@ -139,9 +164,14 @@ a {
         }
     }
 
-    $expense:hover {
+    #{$expense}:hover {
         #{$expense}__controls {
             display: block;
         }
+    }
+
+    a.pseudo {
+        margin: 0 1rem;
+        font-size: 0.8rem;
     }
 }

@@ -23,6 +23,7 @@ import kotlin.collections.forEach
 
 abstract class Action(val type: String)
 class NewExpenseAction(val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
+class EditExpenseAction(val id: Long, val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
 class DeleteExpenseAction(val id: Long) : Action(ACTION_DELETE_EXPENSE)
 class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 
@@ -165,6 +166,22 @@ class DispatchServlet : HttpServlet() {
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
+            is EditExpenseAction -> {
+                if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
+                    res.writer.println("Category with id '${action.categoryId}' doesn't exists")
+                    res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                    return
+                }
+
+                val entity = datastore.get(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+                entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
+                entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
+                entity.setProperty(EXPENSE_PROP_DATE, action.date)
+                entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
+                val key = datastore.put(entity);
+                res.writer.println(key.id)
+                res.setStatus(HttpServletResponse.SC_OK)
+            }
             is NewCategoryAction -> {
                 val entity = Entity(CATEGORY_KIND, userEntity.key)
                 entity.setProperty(CATEGORY_PROP_TITLE, action.title);
@@ -211,11 +228,21 @@ class DispatchServlet : HttpServlet() {
                 val date = Date(actionJson.get(EXPENSE_PROP_DATE).long)
                 val comment = actionJson.get(EXPENSE_PROP_COMMENT).nullString
                 return NewExpenseAction(amount, categoryId, date, comment)
-            } else if (type == ACTION_NEW_CATEGORY) {
+            } 
+            else if (type == ACTION_EDIT_EXPENSE) {
+                val id = actionJson.get(PROP_ID).long
+                val amount = actionJson.get(EXPENSE_PROP_AMOUNT).int
+                val categoryId = actionJson.get(EXPENSE_PROP_CATEGORY_ID).long
+                val date = Date(actionJson.get(EXPENSE_PROP_DATE).long)
+                val comment = actionJson.get(EXPENSE_PROP_COMMENT).nullString
+                return EditExpenseAction(id, amount, categoryId, date, comment)
+            } 
+            else if (type == ACTION_NEW_CATEGORY) {
                 val title = actionJson.get(CATEGORY_PROP_TITLE).string
                 val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong
                 return NewCategoryAction(title, parentId)
-            } else if (type == ACTION_DELETE_EXPENSE) {
+            }
+            else if (type == ACTION_DELETE_EXPENSE) {
                 val id = actionJson.get(PROP_ID).long
                 return DeleteExpenseAction(id)
             }

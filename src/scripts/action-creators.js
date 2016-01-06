@@ -31,6 +31,19 @@ export const newExpense = ({amount, categoryId, comment, date}) => {
     })
 }
 
+export const editExpense = ({id, amount, categoryId, comment, date}) => {
+	return asyncDispatch(() => {
+    	return {
+	        type: 'EDIT_EXPENSE',
+	        id,
+	        amount,
+	        categoryId,
+	        comment,
+	        date
+	    }
+    })
+}
+
 export const deleteExpense = (id) => {
 	return asyncDispatch((result) => {
     	return {
