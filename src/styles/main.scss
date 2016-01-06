@@ -22,7 +22,7 @@ a.pseudo.warning {
 
 .new-expense {
 
-    background: white;
+    
 
 	> table > tbody > tr > td {
 		vertical-align: top;
@@ -79,6 +79,11 @@ a.pseudo.warning {
         display: flex;
         justify-content: center;
         flex-direction: column;
+
+        &__cell {
+            background: white;
+            border-radius: 4px;
+        }
     }
 }
 

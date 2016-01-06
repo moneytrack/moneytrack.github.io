@@ -8,7 +8,9 @@ const ModalContainer = React.createClass({
             ?
             (<div className="modal-container">
                 <div className="modal-container__column">
-                    {this.props.children}
+                    <div className="modal-container__column__cell">
+                        {this.props.children}
+                    </div>
                 </div>
             </div>      )
             : null
