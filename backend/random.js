@@ -213,127 +213,56 @@ var presentsCategoryId = dispatch({
         15:17 - 20000 - Home/Payments/Rent
         20:52 - 1053.56 - Food/Home - Some goods (Okay)
 */
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(315),
-    categoryId: atWorkCategoryId,
-    comment:"Lunch (Teremok)",
-    date: time("2015-11-26 12:46")
+var DAYS = 356
+var EXPENSE_PER_DAY = 3;
+var cats = [homeCategoryId, paymentsCategoryId, rentCategoryId, internetCategoryId,
+ foodCategoryId, atWorkCategoryId, atHomeCategoryId, transportCategoryId, familyCategoryId, presentsCategoryId]
+
+var words = ("using props passed down from parent to generate state in "
++ "often leads to duplication of source of truth where the real data "
++ "is whenever possible compute values on-the-fly to ensure that they dont "
++ "get out of sync later on and cause maintenance trouble").split(/\s+/g)
+
+
+var dev = 0.4;
+
+function choose(arr) {
+    return arr[parseInt(Math.random() * arr.length)]
+}
+
+const makeText = (function() {
+
+    return function(len) {
+        var result = [];
+        var count = len - (len * dev) + (len * dev * 2 * Math.random())
+        for(var i = 0; i < count; ++i) {
+            result.push(choose(words))
+        }
+
+        return result.join(" ");
+    }
 })
 
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(20000),
-    categoryId: rentCategoryId,
-    date: time("2015-11-26 15:17")
-})
+function makeNumber(num) {
+    return num - (num * dev) + (num * dev * 2 * Math.random())
+}
 
+var time = moment("2015-01-01 09:46");
+for(var day = 0; day < DAYS; ++day) {
+    for(var expense = 0; expense < makeNumber(EXPENSE_PER_DAY); ++expense) {
 
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(1053.56),
-    categoryId: atHomeCategoryId,
-    comment:"Some goods (Okay))",
-    date: time("2015-11-26 20:52")
-})
+        time.add(makeNumber(3), 'hours')
+        time.add(makeNumber(30), 'minutes')
 
-/*
-    November 27, 2015:
-        13:10 - 400 - Food/Work - Lunch, sushi
-        21:12 - 293.10 - Food/Home - Diksi
+        dispatch({
+            type:"NEW_EXPENSE",
+            amount: money(makeNumber(300)),
+            categoryId: choose(cats),
+            comment: makeText(5),
+            date: time.valueOf()
+        })
 
-*/
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(400),
-    categoryId: atWorkCategoryId,
-    comment:"Lunch, sushi",
-    date: time("2015-11-27 13:10")
-})
-
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(293.10),
-    categoryId: atHomeCategoryId,
-    comment:"Diksi",
-    date: time("2015-11-27 21:12")
-})
-
-/*
-    November 28, 2015:
-        18:31 - 1574.56 - Some goods from Okay
-*/
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(1574.56),
-    categoryId: atHomeCategoryId,
-    comment:"Some goods from Okay",
-    date: time("2015-11-28 18:31")
-})
-
-/*
-    November 30, 2015:
-        10:34 - 500 - Transport - Podoroznik
-        12:15 - 326 - Food/Work - Lunch (KFC)
-        16:12 - 4210 - Family/Presents - Present for papa
-*/
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(500),
-    categoryId: transportCategoryId,
-    comment:"Podoroznik",
-    date: time("2015-11-30 10:34")
-})
-
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(326),
-    categoryId: atWorkCategoryId,
-    comment:"Lunch (KFC)",
-    date: time("2015-11-30 12:15")
-})
-
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(4210),
-    categoryId: presentsCategoryId,
-    comment:"Present for papa",
-    date: time("2015-11-30 16:12")
-})
-
-
-/*
-    December 01, 2015:
-        12:37 - 336 - Food/Work - Lunch (Teremok)
-        21:32 - 502.90 - Home/Payments/Internet - Interzet
-*/
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(336),
-    categoryId: atWorkCategoryId,
-    comment:"Lunch (Teremok)",
-    date: time("2015-12-01 12:37")
-})
-
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(502.90),
-    categoryId: internetCategoryId,
-    comment:"Interzet",
-    date: time("2015-12-01 21:32")
-})
-
-
-
-/*
-    December 02, 2015:
-        13:06 - 297 - Food/Work - Lunch (Teremok)
-*/
-dispatch({
-    type:"NEW_EXPENSE",
-    amount: money(297),
-    categoryId: atWorkCategoryId,
-    comment:"Lunch (Teremok)",
-    date: time("2015-12-01 13:06")
-})
-
+    }
+    time.add(1, 'days')
+    time.set('hours', 9)
+}

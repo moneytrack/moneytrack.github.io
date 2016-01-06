@@ -83,6 +83,7 @@ a.pseudo.warning {
         &__cell {
             background: white;
             border-radius: 4px;
+            padding: 0.5rem
         }
     }
 }
@@ -178,5 +179,24 @@ a.pseudo.warning {
     a.pseudo {
         margin: 0 1rem;
         font-size: 0.8rem;
+    }
+}
+
+
+.confirm-dialog {
+    padding: 1rem;
+
+    &__msg {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    &__controls {
+        text-align: center;
+        padding: 1rem 0.5rem 0rem 0.5rem;
+
+        > button {
+            margin: 0 0.25rem;
+        }
     }
 }

@@ -7,12 +7,14 @@ import moment from 'moment'
 import ModalContainer from './ModalContainer'
 import EditExpense from './EditExpense'
 import {editExpense} from './action-creators'
+import ConfirmDialog from './ConfirmDialog'
 
 const History = React.createClass({
 
     getInitialState: function() {
         return {
-            editingExpense: false
+            editingExpense: false,
+            deletingExpense: false
         }
     },
 
@@ -70,8 +72,6 @@ const History = React.createClass({
 
         const sortedHistory = history.sort((e1, e2) => e2.date - e1.date)
         const expensesByDays = groupBy(history, (expense) => moment(expense.date).format('YYYY MM DD'))
-
-
 
         return (
             <div className="history">
