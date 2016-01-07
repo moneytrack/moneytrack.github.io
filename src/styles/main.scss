@@ -182,16 +182,20 @@ a.pseudo.warning {
         }
     }
 
-
-
     &__year-month-filter {
-        &__item {
+
+        &__year {
+            font-weight: bold;
+        }
+
+        &__month {
             margin: 0 1rem;
         }
 
         &__item--active {
             background: #EEEFAA;
         }
+
     }
 
     &__current-filter {

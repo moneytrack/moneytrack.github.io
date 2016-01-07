@@ -62,6 +62,21 @@ const History = React.createClass({
         }))
     },
 
+    onFilterByYear: function(year) {
+
+        const m = moment().year(year)
+        m.startOf('year')
+        const from = m.valueOf();
+        m.endOf('year')
+        const to = m.valueOf();
+
+        this.setState(update(this.state, {
+            filterDateFrom: {$set: from},
+            filterDateTo: {$set: to},
+            filterItem: {$set: year}
+        }))
+    },
+
     render: function () {
         const {store} = this.context
         const {history, categoryList, waiting} = store.getState()
@@ -141,20 +156,36 @@ const History = React.createClass({
                 <div className="history__year-month-filter">
                 {
                     Object.keys(yearMonthMap).sort((x,y) => x - y).map((year) => (
-                        <div key={year}><b>{year}:</b>
+                        <div key={year}>
+                            {(filterItem === (year))
+                              ? (
+                                    <span className="history__year-month-filter__item history__year-month-filter__item--active history__year-month-filter__year">
+                                        {year}:
+                                    </span>
+                                )
+                              : (
+                                    <a href="#"
+                                        className="pseudo history__year-month-filter__year history__year-month-filter__item"
+                                        onClick={(e) => {e.preventDefault(); this.onFilterByYear(year)}}>
+                                        {year}:
+                                    </a>
+                                )
+                            }
+
+
                             {
                                 yearMonthMap[year].sort((x,y) => x - y).map((month) => {
                                     var m = moment().month(month).year(year)
                                     if(filterItem === (year + "-" + month)) {
-                                        return (<span key={month} className="history__year-month-filter__item history__year-month-filter__item--active">
+                                        return (<span key={month} className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active">
                                                     {m.format("MMMM")}
                                                 </span>)
 
                                     }
                                     else {
                                         return (<a href="#"
-                                              key={month}
-                                               className="pseudo history__year-month-filter__item"
+                                               key={month}
+                                               className="pseudo history__year-month-filter__month history__year-month-filter__item"
                                                onClick={(e) => {e.preventDefault(); this.onFilterByYearMonth(year, month)}}>
                                                 {m.format("MMMM")}
                                             </a>)
