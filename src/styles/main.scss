@@ -196,10 +196,9 @@ a.pseudo.warning {
 
     &__current-filter {
         margin: 1rem 0;
-
-        &__title {
-            font-weight: bold;
-        }
+        font-size: 0.75rem;
+        color: #999;
+        font-style: italic;
     }
 
 }

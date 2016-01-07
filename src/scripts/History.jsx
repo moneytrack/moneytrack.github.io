@@ -137,16 +137,7 @@ const History = React.createClass({
                                  onCancel={this.onExpenseEditCancel}/>
                 </ModalContainer>
 
-                {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
-                  ? (<div className="history__current-filter">
-                        <span className="history__current-filter__title">Filter:</span>  <span>{
-                            moment(filterDateFrom).format("MMMM Do YYYY")
-                        }</span> — <span>{
-                            moment(filterDateTo).format("MMMM Do YYYY")
-                        }</span>
-                    </div>)
-                  : null
-                }
+
                 <div className="history__year-month-filter">
                 {
                     Object.keys(yearMonthMap).sort((x,y) => x - y).map((year) => (
@@ -175,6 +166,17 @@ const History = React.createClass({
                     ))
                 }
                 </div>
+
+                {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
+                  ? (<div className="history__current-filter">
+                        <span className="history__current-filter__title">Filter:</span>  <span>{
+                            moment(filterDateFrom).format("MMMM Do YYYY")
+                        }</span> — <span>{
+                            moment(filterDateTo).format("MMMM Do YYYY")
+                        }</span>
+                    </div>)
+                  : null
+                }                
 
                 {
                     expensesByDays.map((group) => {
