@@ -232,3 +232,28 @@ a.pseudo.warning {
         }
     }
 }
+
+.drop-down-container {
+    position: relative;
+
+    &__bg {
+        position: fixed;
+        background: rgba(0, 0, 0, 0.25);
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    &__body {
+        position: absolute;
+        z-index: 99999;
+        top: 0;
+        left: 0;
+        padding: 1rem;
+        border-radius: 4px;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+}

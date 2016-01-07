@@ -39,6 +39,12 @@ const History = React.createClass({
         }))
     },
 
+    onCancelEditingExpense: function() {
+        this.setState(update(this.state, {
+            editingExpense: {$set: false}
+        }))
+    },
+
     onExpenseSave: function(data) {
         this.context.store.dispatch(editExpense(data));
         this.setState(update(this.state, {
@@ -150,7 +156,7 @@ const History = React.createClass({
         return (
             <div className="history">
 
-                <ModalContainer visible={this.state.editingExpense}>
+                <ModalContainer visible={this.state.editingExpense} onCancel={this.onCancelEditingExpense}>
                     <EditExpense expenseId={this.state.editingExpenseId}
                                  onSave={this.onExpenseSave}
                                  onCancel={this.onExpenseEditCancel}/>

@@ -11,12 +11,13 @@ import EditExpense from './EditExpense.jsx'
 import TabsContainer from './TabsContainer.jsx'
 import WaitIndicator from './WaitIndicator.jsx'
 import History from './History.jsx'
+import Statistics from './Statistics.jsx'
 
 const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "History"
+            activeTab: "Statistics"
         }
     },
 
@@ -65,7 +66,7 @@ const Root = React.createClass({
                     </div>
 
                     <div>
-                        <div>Statistics sections is not implemented yet</div>
+                        <Statistics />
                     </div>
                 </TabsContainer>
                 <WaitIndicator waiting={waiting}/>

@@ -5,6 +5,7 @@ import InputMoment from 'input-moment'
 import _moment from 'moment'
 
 import ModalContainer from './ModalContainer'
+import DropDownContainer from './DropDownContainer'
 
 const DateTimePicker = React.createClass({
 
@@ -12,6 +13,12 @@ const DateTimePicker = React.createClass({
         return {
             visible: false
         }
+    },
+
+    onCancel: function() {
+        this.setState(update(this.state, {
+            visible: {$set: false}
+        }))
     },
 
     onClick: function() {
@@ -46,7 +53,7 @@ const DateTimePicker = React.createClass({
             <div>
                 <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
                 {  this.state.visible
-                   ? <ModalContainer>
+                   ? <ModalContainer onCancel={this.onCancel}>
                         <InputMoment
                             moment={moment}
                             onChange={this.onChangeDate}
