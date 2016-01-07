@@ -12,9 +12,18 @@ import ConfirmDialog from './ConfirmDialog'
 const History = React.createClass({
 
     getInitialState: function() {
+        var now = moment();
+        now.startOf('month')
+        var from = now.valueOf()
+        now.endOf('month')
+        var to = now.valueOf()
+
         return {
             editingExpense: false,
-            deletingExpense: false
+            deletingExpense: false,
+            filterDateFrom: from,
+            filterDateTo: to,
+            filterItem: now.year() + "-" + now.month()
         }
     },
 
@@ -38,9 +47,25 @@ const History = React.createClass({
         }))  
     },
 
+    onFilterByYearMonth: function(year, month) {
+
+        const m = moment().year(year).month(month)
+        m.startOf('month')
+        const from = m.valueOf();
+        m.endOf('month')
+        const to = m.valueOf();
+
+        this.setState(update(this.state, {
+            filterDateFrom: {$set: from},
+            filterDateTo: {$set: to},
+            filterItem: {$set: year + "-" + month}
+        }))
+    },
+
     render: function () {
         const {store} = this.context
         const {history, categoryList, waiting} = store.getState()
+        const {filterDateFrom, filterDateTo, filterItem} = this.state
 
         function groupBy(arr, f) {
             const result = [];
@@ -70,16 +95,87 @@ const History = React.createClass({
             return result;
         }
 
-        const sortedHistory = history.sort((e1, e2) => e2.date - e1.date)
-        const expensesByDays = groupBy(history, (expense) => moment(expense.date).format('YYYY MM DD'))
+
+        const yearMonthMap = {};
+        history.forEach((expense) => {
+            var month = moment(expense.date).month()
+            var year = moment(expense.date).year()
+            if(!(year in yearMonthMap)) {
+                yearMonthMap[year] = [];
+            }
+            if(yearMonthMap[year].indexOf(month)==-1) {
+                yearMonthMap[year].push(month)
+            }
+        })
+
+        const filteredHistory = history.filter((x) => x.date >= filterDateFrom && x.date <= filterDateTo)
+        const sortedHistory = filteredHistory.sort((e1, e2) => e2.date - e1.date)
+        const expensesByDays = groupBy(filteredHistory, (expense) => moment(expense.date).format('YYYY MM DD'))
+
+        /*
+        
+            2015         2016
+            ----         ----
+            September    January
+            October      Febuary
+            November
+            December
+
+            2015   September October November December
+            2016   January Febuary
+
+            http://localhost:8080/#history/by-month/2016/Febuary
+            http://localhost:8080/#history/by-year/2016
+        */
 
         return (
             <div className="history">
+
                 <ModalContainer visible={this.state.editingExpense}>
                     <EditExpense expenseId={this.state.editingExpenseId}
                                  onSave={this.onExpenseSave}
                                  onCancel={this.onExpenseEditCancel}/>
                 </ModalContainer>
+
+                {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
+                  ? (<div className="history__current-filter">
+                        <span className="history__current-filter__title">Filter:</span>  <span>{
+                            moment(filterDateFrom).format("MMMM Do YYYY")
+                        }</span> — <span>{
+                            moment(filterDateTo).format("MMMM Do YYYY")
+                        }</span>
+                    </div>)
+                  : null
+                }
+                <div className="history__year-month-filter">
+                {
+                    Object.keys(yearMonthMap).sort((x,y) => x - y).map((year) => (
+                        <div key={year}><b>{year}:</b>
+                            {
+                                yearMonthMap[year].sort((x,y) => x - y).map((month) => {
+                                    var m = moment().month(month).year(year)
+                                    if(filterItem === (year + "-" + month)) {
+                                        return (<span key={month} className="history__year-month-filter__item history__year-month-filter__item--active">
+                                                    {m.format("MMMM")}
+                                                </span>)
+
+                                    }
+                                    else {
+                                        return (<a href="#"
+                                              key={month}
+                                               className="pseudo history__year-month-filter__item"
+                                               onClick={(e) => {e.preventDefault(); this.onFilterByYearMonth(year, month)}}>
+                                                {m.format("MMMM")}
+                                            </a>)
+                                    }
+
+                                })
+                            }
+                        </div>
+                    ))
+                }
+                </div>
+
                 {
                     expensesByDays.map((group) => {
                         var day = moment(group[0].date).format('MMMM Do YYYY (dddd)')

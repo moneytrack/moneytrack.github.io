@@ -16,7 +16,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Main"
+            activeTab: "History"
         }
     },
 
@@ -53,7 +53,7 @@ const Root = React.createClass({
 
         return (
             <div>
-                <TabsContainer titleList={["Main", "History"]} 
+                <TabsContainer titleList={["Main", "History", "Statistics"]} 
                                active={this.state.activeTab}
                                onSwitch={this.onSwitchTab}>
                     <div>
@@ -62,6 +62,10 @@ const Root = React.createClass({
 
                     <div>
                         <History onDelete={this.onDelete}/>
+                    </div>
+
+                    <div>
+                        <div>Statistics sections is not implemented yet</div>
                     </div>
                 </TabsContainer>
                 <WaitIndicator waiting={waiting}/>

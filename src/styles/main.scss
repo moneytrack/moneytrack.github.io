@@ -167,6 +167,12 @@ a.pseudo.warning {
         &__controls {
             display: none;
             padding-left: 1rem;
+
+            a.pseudo {
+                margin: 0 1rem;
+                font-size: 0.8rem;
+            }
+
         }
     }
 
@@ -176,10 +182,26 @@ a.pseudo.warning {
         }
     }
 
-    a.pseudo {
-        margin: 0 1rem;
-        font-size: 0.8rem;
+
+
+    &__year-month-filter {
+        &__item {
+            margin: 0 1rem;
+        }
+
+        &__item--active {
+            background: #EEEFAA;
+        }
     }
+
+    &__current-filter {
+        margin: 1rem 0;
+
+        &__title {
+            font-weight: bold;
+        }
+    }
+
 }
 
 
