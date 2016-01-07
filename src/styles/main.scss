@@ -123,6 +123,33 @@ a.pseudo.warning {
 
 .history {
 
+    &__year-month-filter {
+
+        &__year {
+            font-weight: bold;
+        }
+
+        &__month {
+            margin: 0 1rem;
+        }
+
+        &__item--active {
+            background: #EEEFAA;
+        }
+
+    }
+
+    &__current-filter {
+        margin: 1rem 0;
+        font-size: 0.75rem;
+        color: #999;
+        font-style: italic;
+    }
+
+}
+
+.expense-list {
+
     $expense: #{&}__expense;
 
     &__group {
@@ -182,30 +209,10 @@ a.pseudo.warning {
         }
     }
 
-    &__year-month-filter {
 
-        &__year {
-            font-weight: bold;
-        }
-
-        &__month {
-            margin: 0 1rem;
-        }
-
-        &__item--active {
-            background: #EEEFAA;
-        }
-
-    }
-
-    &__current-filter {
-        margin: 1rem 0;
-        font-size: 0.75rem;
-        color: #999;
-        font-style: italic;
-    }
 
 }
+
 
 
 .confirm-dialog {

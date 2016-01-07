@@ -8,6 +8,7 @@ import ModalContainer from './ModalContainer'
 import EditExpense from './EditExpense'
 import {editExpense} from './action-creators'
 import ConfirmDialog from './ConfirmDialog'
+import ExpenseList from './ExpenseList'
 
 const History = React.createClass({
 
@@ -27,7 +28,11 @@ const History = React.createClass({
         }
     },
 
-    onEdit: function(id) {
+    onExpenseDelete: function(id) {
+        this.props.onDelete(id)
+    },
+
+    onExpenseEdit: function(id) {
         this.setState(update(this.state, {
             editingExpense: {$set: true},
             editingExpenseId: {$set: id}
@@ -78,8 +83,7 @@ const History = React.createClass({
     },
 
     render: function () {
-        const {store} = this.context
-        const {history, categoryList, waiting} = store.getState()
+        const {history, categoryList} = this.context.store.getState()
         const {filterDateFrom, filterDateTo, filterItem} = this.state
 
         function groupBy(arr, f) {
@@ -209,46 +213,10 @@ const History = React.createClass({
                   : null
                 }                
 
-                {
-                    expensesByDays.map((group) => {
-                        var day = moment(group[0].date).format('MMMM Do YYYY (dddd)')
-                        return (<div key={day} className="history__group">
-                            <div className="history__group__title">{day}</div>
-                            {
-                                group.map((expense) => {
-                                    const category = categoryList.filter(x => x.id === expense.categoryId)[0]
-
-                                    const cats = collectCategoryAncestors(category).map(cat => cat.title).join(" / ")
-
-                                    return (
-                                        <div key={expense.id} className="history__expense">
-                                            <div className="history__expense__time">
-                                                {moment(expense.date).format("HH:mm")}
-                                            </div>
-                                            <div>
-                                                <div  className="history__expense__first-line">
-                                                    <div className="history__expense__amount">
-                                                        {expense.amount / 100} &#8381;
-                                                    </div>
-                                                    <div  className="history__expense__category">
-                                                       {' '} — {cats}
-                                                    </div>
-                                                </div>
-                                                <div  className="history__expense__comment">
-                                                    {expense.comment}
-                                                </div>
-                                            </div>
-                                            <div  className="history__expense__controls" >
-                                                <a href="#" className="pseudo warning" onClick={(e) => {e.preventDefault(); this.props.onDelete(expense.id)}}>Delete</a>
-                                                <a href="#" className="pseudo" onClick={(e) => {e.preventDefault(); this.onEdit(expense.id); }}>Edit</a>
-                                            </div>
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>)
-                    })
-                }
+                <ExpenseList
+                     data={filteredHistory}
+                     onEdit={this.onExpenseEdit}
+                     onDelete={this.onExpenseDelete}/>
             </div>
         )
     }
