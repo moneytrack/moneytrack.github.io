@@ -275,6 +275,21 @@ a.pseudo.warning {
 
         &__value {
             padding: 0.25rem 0.8rem;
+            white-space: nowrap;            
+            text-align: right;            
+
+            &__dif {
+                font-size: 0.75rem;
+
+                &--plus {
+                    color: red;
+                }
+
+                &--minus {
+                    color: green;
+                }                
+
+            }
         }
     }
 }

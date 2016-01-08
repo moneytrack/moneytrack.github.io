@@ -4,7 +4,9 @@ import update from 'react-addons-update'
 import moment from 'moment'
 
 import TabsContainer from './TabsContainer'
-
+import money from './money'
+const format = money.format()
+const {keys} = Object
 
 const asc = (x,y) => x - y
 const desc = (x,y) => y - x
@@ -14,7 +16,10 @@ const SumTableStatistics = React.createClass({
     getInitialState: function() {
         var years = Object.keys(this.getYearMonthCategoryExpenseMap()).map(x => parseInt(x)).sort(desc)
         return {
-            activeYear: years[0]
+            activeYear: years[0],
+            showChild: false,
+            showAtRoot: false,
+            showDif: true
         }
     },
 
@@ -43,6 +48,26 @@ const SumTableStatistics = React.createClass({
         return yearMonthCategoryExpenseMap
     },
 
+    onChangeChild: function(e){
+        this.setState(update(this.state, {
+            showChild: {$set: !this.state.showChild}
+        }))
+    },
+
+
+    onChangeShotAtRoot: function(e){
+        this.setState(update(this.state, {
+            showAtRoot: {$set: !this.state.showAtRoot}
+        }))
+    },
+
+    onChangeShotDif: function(e){
+        this.setState(update(this.state, {
+            showDif: {$set: !this.state.showDif}
+        }))
+    },
+
+
     render: function () {
         
         const {history, categoryList, rootCategoryIdList} = this.context.store.getState()
@@ -51,74 +76,134 @@ const SumTableStatistics = React.createClass({
 
         const yearMonthCategoryExpenseMap = this.getYearMonthCategoryExpenseMap()
 
-        function calculateSum(category, categoryToExpenses) {
-            const expenseList = categoryToExpenses[category.id] || [];
-            const sum = expenseList.reduce((acc, x) => acc + x.amount, 0)
-            var childSum = categoryList
-                .filter(x => x.parentId === category.id)
-                .map(category => calculateSum(category, categoryToExpenses))
-                .reduce((acc, x) => acc + x, 0)
-            return sum + childSum
-        }
 
-        function calculateSelfSum(category, categoryToExpenses) {
-            const expenseList = categoryToExpenses[category.id] || [];
-            const sum = expenseList.reduce((acc, x) => acc + x.amount, 0)
-
-            return sum;
-        }
-
-        function renderCategory(category, monthCategoryExpenseMap, level) {
-            const result = [];
-            result.push(<tr key={category.id}>
-                        <td style={{paddingLeft: (level * 20) + "px"}} className={"sum-table-statistics__year__category"}>{category.title}</td>
-                        {
-                            Object.keys(monthCategoryExpenseMap).sort(asc).map(month => {
-                                const categoryToExpenses = monthCategoryExpenseMap[month];
-                                const sum = calculateSum(category, categoryToExpenses)
-                                return (<td key={category.id + "-" + month}  className="sum-table-statistics__year__value">
-                                    {sum / 100}
-                                </td>)
-                            })
-                        }
-                      </tr>)
-            var childrenRowList = []
-            categoryList.filter(cat => cat.parentId === category.id).forEach(child => {
-                childrenRowList.push(...renderCategory(child, monthCategoryExpenseMap, level + 1))
-            })
-            if(childrenRowList.length > 0) {
-                childrenRowList.unshift(
-                    <tr key={category.id + "-self"}>
-                        <td style={{paddingLeft: ((level +1) * 20) + "px"}}  className="sum-table-statistics__year__category">
-                            (self)
-                        </td>
-                        {
-                            Object.keys(monthCategoryExpenseMap).sort(asc).map(month => {
-                                const categoryToExpenses = monthCategoryExpenseMap[month];
-                                const sum = calculateSelfSum(category, categoryToExpenses)
-                                return (<td key={category.id + "-" + month + "-self"} className="sum-table-statistics__year__value">
-                                    {sum / 100}
-                                </td>)
-                            })
-                        }
-                    </tr>
-                )
+        function recurseSum(data, category, month) {
+            const childList = categoryList.filter(x => x.parentId === category.id)
+            if(childList.length > 0) {
+                const childSum = childList.map(child => recurseSum(data, child, month)).reduce((acc,x) => acc + x, 0)
+                return childSum;
             }
-            result.push(...childrenRowList)
+            else {
+                return data[category.id][month] 
+            }
+        }
+
+        const renderDif = dif => {
+            if(this.state.showDif) {
+                if(dif) {
+                    if(dif > 0) {
+                        return (
+                            <div className="sum-table-statistics__year__value__dif sum-table-statistics__year__value__dif--plus">
+                                {"+" + format(dif) }
+                            </div>
+                        )
+                    }
+                    else {
+                        return (
+                            <div className="sum-table-statistics__year__value__dif sum-table-statistics__year__value__dif--minus">
+                                {"-" + format(-dif) }
+                            </div>
+                        )
+
+                    }
+                }
+                else {
+                    return (
+                        <div  className="sum-table-statistics__year__value__dif">&nbsp;</div>
+                    )
+                }
+            }
+            else {
+                return <div/>
+            }
+        }
+
+        const renderCategory = (data, category, level) => {
+            const result = [];
+            const categoryData = data[category.id];
+
+            const childList = categoryList.filter(cat => cat.parentId === category.id)
+
+            result.push(<tr key={category.id}>
+                            <td style={{paddingLeft: (level * 20) + "px"}} className={"sum-table-statistics__year__category"}>{category.title}</td>
+                            {
+                                keys(categoryData).sort(asc).map(month => {
+                                    const sum = categoryData[month] + recurseSum(data, category, month);
+                                    var dif = null;
+                                    if(categoryData[month - 1] ) {
+                                        const lastSum = categoryData[month - 1]  + recurseSum(data, category, month - 1)
+                                        dif = lastSum ?  sum - lastSum : null
+                                    }
+                                    return (
+                                        <td key={category.id + "-" + month} className="sum-table-statistics__year__value">
+                                            {format(sum)}
+                                            {renderDif(dif)}
+                                        </td>
+                                    )
+                                })
+                            }
+                      </tr>)
+
+            if(this.state.showChild) {
+                var childrenRowList = []
+                categoryList.filter(cat => cat.parentId === category.id).forEach(child => {
+                    childrenRowList.push(...renderCategory(data, child, level + 1))
+                })
+                if(this.state.showAtRoot && childrenRowList.length > 0) {
+                    childrenRowList.unshift(
+                        <tr key={category.id + "-self"}>
+                            <td style={{paddingLeft: ((level + 1) * 20) + "px"}} className={"sum-table-statistics__year__category"}>(at root)</td>
+                            {
+                                keys(categoryData).sort(asc).map(month => {
+                                    const sum = categoryData[month];
+                                    const lastSum = categoryData[month - 1];
+                                    const dif = lastSum ? sum - lastSum : null
+                                    return (
+                                        <td key={category.id + "-" + month}  className="sum-table-statistics__year__value">
+                                            {format(sum)}
+                                            {renderDif(dif)}
+                                        </td>
+                                    )
+                                })
+                            }
+                        </tr>
+                    )
+                }
+                result.push(...childrenRowList)
+            }
             return result;
         }
         
-        function renderCats(monthCategoryExpenseMap) {
+        function renderTable(data) {
             var rows = [];
 
             const rootCategoryList = categoryList.filter((category) => rootCategoryIdList.indexOf(category.id)!=-1);
             rootCategoryList.forEach((category) => {
-                renderCategory(category, monthCategoryExpenseMap, 0).forEach(subRow => {
-                    rows.push(subRow)
-                })
+                rows.push(...renderCategory(data, category, 0))
             })
 
             return rows;
+        }
+
+        /*
+            Returns map: category -> month -> sum
+        */
+        function calculateTable(monthCategoryExpenseMap) {
+            var result = {}
+
+            categoryList.forEach(category => {
+                result[category.id] = {};
+
+                Object.keys(monthCategoryExpenseMap).sort(asc).map(month => {
+                    const categoryToExpenses = monthCategoryExpenseMap[month];
+                    const expenseList = categoryToExpenses[category.id] || [];
+                    const sum = expenseList.reduce((acc, x) => acc + x.amount, 0)
+                    result[category.id][month] = sum;
+                })
+
+            })
+
+            return result;
         }
 
         return (
@@ -131,32 +216,44 @@ const SumTableStatistics = React.createClass({
                            }}>
                 {
                     Object.keys(yearMonthCategoryExpenseMap).sort(asc).map(year => {
-                        var monthCategoryExpenseMap = yearMonthCategoryExpenseMap[year]
+                        var data = calculateTable(yearMonthCategoryExpenseMap[year])
                         return (
-                            <table key={year} className="sum-table-statistics__year">
-                                <tbody>
+                            <div key={year}>
+                                <div>
+                                    <label><input type="checkbox" checked={this.state.showChild}
+                                                  onChange={this.onChangeChild}/> show child categories</label>
+                                    <label><input type="checkbox"  disabled={!this.state.showChild} checked={this.state.showAtRoot}
+                                          onChange={this.onChangeShotAtRoot}/> show 'at root'</label>
+            
+                                    <label><input type="checkbox" checked={this.state.showDif}
+                                                  onChange={this.onChangeShotDif}/> show difference</label>
+                                </div>
+                                <table className="sum-table-statistics__year">
+                                    <tbody>
 
-                                <tr>
-                                    <td></td>
+                                    <tr>
+                                        <td></td>
+                                        {
+                                            keys(yearMonthCategoryExpenseMap[year]).sort(asc).map(month => {
+                                                const m = moment().year(parseInt(year)).month(parseInt(month))
+                                                return (
+                                                    <td key={year + "-" + month} className="sum-table-statistics__year__month">
+                                                        {m.format("MMMM")}
+                                                    </td>
+                                                )
+                                            })
+                                        }
+                                    </tr> 
+                                                       
                                     {
-                                        Object.keys(monthCategoryExpenseMap).sort(asc).map(month => {
-                                            const m = moment().year(parseInt(year)).month(parseInt(month))
-                                            return (
-                                                <td key={year + "-" + month} className="sum-table-statistics__year__month">
-                                                    {m.format("MMMM")}
-                                                </td>
-                                            )
-                                        })
+                                        renderTable(data)
                                     }
-                                </tr> 
-                                                   
-                                {
-                                    renderCats(monthCategoryExpenseMap)
-                                }
 
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         )
+
                     })
                 }
             </TabsContainer>
