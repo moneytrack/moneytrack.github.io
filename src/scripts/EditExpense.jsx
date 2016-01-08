@@ -86,9 +86,9 @@ const EditExpense = React.createClass({
         }))
     },
 
-    onChangeCategory: function(category) {
+    onChangeCategory: function(categoryId) {
         this.setState(update(this.state, {
-            categoryId: {$set:category.id}
+            categoryId: {$set:categoryId}
         }))
     },
 

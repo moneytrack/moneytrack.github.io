@@ -9,6 +9,7 @@ import EditExpense from './EditExpense'
 import {editExpense} from './action-creators'
 import ConfirmDialog from './ConfirmDialog'
 import ExpenseList from './ExpenseList'
+import CategoryPicker from './CategoryPicker'
 
 const History = React.createClass({
 
@@ -24,7 +25,8 @@ const History = React.createClass({
             deletingExpense: false,
             filterDateFrom: from,
             filterDateTo: to,
-            filterItem: now.year() + "-" + now.month()
+            filterDateItem: now.year() + "-" + now.month(),
+            filterCategory: null
         }
     },
 
@@ -69,7 +71,7 @@ const History = React.createClass({
         this.setState(update(this.state, {
             filterDateFrom: {$set: from},
             filterDateTo: {$set: to},
-            filterItem: {$set: year + "-" + month}
+            filterDateItem: {$set: year + "-" + month}
         }))
     },
 
@@ -84,13 +86,20 @@ const History = React.createClass({
         this.setState(update(this.state, {
             filterDateFrom: {$set: from},
             filterDateTo: {$set: to},
-            filterItem: {$set: year}
+            filterDateItem: {$set: year}
         }))
     },
 
+    onFilterByCategory: function(category) {
+        this.setState(update(this.state, {
+            filterCategory: {$set: category}
+        }))
+    },
+
+
     render: function () {
-        const {history, categoryList} = this.context.store.getState()
-        const {filterDateFrom, filterDateTo, filterItem} = this.state
+        const {history, rootCategoryIdList, categoryList} = this.context.store.getState()
+        const {filterDateFrom, filterDateTo, filterDateItem, filterCategory} = this.state
 
         function groupBy(arr, f) {
             const result = [];
@@ -133,7 +142,10 @@ const History = React.createClass({
             }
         })
 
-        const filteredHistory = history.filter((x) => x.date >= filterDateFrom && x.date <= filterDateTo)
+        var filteredHistory = history.filter(x => x.date >= filterDateFrom && x.date <= filterDateTo)
+        if(filterCategory!==null) {
+            filteredHistory = filteredHistory.filter(x => x.categoryId === filterCategory)
+        }
         const sortedHistory = filteredHistory.sort((e1, e2) => e2.date - e1.date)
         const expensesByDays = groupBy(filteredHistory, (expense) => moment(expense.date).format('YYYY MM DD'))
 
@@ -167,7 +179,7 @@ const History = React.createClass({
                 {
                     Object.keys(yearMonthMap).sort((x,y) => x - y).map((year) => (
                         <div key={year}>
-                            {(filterItem === (year))
+                            {(filterDateItem === (year))
                               ? (
                                     <span className="history__year-month-filter__item history__year-month-filter__item--active history__year-month-filter__year">
                                         {year}:
@@ -186,7 +198,7 @@ const History = React.createClass({
                             {
                                 yearMonthMap[year].sort((x,y) => x - y).map((month) => {
                                     var m = moment().month(month).year(year)
-                                    if(filterItem === (year + "-" + month)) {
+                                    if(filterDateItem === (year + "-" + month)) {
                                         return (<span key={month} className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active">
                                                     {m.format("MMMM")}
                                                 </span>)
@@ -208,9 +220,19 @@ const History = React.createClass({
                 }
                 </div>
 
+                <div className="history__category-filter">
+                    <CategoryPicker
+                        rootCategoryIdList={rootCategoryIdList}
+                        categoryList={categoryList}
+                        allowEmpty={true}
+                        value={this.state.filterCategory}
+                        onChange={this.onFilterByCategory}
+                     />
+                </div>
+
                 {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
                   ? (<div className="history__current-filter">
-                        <span className="history__current-filter__title">Filter:</span>  <span>{
+                        <span className="history__current-filter__title">Showing:</span>  <span>{
                             moment(filterDateFrom).format("MMMM Do YYYY")
                         }</span> — <span>{
                             moment(filterDateTo).format("MMMM Do YYYY")

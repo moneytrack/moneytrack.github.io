@@ -17,7 +17,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Statistics"
+            activeTab: "History"
         }
     },
 
