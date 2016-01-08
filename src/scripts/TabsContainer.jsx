@@ -3,12 +3,6 @@ import React from 'react'
 
 const TabsContainer = React.createClass({
 
-    getInitialState: function() {
-        return {
-            active: ""
-        }
-    },
-
     propTypes: {
         titleList: React.PropTypes.arrayOf(React.PropTypes.string),
         active: React.PropTypes.string,
@@ -30,9 +24,9 @@ const TabsContainer = React.createClass({
     render: function() {
 
         var activeTabIndex = this.props.titleList.indexOf(this.props.active)
-
+        var className = "tabs-container" + (this.props.className ? " " + this.props.className : "")
         return  (
-            <div className="tabs-container">
+            <div className={className}>
                 <div className="tabs-container__labels">
                 {
                     this.props.titleList.map((title) => (

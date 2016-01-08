@@ -257,3 +257,24 @@ a.pseudo.warning {
     }
 
 }
+
+.statistics {
+}
+
+.sum-table-statistics {
+    &__year {
+        &__month {
+            font-weight: bold;
+            padding: 1rem 0.8rem;
+        }
+
+        &__category {
+            font-style: italic;
+            padding: 0.25rem 0.8rem;
+        }
+
+        &__value {
+            padding: 0.25rem 0.8rem;
+        }
+    }
+}
