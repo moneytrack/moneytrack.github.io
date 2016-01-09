@@ -28,7 +28,8 @@ const History = React.createClass({
             filterDateFrom: from,
             filterDateTo: to,
             filterDateItem: now.year() + "-" + now.month(),
-            filterCategory: null
+            filterCategory: null,
+            filterComment: ""
         }
     },
 
@@ -99,9 +100,16 @@ const History = React.createClass({
     },
 
 
+    onFilterByComment: function(e) {
+        this.setState(update(this.state, {
+            filterComment: {$set: e.target.value}
+        }))
+    },
+
+
     render: function () {
         const {history, rootCategoryIdList, categoryList} = this.context.store.getState()
-        const {filterDateFrom, filterDateTo, filterDateItem, filterCategory} = this.state
+        const {filterDateFrom, filterDateTo, filterDateItem, filterCategory, filterComment} = this.state
 
         function groupBy(arr, f) {
             const result = [];
@@ -148,6 +156,9 @@ const History = React.createClass({
         if(filterCategory!==null) {
             filteredHistory = filteredHistory.filter(x => x.categoryId === filterCategory)
         }
+        if(filterComment !== "") {
+            filteredHistory = filteredHistory.filter(x => x.comment.indexOf(filterComment)!=-1)
+        }
         const sortedHistory = filteredHistory.sort((e1, e2) => e2.date - e1.date)
         const expensesByDays = groupBy(filteredHistory, (expense) => moment(expense.date).format('YYYY MM DD'))
 
@@ -192,6 +203,11 @@ const History = React.createClass({
                             { 
                                 filterCategory !== null
                                 ? <span>, in category &bdquo;{categoryList.filter(x => x.id === filterCategory)[0].title}&ldquo;</span>
+                                : null
+                            }
+                            { 
+                                filterComment !== ""
+                                ? <span>, with comment, containing &bdquo;{filterComment}&ldquo;</span>
                                 : null
                             }
                         </div>)
@@ -272,6 +288,11 @@ const History = React.createClass({
                             value={this.state.filterCategory}
                             onChange={this.onFilterByCategory}
                          />
+                    </div>
+
+                    <div  className="history__title">Filter by comment</div>
+                    <div className="history__comment-filter">
+                        <input type="text" value={this.state.filterComment} onChange={this.onFilterByComment} />
                     </div>
                 </div>
 
