@@ -43,13 +43,23 @@ a.pseudo.warning {
 
 .category-picker {
     &__category {
+        margin: 0.1rem 0.3rem;
+        padding: 0.2rem;
+
         > div {
-           padding: 0.1rem 0.3rem;	
+            display: inline;
+            border-bottom: 1px dashed #006DCE;     
+            color: #006DCE;      
         }
 
         &--selected {
-            background: #EEEFAA;
+            > div {
+                background: #EEEFAA;
+                border-bottom: none;
+                color: inherit;
+            }
         }
+
 
         cursor: pointer;
     }
