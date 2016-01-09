@@ -21,9 +21,6 @@ a.pseudo.warning {
 }
 
 .new-expense {
-
-    
-
 	> table > tbody > tr > td {
 		vertical-align: top;
 	    padding: 0.25rem 0.5rem;	
@@ -47,9 +44,7 @@ a.pseudo.warning {
         }
 
         &--selected {
-            background: #dfe0e4;
-            font-weight: bold;
-            color: #666;
+            background: #EEEFAA;
         }
 
         cursor: default;
@@ -122,19 +117,37 @@ a.pseudo.warning {
 
 
 .history {
+    display: flex;
+
+    &__title {
+        font-weight: bold;
+        margin: 1rem 0;
+    }
+
+    &__filters {
+        width: 35%;
+        padding: 0rem 2rem 0rem 0rem;
+    }
+
+    &__results {
+        width: 65%;
+    }
 
     &__year-month-filter {
 
         &__year {
             font-weight: bold;
+            margin: 0.5rem 0 0 0;
         }
 
         &__month {
-            margin: 0 1rem;
+            margin: 0.25rem 1rem;
         }
 
         &__item--active {
-            background: #EEEFAA;
+            span {
+                background: #EEEFAA;
+            }
         }
 
     }
@@ -144,7 +157,8 @@ a.pseudo.warning {
         font-size: 0.75rem;
         color: #999;
         font-style: italic;
-    }
+    }    
+
 
 }
 
