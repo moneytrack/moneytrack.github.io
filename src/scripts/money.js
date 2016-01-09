@@ -24,6 +24,9 @@ export default {
         if(pennies < 10) result += "0"
         result += pennies
         result += currency
+
+        console.log("format",cents,result)
+
         return result;
     }
 }
