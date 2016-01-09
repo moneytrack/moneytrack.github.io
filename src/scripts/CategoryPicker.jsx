@@ -56,8 +56,8 @@ const CategoryPicker = React.createClass({
             }
             classes = classes.join(" ")
             children.unshift(<div key="empty" className={classes} onClick={() => this.onChange(null)}>
-                                <div>
-                                    (not selected)
+                                <div className="category-picker__empty">
+                                    Do not filter by category
                                 </div>
                             </div>)
         }

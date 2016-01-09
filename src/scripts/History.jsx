@@ -10,6 +10,8 @@ import {editExpense} from './action-creators'
 import ConfirmDialog from './ConfirmDialog'
 import ExpenseList from './ExpenseList'
 import CategoryPicker from './CategoryPicker'
+import {asc,desc} from './arrays'
+const {keys} = Object
 
 const History = React.createClass({
 
@@ -187,6 +189,11 @@ const History = React.createClass({
                             }</span> — <span>{
                                 moment(filterDateTo).format("MMMM Do YYYY")
                             }</span>
+                            { 
+                                filterCategory !== null
+                                ? <span>, in category &bdquo;{categoryList.filter(x => x.id === filterCategory)[0].title}&ldquo;</span>
+                                : null
+                            }
                         </div>)
                       : null
                     }   
@@ -197,12 +204,12 @@ const History = React.createClass({
                          onDelete={this.onExpenseDelete}/>
                 </div>
 
-<div className="history__filters">
+                <div className="history__filters">
                     <div  className="history__title">Filter by date</div>
                     <div className="history__year-month-filter">
                     {
-                        Object.keys(yearMonthMap).sort((x,y) => x - y).map((year) => (
-                            <div key={year}>
+                        keys(yearMonthMap).sort(desc).map((year) => (
+                            <div key={year} className="history__year-month-filter__year-block">
                                 {(filterDateItem === (year))
                                   ? (
                                         <div  className="history__year-month-filter__item history__year-month-filter__item--active history__year-month-filter__year"><span>
@@ -220,21 +227,28 @@ const History = React.createClass({
 
 
                                 {
-                                    yearMonthMap[year].sort((x,y) => x - y).map((month) => {
+                                    yearMonthMap[year].sort(desc).map((month) => {
                                         var m = moment().month(month).year(year)
                                         if(filterDateItem === (year + "-" + month)) {
-                                            return (<div  className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active"><span key={month}>
+                                            return (
+                                                <div key={month} className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active">
+                                                    <span>
                                                         {m.format("MMMM")}
-                                                    </span></div>)
+                                                    </span>
+                                                </div>
+                                            )
 
                                         }
                                         else {
-                                            return (<div className="history__year-month-filter__month history__year-month-filter__item"><a href="#"
-                                                   key={month}
-                                                   className="pseudo"
-                                                   onClick={(e) => {e.preventDefault(); this.onFilterByYearMonth(year, month)}}>
-                                                    {m.format("MMMM")}
-                                                </a></div>)
+                                            return (
+                                                <div key={month} className="history__year-month-filter__month history__year-month-filter__item">
+                                                    <a href="#"
+                                                       className="pseudo"
+                                                       onClick={(e) => {e.preventDefault(); this.onFilterByYearMonth(year, month)}}>
+                                                        {m.format("MMMM")}
+                                                    </a>
+                                                </div>
+                                            )
                                         }
 
                                     })
@@ -244,6 +258,11 @@ const History = React.createClass({
                     }
                     </div>
 
+
+                        
+                </div>                
+
+                <div className="history__filters">
                     <div  className="history__title">Filter by category</div>
                     <div className="history__category-filter">
                         <CategoryPicker
@@ -254,8 +273,7 @@ const History = React.createClass({
                             onChange={this.onFilterByCategory}
                          />
                     </div>
-                        
-                </div>                
+                </div>
 
             </div>
         )

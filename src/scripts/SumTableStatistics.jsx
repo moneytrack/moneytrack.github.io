@@ -5,12 +5,10 @@ import moment from 'moment'
 
 import TabsContainer from './TabsContainer'
 import money from './money'
+import {asc,desc} from './arrays'
+
 const format = money.format()
 const {keys} = Object
-
-const asc = (x,y) => x - y
-const desc = (x,y) => y - x
-
 
 const SumTableStatistics = React.createClass({
     getInitialState: function() {

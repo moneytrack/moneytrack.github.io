@@ -3,7 +3,9 @@
 html {
     font-size: 12pt;
     font-family: 'PT Sans';
+    overflow-y: scroll;
 }
+
 
 a {
     color: #006DCE;
@@ -20,7 +22,7 @@ a.pseudo.warning {
     border-bottom-color: red;
 }
 
-.new-expense {
+.edit-expense {
 	> table > tbody > tr > td {
 		vertical-align: top;
 	    padding: 0.25rem 0.5rem;	
@@ -31,13 +33,15 @@ a.pseudo.warning {
 	    	text-align: right;
 	    }
 	}
+
+    &__category-picker-wrapper {
+        border: 1px solid #999;
+        border-radius: 5px;
+        padding: 0.5rem;        
+    }
 }
 
 .category-picker {
-    border: 1px solid #999;
-    border-radius: 5px;
-    padding: 0.5rem;
-
     &__category {
         > div {
            padding: 0.1rem 0.3rem;	
@@ -47,11 +51,15 @@ a.pseudo.warning {
             background: #EEEFAA;
         }
 
-        cursor: default;
+        cursor: pointer;
     }
 
     &__children {
         padding-left: 20px;
+    }
+
+    &__empty {
+        font-style: italic;
     }
 
 }
@@ -125,12 +133,12 @@ a.pseudo.warning {
     }
 
     &__filters {
-        width: 35%;
-        padding: 0rem 2rem 0rem 0rem;
+        width: 20%;
+        padding: 0rem 0rem 0rem 2rem;
     }
 
     &__results {
-        width: 65%;
+        width: 60%;
     }
 
     &__year-month-filter {
