@@ -26,6 +26,7 @@ var gulp = require('gulp'),
     watch = require('gulp-watch'),
     streamify = require('gulp-streamify'),
     uglify = require('gulp-uglify'),
+    rename = require('gulp-rename'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     watchify = require('watchify'),
@@ -33,17 +34,50 @@ var gulp = require('gulp'),
     fs = require('fs'),
     babelify = require('babelify'),
     babelPresetEs2015 = require('babel-preset-es2015'),
-    babelPresetReact = require('babel-preset-react');
+    babelPresetReact = require('babel-preset-react')
+
+    packageJson = require('./package.json');
 
 
-var DEBUG_ROOT = './debug';
+var DEBUG_ROOT = 'D:/dev/moneytrack/backend/target/backend-1.0-SNAPSHOT';
 var SRC_ROOT = './src';
 var PROD_ROOT = './public';
+
+
 
 gulp.task('html', function(){
     var files = SRC_ROOT + '/**.html';
     return gulp.src(files)
         .pipe(gulp.dest(PROD_ROOT))
+});
+
+gulp.task('vendor', function(){
+    var bundler = browserify('./.noop.js', {
+        debug: false,
+        cache: {},
+        packageCache: {},
+        fullPaths: true,
+        extensions: [".js", ".jsx"],
+        require: Object.keys(packageJson.dependencies)
+    });
+
+    function onError(err) {
+        gutil.log(gutil.colors.red(err.message));
+    }
+
+    bundler = bundler.transform(babelify, {
+        global: true,
+        presets: [babelPresetReact, babelPresetEs2015]
+    })
+
+    return bundler.bundle()
+        .on('error',  onError)
+        .pipe(source('vendor.js'))
+        .on('error', onError)
+        .pipe(streamify(uglify()))
+        .on('error', onError)
+        .pipe(gulp.dest(PROD_ROOT + '/scripts'))
+        .on('error', onError)
 });
 
 gulp.task('scripts', function(){
@@ -59,7 +93,15 @@ gulp.task('scripts', function(){
         gutil.log(gutil.colors.red(err.message));
     }
 
-    bundler = bundler.transform(babelify, {presets: [babelPresetEs2015, babelPresetReact]})
+    // Register all dependencies as external (they are loaded via vendor bundle)
+    Object.keys(packageJson.dependencies).forEach((dep) => {
+        bundler.external(dep)
+    })
+
+    bundler = bundler.transform(babelify, {
+        global: true,
+        presets: [babelPresetReact, babelPresetEs2015]
+    })
 
     return bundler.bundle()
         .on('error',  onError)
@@ -85,7 +127,7 @@ gulp.task('images', function(){
         .pipe(gulp.dest(PROD_ROOT + '/images'))
 });
 
-gulp.task('default', ['html', 'scripts', 'styles', 'images']);
+gulp.task('default', ['html', 'vendor', 'scripts', 'styles', 'images']);
 
 
 //***************** Debug *****************
@@ -97,8 +139,58 @@ gulp.task('debug_html', function(){
         .pipe(gulp.dest(DEBUG_ROOT))
 });
 
+gulp.task('debug_vendor', function(){
+    var bundler = browserify('./.noop.js', {
+        debug: true,
+        cache: {},
+        packageCache: {},
+        fullPaths: true,
+        extensions: [".js", ".jsx"],
+        require: Object.keys(packageJson.dependencies)
+    });
 
+    bundler = bundler.transform(babelify, {
+        global: true,
+        presets: [babelPresetReact, babelPresetEs2015]
+    })
+    bundler = watchify(bundler);
 
+    function onError(err) {
+        anybar('red');
+        gutil.log(gutil.colors.red(err.message));
+        var notifier = require('node-notifier');
+        notifier.notify({
+          'title': 'ERROR',
+          'message': err.message
+        });        
+    }
+
+    function rebundle() {
+        anybar('yellow');
+        var bundle = bundler.bundle()
+            .on('error',  onError)
+            .pipe(source('vendor.js'))
+            .on('error', onError)
+            .pipe(gulp.dest(DEBUG_ROOT + '/scripts'))
+            .on('error', onError)
+            .on('end', function(){
+                anybar('green');
+            })
+        return bundle
+    }
+
+    bundler.on('update', function() {
+        var start = Date.now();
+        gutil.log('Rebundle vendor...');
+        var bundle = rebundle();
+        bundle.on('end', function(){
+            gutil.log("Done! Time: " + (Date.now() - start));
+        });
+    });
+
+    return rebundle();
+
+});
 
 gulp.task('debug_scripts', function(){
     var bundler = browserify(SRC_ROOT + '/scripts/main.jsx', {
@@ -109,7 +201,14 @@ gulp.task('debug_scripts', function(){
         extensions: [".js", ".jsx"]
     });
 
-    bundler = bundler.transform(babelify, {presets: [babelPresetEs2015, babelPresetReact]})
+    // Register all dependencies as external (they are loaded via vendor bundle)
+    Object.keys(packageJson.dependencies).forEach((dep) => {
+        bundler.external(dep)
+    })
+
+    bundler = bundler.transform(babelify, {
+        presets: [babelPresetReact, babelPresetEs2015]
+    })
     bundler = watchify(bundler);
 
     function onError(err) {
@@ -138,7 +237,7 @@ gulp.task('debug_scripts', function(){
 
     bundler.on('update', function() {
         var start = Date.now();
-        gutil.log('Rebundle...');
+        gutil.log('Rebundle app...');
         var bundle = rebundle();
         bundle.on('end', function(){
             gutil.log("Done! Time: " + (Date.now() - start));
@@ -148,12 +247,16 @@ gulp.task('debug_scripts', function(){
     return rebundle();
 });
 
-gulp.task('debug_styles', function(){
+gulp.task('__debug_styles', function(){
     var files = SRC_ROOT + '/styles/**.scss';
     return gulp.src(files)
-        .pipe(watch(files))
         .pipe(sass().on('error', sass.logError))
         .pipe(gulp.dest(DEBUG_ROOT + '/styles'))
+});
+
+gulp.task('debug_styles', ['__debug_styles'], function(){
+    var files = SRC_ROOT + '/styles/**.scss';
+    return gulp.watch(files, ['__debug_styles'])
 });
 
 gulp.task('debug_images', function(){
@@ -163,4 +266,4 @@ gulp.task('debug_images', function(){
         .pipe(gulp.dest(DEBUG_ROOT + '/images'))
 });
 
-gulp.task('debug', ['debug_html', 'debug_scripts', 'debug_styles', 'debug_images']);
+gulp.task('debug', ['debug_html', 'debug_vendor', 'debug_scripts', 'debug_styles', 'debug_images']);

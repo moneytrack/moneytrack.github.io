@@ -1,3 +1,4 @@
+"use strict"
 export const isNumber = (value) => {
     if(/^[0-9]*([,.][0-9]*)?$/.test(value)) {
         return true

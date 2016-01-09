@@ -19,62 +19,120 @@
  * Author:  Nikolay Mavrenkov <koluch@koluch.ru>
  * Created: 01.11.2015 23:04
  */
+import Promise from 'es6-promise'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
-import {createStore} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
+import createLogger from 'redux-logger'
+import thunkMiddleware from 'redux-thunk'
 import {Provider} from 'react-redux'
+import moment from 'moment'
 
+import ajax from './ajax'
 import Root from './Root.jsx'
 
-const initState = {
-    seq: 9,
-    categoryList: [
-        {id:0,title:"Other"},
-        {id:1,title:"Lunch"},
-        {id:2,title:"Grocery"},
-        {id:6,title:"Home",children:[
-            {id:7,title:"Electricity"},
-            {id:8,title:"Internet"}
-        ]},
-    ],
-    history: [
-        {id:3, amount:290.0, comment:"KFC", date: 1451126739340, categoryId:1},
-        {id:4, amount:860.0, comment:"Some food", date: 1450983139340, categoryId:2},
-        {id:5, amount:390.0, comment:"Teremok", date: 1451041813860, categoryId:1}
-    ]
-}
+const DISPATCH_URL = "http://localhost:8080/dispatch"
 
-const reducer = (state = initState, action) => {
-    switch(action.type) {
-        case 'NEW_EXPENSE': {
-            const amount = parseFloat(action.amount)
-            const categoryId = parseInt(action.categoryId)
-            const comment = action.comment;
+ajax.get(DISPATCH_URL)
+.then((response) => {
+    return response
+}, (err) => {
+    console.error(err)
+    console.error("Failed to load state, use default state");
+    return Promise.resolve({
+        history: [],
+        categoryList: []
+    });
+})
+.then((initState) => {
 
-            const valid = !isNaN(amount) && state.categoryList.filter((x) => x.id === categoryId).length > 0;
-            if(valid) {
-                state = update(state, {
-                    history: {$push: [{
-                        id: state.seq,
-                        amount:parseFloat(amount),
-                        categoryId,
-                        comment
-                    }]},
-                    seq: {$set: state.seq + 1}
-                })
+    const reducer = (state = initState, action) => {
+        const {type, status} = action
+        switch(type) {
+            case 'WAIT': {
+                return update(state, {waiting: {$set:true} })
             }
-        };
-        default: ;
+
+            case 'STOP_WAIT': {
+                return update(state, {waiting: {$set:false} })
+            }
+
+            case 'NEW_EXPENSE': {
+                const amount = parseFloat(action.amount)
+                const categoryId = parseInt(action.categoryId)
+                const comment = action.comment;
+                const id = action.id
+                const date = moment(action.date).valueOf()
+
+                const valid = !isNaN(amount) && state.categoryList.filter((x) => x.id === categoryId).length > 0;
+                if(valid) {
+                    return update(state, {
+                        history: {$push: [{
+                            id,
+                            amount,
+                            categoryId,
+                            comment,
+                            date
+                        }]}
+                    })
+                }
+                else {
+                    console.error("Invalid action", action)
+                }
+                //todo: handle "failed" case
+            }
+            break;
+
+            case 'EDIT_EXPENSE': {
+                const id = action.id
+                const amount = parseFloat(action.amount)
+                const categoryId = parseInt(action.categoryId)
+                const comment = action.comment;
+                const date = moment(action.date).valueOf()
+
+                var newHistory = state.history.map((expense) => {
+                    if(expense.id === id) {
+                        return {id, amount, categoryId, comment, date}
+                    }
+                    else {
+                        return expense
+                    }
+                })
+
+                return update(state, {
+                    history: {$set: newHistory}
+                })
+                //todo: handle "failed" case
+            }
+            break;
+
+
+            case 'DELETE_EXPENSE': {
+                return update(state, {
+                    history: {$set: state.history.filter(expense => expense.id !== action.id)}
+                })
+                //todo: handle "failed" case
+            }
+            break;
+
+            default: ;
+        }
+        return state
     }
-    return state
-}
 
-const store = createStore(reducer)
+    const store = applyMiddleware(thunkMiddleware, createLogger())(createStore)(reducer)
+    // const store = createStore(reducer)
 
-ReactDOM.render(
-    <Provider store={store}>
-        <Root />
-    </Provider>,
-    document.getElementById("react")
-)
+    ReactDOM.render(
+        <Provider store={store}>
+            <Root />
+        </Provider>,
+        document.getElementById("react")
+    )
+}, (err) => {
+    console.error(err)
+})
+.catch((err) => {
+    console.error(err)  
+})

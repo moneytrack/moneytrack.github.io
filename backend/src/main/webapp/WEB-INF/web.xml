@@ -17,4 +17,13 @@
         <servlet-name>AuthServlet</servlet-name>
         <url-pattern>/auth</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CleanServlet</servlet-name>
+        <servlet-class>ru.koluch.wordlist.CleanServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CleanServlet</servlet-name>
+        <url-pattern>/clean</url-pattern>
+    </servlet-mapping>
 </web-app>
