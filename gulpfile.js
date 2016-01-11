@@ -39,7 +39,7 @@ var gulp = require('gulp'),
     packageJson = require('./package.json');
 
 
-var DEBUG_ROOT = 'D:/dev/moneytrack/backend/target/backend-1.0-SNAPSHOT';
+var DEBUG_ROOT = './backend/target/backend-1.0-SNAPSHOT';
 var SRC_ROOT = './src';
 var PROD_ROOT = './public';
 

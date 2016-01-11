@@ -12,6 +12,7 @@ import TabsContainer from './TabsContainer.jsx'
 import WaitIndicator from './WaitIndicator.jsx'
 import History from './History.jsx'
 import Statistics from './Statistics.jsx'
+import Settings from './Settings'
 
 const Root = React.createClass({
 
@@ -54,7 +55,7 @@ const Root = React.createClass({
 
         return (
             <div>
-                <TabsContainer titleList={["Main", "History", "Statistics"]} 
+                <TabsContainer titleList={["Main", "History", "Statistics", "Settings"]}
                                active={this.state.activeTab}
                                onSwitch={this.onSwitchTab}>
                     <div>
@@ -68,6 +69,11 @@ const Root = React.createClass({
                     <div>
                         <Statistics />
                     </div>
+
+                    <div>
+                        <Settings />
+                    </div>
+
                 </TabsContainer>
                 <WaitIndicator waiting={waiting}/>
                 

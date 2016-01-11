@@ -116,7 +116,9 @@ ajax.get(DISPATCH_URL)
             }
             break;
 
-            default: ;
+            default:
+                //todo: log
+            ;
         }
         return state
     }
