@@ -23,6 +23,7 @@ const TabsContainer = React.createClass({
 
     render: function() {
 
+
         var activeTabIndex = this.props.titleList.indexOf(this.props.active)
         var className = "tabs-container" + (this.props.className ? " " + this.props.className : "")
         return  (
@@ -50,7 +51,11 @@ const TabsContainer = React.createClass({
                 </div>
             </div>      
         )
-    },
+    }
 })
+
+TabsContainer.contextTypes = {
+    store: React.PropTypes.object
+}
 
 export default TabsContainer

@@ -18,7 +18,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Main"
+            activeTab: "Settings"
         }
     },
 
@@ -63,7 +63,7 @@ const Root = React.createClass({
                                active={this.state.activeTab}
                                onSwitch={this.onSwitchTab}>
                     <div>
-                        <EditExpense onAdd={this.onAdd} onAddCategory={this.onAddCategory} />
+                        <EditExpense onAdd={this.onAdd}/>
                     </div>
 
                     <div>

@@ -209,7 +209,6 @@ const SumTableStatistics = React.createClass({
                            titleList={Object.keys(yearMonthCategoryExpenseMap).sort(asc)} 
                            active={(this.state.activeYear || "").toString()}
                            onSwitch={(year) => {
-                                console.log(year)
                                 this.setState(update(this.state, {activeYear: {$set: year}}))
                            }}>
                 {

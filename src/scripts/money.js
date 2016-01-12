@@ -25,8 +25,6 @@ export default {
         result += pennies
         result += currency
 
-        console.log("format",cents,result)
-
         return result;
     }
 }

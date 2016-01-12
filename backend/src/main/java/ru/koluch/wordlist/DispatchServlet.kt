@@ -2,6 +2,8 @@ package ru.koluch.wordlist
 
 import com.github.salomonbrys.kotson.*
 import com.google.appengine.api.datastore.*
+import com.google.appengine.api.datastore.Query.FilterOperator.EQUAL
+import com.google.appengine.api.datastore.Query.FilterPredicate
 import com.google.gson.*
 import java.lang.reflect.Type
 import java.security.Principal
@@ -26,6 +28,8 @@ class NewExpenseAction(val amount: Int, val categoryId: Long, val date: Date, va
 class EditExpenseAction(val id: Long, val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
 class DeleteExpenseAction(val id: Long) : Action(ACTION_DELETE_EXPENSE)
 class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
+class EditCategoryAction(val id: Long, val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
+class DeleteCategoryAction(val id: Long) : Action(ACTION_NEW_CATEGORY)
 
 
 class DispatchServlet : HttpServlet() {
@@ -74,7 +78,7 @@ class DispatchServlet : HttpServlet() {
 
             fun collectCategoryIdList(parent: Long?): JsonArray {
                 val query = Query(CATEGORY_KIND, userEntity.key).setFilter(
-                    Query.FilterPredicate(CATEGORY_PROP_PARENT_ID, Query.FilterOperator.EQUAL, parent)
+                    FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, parent)
                 )
                 val preparedQuery = datastore.prepare(query)
                 val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
@@ -182,6 +186,11 @@ class DispatchServlet : HttpServlet() {
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
+            is DeleteExpenseAction -> {
+                datastore.delete(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+                res.setStatus(HttpServletResponse.SC_OK)
+            }
+
             is NewCategoryAction -> {
                 val entity = Entity(CATEGORY_KIND, userEntity.key)
                 entity.setProperty(CATEGORY_PROP_TITLE, action.title);
@@ -197,10 +206,54 @@ class DispatchServlet : HttpServlet() {
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
-            is DeleteExpenseAction -> {
-                datastore.delete(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+            is DeleteCategoryAction -> {
+                val tx = datastore.beginTransaction();
+
+                fun remove(categoryId: Long) {
+
+
+                    val childQuery = Query(CATEGORY_KIND, userEntity.key)
+                    childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, categoryId))
+                    val childList = datastore.prepare(childQuery).asList(FetchOptions.Builder.withDefaults())
+
+                    val expensesQuery = Query(EXPENSE_KIND, userEntity.key)
+                    expensesQuery.setFilter(FilterPredicate(EXPENSE_PROP_CATEGORY_ID, EQUAL, categoryId))
+                    val expenseList = datastore.prepare(expensesQuery).asList(FetchOptions.Builder.withDefaults())
+
+                    // Remove childs
+                    for (child in childList) {
+                        remove(child.key.id)
+                    }
+
+                    // Remove expenses
+                    for (expense in expenseList) {
+                        datastore.delete(tx, expense.key)
+                    }
+
+                    datastore.delete(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, categoryId))
+
+                }
+                remove(action.id)
+                tx.commit()
                 res.setStatus(HttpServletResponse.SC_OK)
             }
+            is EditCategoryAction -> {
+                if(action.parentId != null) {
+                    if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
+                        res.writer.println("Category with id '${action.parentId}' doesn't exists")
+                        res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                        return
+                    }
+                }
+
+                val entity = datastore.get(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+                entity.setProperty(CATEGORY_PROP_TITLE, action.title);
+                entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
+                val key = datastore.put(entity);
+                res.writer.println(key.id)
+                res.setStatus(HttpServletResponse.SC_OK)
+            }
+
             else -> {
                 res.writer.println("Unknown action type: ${action.type}")
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST)
@@ -246,10 +299,20 @@ class DispatchServlet : HttpServlet() {
                 val id = actionJson.get(PROP_ID).long
                 return DeleteExpenseAction(id)
             }
+            else if (type == ACTION_EDIT_CATEGORY) {
+                val id = actionJson.get(PROP_ID).long
+                val title = actionJson.get(CATEGORY_PROP_TITLE).string
+                val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong
+                return EditCategoryAction(id, title, parentId)
+            }
+            else if (type == ACTION_DELETE_CATEGORY) {
+                val id = actionJson.get(PROP_ID).long
+                return DeleteCategoryAction(id)
+            }
+            throw ActionParseException("Unknown action type: " + type)
         } catch(e: Exception) {
             throw ActionParseException(e)
         }
-        throw ActionParseException("Unknown action type: " + type)
     }
 }
 

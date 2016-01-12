@@ -50,9 +50,6 @@ const EditExpense = React.createClass({
         }
         else if(this.state.mode === "EDIT"){
 
-            console.log("date",this.state.date)
-            console.log("unwapped",DateTimePicker.unwrapState(this.state.date))
-
             this.props.onSave({
                 id: this.state.id,
                 amount: Math.floor(NumberInput.unwrapState(this.state.amount) * 100),

@@ -31,6 +31,7 @@ import moment from 'moment'
 
 import ajax from './ajax'
 import Root from './Root.jsx'
+import {find} from './arrays'
 
 const DISPATCH_URL = "http://localhost:8081/dispatch"
 
@@ -91,7 +92,7 @@ ajax.get(DISPATCH_URL)
                 const comment = action.comment;
                 const date = moment(action.date).valueOf()
 
-                var newHistory = state.history.map((expense) => {
+                let newHistory = state.history.map((expense) => {
                     if(expense.id === id) {
                         return {id, amount, categoryId, comment, date}
                     }
@@ -118,7 +119,7 @@ ajax.get(DISPATCH_URL)
 
             case 'NEW_CATEGORY': {
                 const id = parseFloat(action.id)
-                const title = parseInt(action.title)
+                const title = action.title
                 const parentId = action.parentId
 
                 const newCategory = {
@@ -128,7 +129,7 @@ ajax.get(DISPATCH_URL)
                     childIdList: []
                 }
 
-                var newCategoryList = state.categoryList.map(category => {
+                let newCategoryList = state.categoryList.map(category => {
                     if(category.id === parentId) {
                         return update(category, {
                             childIdList: {$push: [id]}
@@ -140,7 +141,7 @@ ajax.get(DISPATCH_URL)
                 })
                 newCategoryList = newCategoryList.concat([newCategory])
 
-                var newRootCategoryIdList = state.rootCategoryIdList.concat(parentId === null ? [id] : [])
+                let newRootCategoryIdList = state.rootCategoryIdList.concat(parentId === null ? [id] : [])
 
                 return update(state, {
                     categoryList: {$set: newCategoryList},
@@ -149,6 +150,38 @@ ajax.get(DISPATCH_URL)
                 //todo: handle "failed" case
             }
             break;
+
+            case 'DELETE_CATEGORY': {
+                const parentId = find(state.categoryList, x => x.id === action.id).parentId || null; //todo: fix
+
+                let newCategoryList;
+                let newRootCategoryIdList;
+                if(parentId != null) {
+                    newCategoryList = state.categoryList.map(category => {
+                        if(category.id === parentId) {
+                            return update(category, {
+                                childIdList: {$set: category.childIdList.filter(x => x !== action.id)}
+                            })
+                        }
+                        else {
+                            return category;
+                        }
+                    })
+                    newRootCategoryIdList = state.rootCategoryIdList
+                }
+                else {
+                    newCategoryList = state.categoryList
+                    newRootCategoryIdList = state.rootCategoryIdList.filter(x => x !== action.id)
+                }
+
+                return update(state, {
+                    categoryList: {$set: newCategoryList},
+                    rootCategoryIdList: {$set: newRootCategoryIdList}
+                })
+                //todo: handle "failed" case
+            }
+            break;
+
 
             default:
                 console.warn("Unhandled action", action);

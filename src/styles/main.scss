@@ -72,6 +72,37 @@ a.pseudo.warning {
 
 }
 
+.edit-category-list {
+    &__category {
+        margin: 0.1rem 0.3rem;
+        padding: 0.2rem;
+
+        &__title {
+            display: inline;
+            border-bottom: 1px dashed #006DCE;
+            color: #006DCE;
+        }
+
+        &--selected &__title {
+            background: #EEEFAA;
+            border-bottom: none;
+            color: inherit;
+        }
+
+
+        cursor: pointer;
+    }
+
+    &__children {
+        padding-left: 20px;
+    }
+
+    &__empty {
+        font-style: italic;
+    }
+
+}
+
 .m-input-moment {
     background: white;
 }

@@ -63,3 +63,23 @@ export const newCategory = ({title, parentId}) => {
 	    }
     })
 }
+
+export const editCategory = ({id, title, parentId}) => {
+	return asyncDispatch((result) => {
+		return {
+			type: 'EDIT_CATEGORY',
+			id,
+			title,
+			parentId
+		}
+	})
+}
+
+export const deleteCategory = ({id}) => {
+	return asyncDispatch((result) => {
+		return {
+			type: 'DELETE_CATEGORY',
+			id
+		}
+	})
+}

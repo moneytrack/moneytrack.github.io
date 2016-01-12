@@ -71,7 +71,6 @@ DateTimePicker.contextTypes = {
 }
 
 DateTimePicker.wrapState = function(timestamp) {
-    console.log("wrap",timestamp)
     return {
         timestamp,
         moment: _moment(timestamp)
