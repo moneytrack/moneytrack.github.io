@@ -24,7 +24,7 @@ const EditExpense = React.createClass({
             }
         }
         else {
-            var firstCategoryId = rootCategoryIdList.length > 0 ? rootCategoryIdList[0] : -1;
+            let firstCategoryId = rootCategoryIdList.length > 0 ? rootCategoryIdList[0] : -1;
             return {
                 amount: NumberInput.wrapState(0),
                 categoryId: firstCategoryId,

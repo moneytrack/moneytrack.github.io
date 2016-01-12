@@ -23,7 +23,7 @@ const NumberInput = React.createClass({
 
 
     onChange: function(e) {
-        var value = e.target.value
+        let value = e.target.value
         value = value.replace(/\s/g,'')
         value = value.replace(/,/g,'.')
         value = /^0[0-9]+/.test(value) ? value.substring(1) : value

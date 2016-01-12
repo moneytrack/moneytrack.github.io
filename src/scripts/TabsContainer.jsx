@@ -24,8 +24,8 @@ const TabsContainer = React.createClass({
     render: function() {
 
 
-        var activeTabIndex = this.props.titleList.indexOf(this.props.active)
-        var className = "tabs-container" + (this.props.className ? " " + this.props.className : "")
+        let activeTabIndex = this.props.titleList.indexOf(this.props.active)
+        let className = "tabs-container" + (this.props.className ? " " + this.props.className : "")
         return  (
             <div className={className}>
                 <div className="tabs-container__labels">

@@ -20,11 +20,11 @@ const EditCategoryList = React.createClass({
     },
 
     renderRecurse: function(list, level) {
-        var {categoryList} = this.context.store.getState();
+        let {categoryList} = this.context.store.getState();
 
         return list.map((category) => {
             const childList = category.childIdList.map(id => categoryList.filter(x => x.id === id)[0])
-            var classes = ["edit-category-list__category"]
+            let classes = ["edit-category-list__category"]
             classes = classes.join(" ")
             if(childList.length > 0) {
                 const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
@@ -63,12 +63,12 @@ const EditCategoryList = React.createClass({
     },
 
     render: function() {
-        var {rootCategoryIdList,categoryList} = this.context.store.getState();
+        let {rootCategoryIdList,categoryList} = this.context.store.getState();
 
         const rootCategoryList = rootCategoryIdList.map(id => categoryList.filter(x => x.id === id)[0])
         const children = this.renderRecurse(rootCategoryList, 0)
         if(this.props.allowEmpty) {
-            var classes = ["edit-category-list__category"]
+            let classes = ["edit-category-list__category"]
             if(this.props.value === null) {
                 classes.push("edit-category-list__category--selected")
             }

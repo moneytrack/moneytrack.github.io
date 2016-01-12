@@ -17,7 +17,7 @@ const CategoryPicker = React.createClass({
     renderRecurse: function(list, level) {
         return list.map((category) => {
             const childList = category.childIdList.map(id => this.props.categoryList.filter(x => x.id === id)[0])
-            var classes = ["category-picker__category"]
+            let classes = ["category-picker__category"]
             if(this.props.value === category.id) {
                 classes.push("category-picker__category--selected")
             }
@@ -50,7 +50,7 @@ const CategoryPicker = React.createClass({
         const rootCategoryList = this.props.rootCategoryIdList.map(id => this.props.categoryList.filter(x => x.id === id)[0])
         const children = this.renderRecurse(rootCategoryList, 0)
         if(this.props.allowEmpty) {
-            var classes = ["category-picker__category"]
+            let classes = ["category-picker__category"]
             if(this.props.value === null) {
                 classes.push("category-picker__category--selected")
             }

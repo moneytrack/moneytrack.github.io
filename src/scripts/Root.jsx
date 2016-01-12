@@ -54,8 +54,8 @@ const Root = React.createClass({
         const {store} = this.context
         const {history, categoryList, waiting} = store.getState()
 
-        var input;
-        var prevValue = 0;
+        let input;
+        let prevValue = 0;
 
         return (
             <div>

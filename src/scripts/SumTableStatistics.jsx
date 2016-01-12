@@ -12,7 +12,7 @@ const {keys} = Object
 
 const SumTableStatistics = React.createClass({
     getInitialState: function() {
-        var years = Object.keys(this.getYearMonthCategoryExpenseMap()).map(x => parseInt(x)).sort(desc)
+        let years = Object.keys(this.getYearMonthCategoryExpenseMap()).map(x => parseInt(x)).sort(desc)
         return {
             activeYear: years[0],
             showChild: false,
@@ -28,9 +28,9 @@ const SumTableStatistics = React.createClass({
         const yearMonthCategoryExpenseMap = {}
 
         history.forEach(expense => {
-            var month = moment(expense.date).month()
-            var year = moment(expense.date).year()
-            var categoryId = expense.categoryId
+            let month = moment(expense.date).month()
+            let year = moment(expense.date).year()
+            let categoryId = expense.categoryId
             if(!(year in yearMonthCategoryExpenseMap)) {
                 yearMonthCategoryExpenseMap[year] = [];
             }
@@ -127,7 +127,7 @@ const SumTableStatistics = React.createClass({
                             {
                                 keys(categoryData).sort(asc).map(month => {
                                     const sum = categoryData[month] + recurseSum(data, category, month);
-                                    var dif = null;
+                                    let dif = null;
                                     if(categoryData[month - 1] ) {
                                         const lastSum = categoryData[month - 1]  + recurseSum(data, category, month - 1)
                                         dif = lastSum ?  sum - lastSum : null
@@ -143,7 +143,7 @@ const SumTableStatistics = React.createClass({
                       </tr>)
 
             if(this.state.showChild) {
-                var childrenRowList = []
+                let childrenRowList = []
                 categoryList.filter(cat => cat.parentId === category.id).forEach(child => {
                     childrenRowList.push(...renderCategory(data, child, level + 1))
                 })
@@ -173,7 +173,7 @@ const SumTableStatistics = React.createClass({
         }
         
         function renderTable(data) {
-            var rows = [];
+            let rows = [];
 
             const rootCategoryList = categoryList.filter((category) => rootCategoryIdList.indexOf(category.id)!=-1);
             rootCategoryList.forEach((category) => {
@@ -187,7 +187,7 @@ const SumTableStatistics = React.createClass({
             Returns map: category -> month -> sum
         */
         function calculateTable(monthCategoryExpenseMap) {
-            var result = {}
+            let result = {}
 
             categoryList.forEach(category => {
                 result[category.id] = {};
@@ -213,7 +213,7 @@ const SumTableStatistics = React.createClass({
                            }}>
                 {
                     Object.keys(yearMonthCategoryExpenseMap).sort(asc).map(year => {
-                        var data = calculateTable(yearMonthCategoryExpenseMap[year])
+                        let data = calculateTable(yearMonthCategoryExpenseMap[year])
                         return (
                             <div key={year}>
                                 <div>

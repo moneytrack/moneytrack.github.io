@@ -16,11 +16,11 @@ const {keys} = Object
 const History = React.createClass({
 
     getInitialState: function() {
-        var now = moment();
+        let now = moment();
         now.startOf('month')
-        var from = now.valueOf()
+        let from = now.valueOf()
         now.endOf('month')
-        var to = now.valueOf()
+        let to = now.valueOf()
 
         return {
             editingExpense: false,
@@ -113,11 +113,11 @@ const History = React.createClass({
 
         function groupBy(arr, f) {
             const result = [];
-            var group = null;
-            var lastGroupValue = null;
-            for(var i = 0; i<arr.length; ++i) {
-                var next = arr[i]
-                var newGroupValue = f(next)
+            let group = null;
+            let lastGroupValue = null;
+            for(let i = 0; i<arr.length; ++i) {
+                let next = arr[i]
+                let newGroupValue = f(next)
                 if(group === null || f(next) !== lastGroupValue) {
                     group = []
                     result.push(group)
@@ -129,10 +129,10 @@ const History = React.createClass({
         }
 
         function collectCategoryAncestors(category) {
-            var parentId = category.parentId;
+            let parentId = category.parentId;
             const result = [category];
             while(parentId) {
-                var parent = categoryList.filter(x => x.id === parentId)[0];
+                let parent = categoryList.filter(x => x.id === parentId)[0];
                 result.unshift(parent)
                 parentId = parent.parentId;
             }
@@ -142,8 +142,8 @@ const History = React.createClass({
 
         const yearMonthMap = {};
         history.forEach((expense) => {
-            var month = moment(expense.date).month()
-            var year = moment(expense.date).year()
+            let month = moment(expense.date).month()
+            let year = moment(expense.date).year()
             if(!(year in yearMonthMap)) {
                 yearMonthMap[year] = [];
             }
@@ -152,13 +152,14 @@ const History = React.createClass({
             }
         })
 
-        var filteredHistory = history.filter(x => x.date >= filterDateFrom && x.date <= filterDateTo)
+        let filteredHistory = history.filter(x => x.date >= filterDateFrom && x.date <= filterDateTo)
         if(filterCategory!==null) {
             filteredHistory = filteredHistory.filter(x => x.categoryId === filterCategory)
         }
         if(filterComment !== "") {
             filteredHistory = filteredHistory.filter(x => x.comment.indexOf(filterComment)!=-1)
         }
+
         const sortedHistory = filteredHistory.sort((e1, e2) => e2.date - e1.date)
         const expensesByDays = groupBy(filteredHistory, (expense) => moment(expense.date).format('YYYY MM DD'))
 
@@ -244,7 +245,7 @@ const History = React.createClass({
 
                                 {
                                     yearMonthMap[year].sort(desc).map((month) => {
-                                        var m = moment().month(month).year(year)
+                                        let m = moment().month(month).year(year)
                                         if(filterDateItem === (year + "-" + month)) {
                                             return (
                                                 <div key={month} className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active">

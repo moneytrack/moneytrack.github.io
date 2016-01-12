@@ -2,7 +2,7 @@
 import {Promise} from 'es6-promise'
 
 module.exports.get = (url) => {
-    var xmlhttp;
+    let xmlhttp;
 
     return new Promise((resolve, reject) => {
         
@@ -49,7 +49,7 @@ module.exports.get = (url) => {
 module.exports.post = (url, body) => {
     return new Promise((resolve, reject) => {
 
-        var xmlhttp;
+        let xmlhttp;
 
         if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari

@@ -7,11 +7,11 @@ export default {
         const decimalDelim = settings.decimalDelim || "."
         const currency = settings.currency || ""
 
-        var result = "";
-        var dollars = parseInt(cents / 100)
-        var pennies = parseInt(cents % 100)
+        let result = "";
+        let dollars = parseInt(cents / 100)
+        let pennies = parseInt(cents % 100)
         while(dollars >= 1000) {
-            var group = dollars % 1000
+            let group = dollars % 1000
             result = group + result
             if(group < 100) result = "0" + result
             if(group < 10) result = "0" + result

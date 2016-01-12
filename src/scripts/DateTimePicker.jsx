@@ -25,7 +25,7 @@ const DateTimePicker = React.createClass({
         this.setState(update(this.state, {
             visible: {$set: !this.state.visible}
         }))
-        var resetMoment = _moment(this.props.value.timestamp)
+        let resetMoment = _moment(this.props.value.timestamp)
         this.props.onChange(update(this.props.value, {
             moment: {$set: resetMoment}
         }))

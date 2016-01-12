@@ -19,11 +19,11 @@ const ExpenseList = React.createClass({
 
         function groupBy(arr, f) {
             const result = [];
-            var group = null;
-            var lastGroupValue = null;
-            for(var i = 0; i<arr.length; ++i) {
-                var next = arr[i]
-                var newGroupValue = f(next)
+            let group = null;
+            let lastGroupValue = null;
+            for(let i = 0; i<arr.length; ++i) {
+                let next = arr[i]
+                let newGroupValue = f(next)
                 if(group === null || f(next) !== lastGroupValue) {
                     group = []
                     result.push(group)
@@ -35,10 +35,10 @@ const ExpenseList = React.createClass({
         }
 
         function collectCategoryAncestors(category) {
-            var parentId = category.parentId;
+            let parentId = category.parentId;
             const result = [category];
             while(parentId) {
-                var parent = categoryList.filter(x => x.id === parentId)[0];
+                let parent = categoryList.filter(x => x.id === parentId)[0];
                 result.unshift(parent)
                 parentId = parent.parentId;
             }
@@ -54,7 +54,7 @@ const ExpenseList = React.createClass({
 
                 {
                     expensesByDays.map((group) => {
-                        var day = moment(group[0].date).format('MMMM Do YYYY (dddd)')
+                        let day = moment(group[0].date).format('MMMM Do YYYY (dddd)')
                         return (<div key={day} className="expense-list__group">
                             <div className="expense-list__group__title">{day}</div>
                             {
