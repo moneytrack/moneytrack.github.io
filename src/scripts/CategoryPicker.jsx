@@ -15,7 +15,9 @@ const CategoryPicker = React.createClass({
     },
 
     renderRecurse: function(list, level) {
-        return list.map((category) => {
+        var sorted = list.slice().sort((c1, c2) => c1.order - c2.order)
+
+        return sorted.map((category) => {
             const childList = category.childIdList.map(id => this.props.categoryList.filter(x => x.id === id)[0])
             let classes = ["category-picker__category"]
             if(this.props.value === category.id) {

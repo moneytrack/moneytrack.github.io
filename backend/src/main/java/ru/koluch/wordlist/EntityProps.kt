@@ -38,3 +38,4 @@ const val CATEGORY_KIND = "Category";
 const val CATEGORY_PROP_TITLE = "title";
 const val CATEGORY_PROP_PARENT_ID = "parentId";
 const val CATEGORY_PROP_CHILD_ID_LIST = "childIdList";
+const val CATEGORY_PROP_ORDER = "order";

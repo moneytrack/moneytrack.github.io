@@ -10,10 +10,8 @@ import java.security.Principal
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import kotlin.collections.map
 import java.util.Date
-import kotlin.collections.fold
-import kotlin.collections.forEach
+import kotlin.collections.*
 
 /**
  * Copyright (c) 2015 Nikolai Mavrenkov <koluch@koluch.ru>
@@ -98,6 +96,7 @@ class DispatchServlet : HttpServlet() {
                         PROP_ID to categoryEntity.key.id,
                         CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
                         CATEGORY_PROP_PARENT_ID to categoryEntity.getProperty(CATEGORY_PROP_PARENT_ID),
+                        CATEGORY_PROP_ORDER to categoryEntity.getProperty(CATEGORY_PROP_ORDER),
                         CATEGORY_PROP_CHILD_ID_LIST to collectCategoryIdList(categoryEntity.key.id)
                     ))
                 }
@@ -193,16 +192,33 @@ class DispatchServlet : HttpServlet() {
 
             is NewCategoryAction -> {
                 val entity = Entity(CATEGORY_KIND, userEntity.key)
+
+                val tx = datastore.beginTransaction();
+
                 entity.setProperty(CATEGORY_PROP_TITLE, action.title);
                 if (action.parentId != null) {
-                    if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
+                    if (!datastore.exists(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId), userEntity.key)) {
                         res.writer.println("Parent category with id '${action.parentId}' doesn't exists")
                         res.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
                     }
                 };
+
+                val childQuery = Query(CATEGORY_KIND, userEntity.key)
+                childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, action.parentId))
+                val childList = datastore.prepare(tx, childQuery).asList(FetchOptions.Builder.withDefaults())
+
+                val maxOrder: Long = childList.fold(0L, {acc, child ->
+                    val order = (child.getProperty(CATEGORY_PROP_ORDER) as Long?) ?: 0
+                    Math.max(acc, order)
+                })
+
                 entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
-                val key = datastore.put(entity);
+                entity.setProperty(CATEGORY_PROP_ORDER, maxOrder + 1)
+                val key = datastore.put(tx, entity);
+
+                tx.commit()
+
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
             }
