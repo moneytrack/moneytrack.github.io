@@ -9,6 +9,40 @@ const EditCategoryList = React.createClass({
         allowEmpty: React.PropTypes.bool
     },
 
+    getInitialState: function() {
+        return {
+            editing: false,
+            editingId: null,
+            editingText: null
+        }
+    },
+
+    onEditTitleBegin: function(category) {
+
+        this.setState(update(this.state, {
+            editing: {$set: true},
+            editingId: {$set: category.id},
+            editingText: {$set: category.title},
+        }))
+    },
+
+    onEditFinished: function(e) {
+        if(e.keyCode == 13) {
+            console.log("todo: save");
+        }
+        else if(e.keyCode == 27) {
+            this.setState(update(this.state, {
+                editing: {$set: false},
+            }))
+        }
+    },
+
+    onEdit: function(e) {
+        this.setState(update(this.state, {
+            editingText: {$set: e.target.value},
+        }))
+    },
+
     onNewCategory: function(e, parentId, refId) {
         e.preventDefault()
         this.props.onNewCategory(this.refs[refId].value, parentId)
@@ -30,8 +64,11 @@ const EditCategoryList = React.createClass({
                 const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
                 return [
                     <div key={category.id} className={classes} >
-                        <div className="edit-category-list__category__title">
-                            {category.title}
+                        <div className="edit-category-list__category__title"
+                             onClick={() => this.onEditTitleBegin(category)}>
+                            {(this.state.editing && this.state.editingId === category.id )
+                            ? <input value={this.state.editingText} onChange={this.onEdit} onKeyUp={this.onEditFinished}/>
+                            : category.title}
                         </div>
                         <button onClick={(e) => this.onDeleteCategory(e, category.id)}>Delete</button>
                     </div>,
@@ -47,10 +84,12 @@ const EditCategoryList = React.createClass({
             else {
                 return [
                     <div key={category.id} className={classes}>
-                        <div className="edit-category-list__category__title">
-                            {category.title}
+                        <div className="edit-category-list__category__title" onClick={() => this.onEditTitleBegin(category)}>
+                            {(this.state.editing && this.state.editingId === category.id )
+                                ? <input value={this.state.editingText} onChange={this.onEdit}  onKeyUp={this.onEditFinished}/>
+                                : category.title}
                         </div>
-                        {' '}<button  onClick={(e) => this.onDeleteCategory(e, category.id)}>Delete</button>
+                        {' '}<button  onClick={(e) => this.onDeleteCategory(e, category.id)} >Delete</button>
                         <div>
                             <label>New category: <input  ref={"new_category_" + category.id} /> </label>
                             {' '}<button onClick={(e) => this.onNewCategory(e, category.id, "new_category_" + category.id)}>Add</button>
