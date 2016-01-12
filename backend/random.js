@@ -54,7 +54,7 @@ function Sender() {
 
 Sender.prototype.sendAction = function (data) {
     return post({
-        url: "http://localhost:8080/dispatch",
+        url: "http://localhost:8081/dispatch",
         json: true,
         headers: this.cookies,
         body: data
@@ -113,7 +113,7 @@ Sender.prototype.post = function(url, params) {
 var sender = new Sender();
 
 function dispatch(json)  {
-    var result = sender.post('http://localhost:8080/dispatch', { json: json})
+    var result = sender.post('http://localhost:8081/dispatch', { json: json})
     if(result.body) {
         return JSON.parse(result.body)
     }
@@ -127,15 +127,15 @@ function money(rubels) {
     return Math.floor(rubels * 100)
 }
 
-sender.get('http://localhost:8080/clean')
+sender.get('http://localhost:8081/clean')
 
-var loginResponse = sender.post('http://localhost:8080/_ah/login?continue=%2Fauth', {form: {
+var loginResponse = sender.post('http://localhost:8081/_ah/login?continue=%2Fauth', {form: {
     'email':'test@example.com',
     'continue':'/auth',
     'action':'Log In'
 }});
 
-sender.get('http://localhost:8080/auth')
+sender.get('http://localhost:8081/auth')
 
 /*
     Categories:

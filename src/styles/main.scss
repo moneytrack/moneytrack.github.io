@@ -25,7 +25,7 @@ a.pseudo.warning {
 .edit-expense {
 	> table > tbody > tr > td {
 		vertical-align: top;
-	    padding: 0.25rem 0.5rem;	
+	    padding: 0.25rem 0.5rem;
 	}
 
 	&__field {
@@ -37,7 +37,7 @@ a.pseudo.warning {
     &__category-picker-wrapper {
         border: 1px solid #999;
         border-radius: 5px;
-        padding: 0.5rem;        
+        padding: 0.5rem;
     }
 }
 
@@ -46,18 +46,16 @@ a.pseudo.warning {
         margin: 0.1rem 0.3rem;
         padding: 0.2rem;
 
-        > div {
+        &__title {
             display: inline;
-            border-bottom: 1px dashed #006DCE;     
-            color: #006DCE;      
+            border-bottom: 1px dashed #006DCE;
+            color: #006DCE;
         }
 
-        &--selected {
-            > div {
-                background: #EEEFAA;
-                border-bottom: none;
-                color: inherit;
-            }
+        &--selected &__title {
+            background: #EEEFAA;
+            border-bottom: none;
+            color: inherit;
         }
 
 
@@ -175,7 +173,7 @@ a.pseudo.warning {
         font-size: 0.75rem;
         color: #999;
         font-style: italic;
-    }    
+    }
 
 
 }
@@ -307,8 +305,8 @@ a.pseudo.warning {
 
         &__value {
             padding: 0.25rem 0.8rem;
-            white-space: nowrap;            
-            text-align: right;            
+            white-space: nowrap;
+            text-align: right;
 
             &__dif {
                 font-size: 0.75rem;
@@ -319,7 +317,7 @@ a.pseudo.warning {
 
                 &--minus {
                     color: green;
-                }                
+                }
 
             }
         }

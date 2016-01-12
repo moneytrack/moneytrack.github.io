@@ -2,10 +2,10 @@
 
 import ajax from "./ajax"
 
-const DISPATCH_URL = "http://localhost:8080/dispatch"
+const DISPATCH_URL = "http://localhost:8081/dispatch"
 
 function asyncDispatch(cb) {
-	return dispatch => {	
+	return dispatch => {
 		dispatch({type:"WAIT"})
 
 		ajax.post(DISPATCH_URL, cb(null)).then((result) => {
@@ -48,8 +48,18 @@ export const deleteExpense = (id) => {
 	return asyncDispatch((result) => {
     	return {
 	        type: 'DELETE_EXPENSE',
-	        id 
-	    }	
+	        id
+	    }
     })
 }
 
+export const newCategory = ({title, parentId}) => {
+	return asyncDispatch((id) => {
+    	return {
+	        type: 'NEW_CATEGORY',
+            id,
+	        title,
+            parentId
+	    }
+    })
+}

@@ -32,7 +32,7 @@ import moment from 'moment'
 import ajax from './ajax'
 import Root from './Root.jsx'
 
-const DISPATCH_URL = "http://localhost:8080/dispatch"
+const DISPATCH_URL = "http://localhost:8081/dispatch"
 
 ajax.get(DISPATCH_URL)
 .then((response) => {
@@ -116,7 +116,42 @@ ajax.get(DISPATCH_URL)
             }
             break;
 
+            case 'NEW_CATEGORY': {
+                const id = parseFloat(action.id)
+                const title = parseInt(action.title)
+                const parentId = action.parentId
+
+                const newCategory = {
+                    id,
+                    title,
+                    parentId,
+                    childIdList: []
+                }
+
+                var newCategoryList = state.categoryList.map(category => {
+                    if(category.id === parentId) {
+                        return update(category, {
+                            childIdList: {$push: [id]}
+                        })
+                    }
+                    else {
+                        return category;
+                    }
+                })
+                newCategoryList = newCategoryList.concat([newCategory])
+
+                var newRootCategoryIdList = state.rootCategoryIdList.concat(parentId === null ? [id] : [])
+
+                return update(state, {
+                    categoryList: {$set: newCategoryList},
+                    rootCategoryIdList: {$set: newRootCategoryIdList}
+                })
+                //todo: handle "failed" case
+            }
+            break;
+
             default:
+                console.warn("Unhandled action", action);
                 //todo: log
             ;
         }
@@ -136,5 +171,5 @@ ajax.get(DISPATCH_URL)
     console.error(err)
 })
 .catch((err) => {
-    console.error(err)  
+    console.error(err)
 })

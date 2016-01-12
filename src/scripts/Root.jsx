@@ -4,7 +4,7 @@ import React from 'react'
 import moment from 'moment'
 import update from 'react-addons-update'
 
-import {newExpense, deleteExpense} from './action-creators.js'
+import {newExpense, deleteExpense, newCategory} from './action-creators.js'
 
 import NumberInput from './NumberInput.jsx'
 import EditExpense from './EditExpense.jsx'
@@ -18,7 +18,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "History"
+            activeTab: "Main"
         }
     },
 
@@ -34,6 +34,10 @@ const Root = React.createClass({
 
     onAdd: function(attrs) {
         this.context.store.dispatch(newExpense(attrs))
+    },
+
+    onAddCategory: function(attrs) {
+        this.context.store.dispatch(newCategory(attrs))
     },
 
     onDelete: function(id) {
@@ -59,7 +63,7 @@ const Root = React.createClass({
                                active={this.state.activeTab}
                                onSwitch={this.onSwitchTab}>
                     <div>
-                        <EditExpense onAdd={this.onAdd} />
+                        <EditExpense onAdd={this.onAdd} onAddCategory={this.onAddCategory} />
                     </div>
 
                     <div>
@@ -76,8 +80,8 @@ const Root = React.createClass({
 
                 </TabsContainer>
                 <WaitIndicator waiting={waiting}/>
-                
-                
+
+
             </div>
         )
     }

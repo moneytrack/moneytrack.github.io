@@ -38,7 +38,7 @@ const EditExpense = React.createClass({
 
     onSubmit: function(e) {
         e.preventDefault();
-        
+
         if(this.state.mode === "NEW") {
             this.props.onAdd({
                 amount: Math.floor(NumberInput.unwrapState(this.state.amount) * 100),
@@ -49,7 +49,7 @@ const EditExpense = React.createClass({
             this.setState(this.getInitialState())
         }
         else if(this.state.mode === "EDIT"){
-                
+
             console.log("date",this.state.date)
             console.log("unwapped",DateTimePicker.unwrapState(this.state.date))
 
@@ -66,13 +66,13 @@ const EditExpense = React.createClass({
         }
     },
 
-     
+
 
     onAmountChange: function(value) {
         this.setState(update(this.state, {
             amount: {$set:value}
         }))
-    },    
+    },
 
     onChangeComment: function(e) {
         this.setState(update(this.state, {
@@ -92,6 +92,13 @@ const EditExpense = React.createClass({
         }))
     },
 
+    onNewCategory: function(title, parentId) {
+        this.props.onAddCategory({
+            title,
+            parentId
+        })
+    },
+
     onCancel: function() {
         this.props.onCancel()
     },
@@ -106,26 +113,28 @@ const EditExpense = React.createClass({
                             <td><NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></td>
                         </tr>
                         <tr>
-                            <td className="edit-expense__field__label">Category: </td> 
+                            <td className="edit-expense__field__label">Category: </td>
                             <td>
                                 <div  className="edit-expense__category-picker-wrapper">
-                                    <CategoryPicker categoryList={this.context.store.getState().categoryList} 
-                                            rootCategoryIdList={this.context.store.getState().rootCategoryIdList} 
-                                            value={this.state.categoryId}
-                                            onChange={this.onChangeCategory}/>
-                                </div>      
+                                    <CategoryPicker categoryList={this.context.store.getState().categoryList}
+                                                    rootCategoryIdList={this.context.store.getState().rootCategoryIdList}
+                                                    value={this.state.categoryId}
+                                                    onChange={this.onChangeCategory}
+                                                    editingEnabled={true}
+                                                    onNewCategory={this.onNewCategory}/>
+                                </div>
                             </td>
                         </tr>
                         <tr>
                             <td className="edit-expense__field__label">Date:</td>
                             <td>
-                                <DateTimePicker 
-                                            value={this.state.date} 
+                                <DateTimePicker
+                                            value={this.state.date}
                                             onChange={this.onChangeDate} />
                             </td>
                         </tr>
                         <tr>
-                            <td className="edit-expense__field__label">Comment:</td> 
+                            <td className="edit-expense__field__label">Comment:</td>
                             <td><input value={this.state.comment} onChange={this.onChangeComment}/></td>
                         </tr>
                         <tr>

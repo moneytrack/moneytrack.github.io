@@ -7,11 +7,17 @@ const CategoryPicker = React.createClass({
         rootCategoryIdList: React.PropTypes.arrayOf(React.PropTypes.number),
         categoryList: React.PropTypes.arrayOf(React.PropTypes.object),
         allowEmpty: React.PropTypes.bool,
+        editingEnabled: React.PropTypes.bool,
         value: React.PropTypes.number // active category id
     },
 
     onChange: function(category) {
         this.props.onChange(category)
+    },
+
+    onNewCategory: function(e, parentId, refId) {
+        e.preventDefault()
+        this.props.onNewCategory(this.refs[refId].value, parentId)
     },
 
     renderRecurse: function(list, level) {
@@ -26,23 +32,29 @@ const CategoryPicker = React.createClass({
                 const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
                 return [
                     <div key={category.id} className={classes} onClick={() => this.onChange(category.id)}>
-                        <div>
+                        <div className="category-picker__category__title">
                             {category.title}
                         </div>
                     </div>,
-                    <div key={category.id + '-children'} className="category-picker__children">{childListRendered}</div>
+                    <div key={category.id + '-children'} className="category-picker__children">
+                        {childListRendered}
+                        {this.props.editingEnabled ? <div>
+                            <label>New category: <input  ref={"new_category_" + category.id} /> </label>
+                            <button onClick={(e) => this.onNewCategory(e, category.id, "new_category_" + category.id)}>Add</button>
+                        </div> : null }
+                    </div>
                 ]
             }
             else {
                 return [
                     <div key={category.id} className={classes} onClick={() => this.onChange(category.id)}>
-                        <div>
+                        <div className="category-picker__category__title">
                             {category.title}
                         </div>
                     </div>
                 ]
             }
-            
+
         })
     },
 
@@ -56,7 +68,7 @@ const CategoryPicker = React.createClass({
             }
             classes = classes.join(" ")
             children.unshift(<div key="empty" className={classes} onClick={() => this.onChange(null)}>
-                                <div className="category-picker__empty">
+                                <div className="category-picker__empty" >
                                     Do not filter by category
                                 </div>
                             </div>)
@@ -64,7 +76,11 @@ const CategoryPicker = React.createClass({
         return  (
             <div className="category-picker">
                 {children}
-            </div>      
+                <div>
+                    <label >New category: <input ref={"new_category_root"} /> </label>
+                    <button onClick={(e) => this.onNewCategory(e, null, "new_category_root")}>Add</button>
+                </div>
+            </div>
         )
     },
 })
