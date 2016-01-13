@@ -1,6 +1,7 @@
 "use strict"
 import React from 'react'
 import update from 'react-addons-update'
+import {find} from './arrays'
 
 const EditCategoryList = React.createClass({
     getInitialState: function() {
@@ -40,6 +41,13 @@ const EditCategoryList = React.createClass({
         }))
     },
 
+    onMove: function(id, e) {
+        const toId = parseInt(e.target.value);
+        if(id >= 0) {
+            this.props.onMoveCategory(id, toId)
+        }
+    },
+
     onNewCategory: function(e, parentId, refId) {
         e.preventDefault()
         this.props.onNewCategory(this.refs[refId].value, parentId)
@@ -51,9 +59,35 @@ const EditCategoryList = React.createClass({
     },
 
     renderRecurse: function(list, level) {
-        let {categoryList} = this.context.store.getState();
+        let {categoryList, rootCategoryId} = this.context.store.getState();
 
-        return list.map((category) => {
+        function renderMoveToOptions(category, current, level = 0) {
+
+            if(category.id == current) {
+                return [];
+            }
+
+            let space = "";
+            for(let i = 0; i<level; ++i) {
+                space += String.fromCharCode(parseInt("00A0", 16))
+                space += String.fromCharCode(parseInt("00A0", 16))
+            }
+            let childOptionList = [
+                <option value={category.id} key={category.id}>{space + category.title}</option>
+            ];
+            category.childIdList.map((id) => {
+                let child = find(categoryList, x => x.id === id)
+                return renderMoveToOptions(child, current, level + 1)
+            }).forEach(subList => subList.forEach(option => {
+                childOptionList.push(option)
+            }))
+            return childOptionList
+        }
+
+        let rootCategory = categoryList.filter(x => x.id === rootCategoryId)[0]
+
+        let sorted = list.slice().sort((c1, c2) => c1.order - c2.order)
+        return sorted.map((category) => {
             const childList = category.childIdList.map(id => categoryList.filter(x => x.id === id)[0])
             let classes = ["edit-category-list__category"]
             classes = classes.join(" ")
@@ -68,6 +102,10 @@ const EditCategoryList = React.createClass({
                             : category.title}
                         </div>
                         <button onClick={(e) => this.onDeleteCategory(e, category.id)}>Delete</button>
+                        <select onChange={(e) => this.onMove(category.id, e)}>
+                            <option value={-1}>Move to...</option>
+                            {renderMoveToOptions(rootCategory, category.id)}
+                        </select>
                     </div>,
                     <div key={category.id + '-children'} className="edit-category-list__children">
                         {childListRendered}
@@ -87,6 +125,10 @@ const EditCategoryList = React.createClass({
                                 : category.title}
                         </div>
                         {' '}<button  onClick={(e) => this.onDeleteCategory(e, category.id)} >Delete</button>
+                        <select  onChange={(e) => this.onMove(category.id, e)}>
+                            <option value={-1}>Move to...</option>
+                            {renderMoveToOptions(rootCategory, category.id)}
+                        </select>
                         <div>
                             <label>New category: <input  ref={"new_category_" + category.id} /> </label>
                             {' '}<button onClick={(e) => this.onNewCategory(e, category.id, "new_category_" + category.id)}>Add</button>

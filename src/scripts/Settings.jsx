@@ -29,6 +29,13 @@ const Settings = React.createClass({
         }))
     },
 
+    onMoveCategory: function(id, parentId) {
+        this.context.store.dispatch(editCategory({
+            id,
+            parentId
+        }))
+    },
+
     onDeleteCategory: function(id) {
         this.context.store.dispatch(deleteCategory({
             id
@@ -48,6 +55,7 @@ const Settings = React.createClass({
                 <TabsContainer titleList={["Categories","User settings"]} active={this.state.active} onSwitch={this.onSwitch}>
                     <EditCategoryList onNewCategory={this.onNewCategory}
                                       onRenameCategory={this.onRenameCategory}
+                                      onMoveCategory={this.onMoveCategory}
                                       onDeleteCategory={this.onDeleteCategory} />
                     <UserSettings />
                 </TabsContainer>

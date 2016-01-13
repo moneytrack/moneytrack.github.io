@@ -323,7 +323,7 @@ class DispatchServlet : HttpServlet() {
             }
             else if (type == ACTION_EDIT_CATEGORY) {
                 val id = actionJson.get(PROP_ID).long
-                val title = actionJson.get(CATEGORY_PROP_TITLE).string
+                val title = actionJson.get(CATEGORY_PROP_TITLE).nullString
                 val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong
                 return EditCategoryAction(id, title, parentId)
             }

@@ -64,7 +64,7 @@ export const newCategory = ({title, parentId}) => {
     })
 }
 
-export const editCategory = ({id, title, parentId}) => {
+export const editCategory = ({id, title = null, parentId  = null}) => {
 	return asyncDispatch((result) => {
 		return {
 			type: 'EDIT_CATEGORY',

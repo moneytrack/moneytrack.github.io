@@ -18,7 +18,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Main"
+            activeTab: "Settings"
         }
     },
 

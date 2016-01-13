@@ -155,26 +155,46 @@ ajax.get(DISPATCH_URL)
                 const title = action.title
                 const parentId = action.parentId
 
-                const newCategoryList = state.categoryList.map(category => {
-                    if(category.id === id) {
-                        let newCategory = category;
-                        if(title) {
-                            newCategory = update(category, {
+
+
+                let newCategoryList = state.categoryList;
+
+                if(title !== null) {
+                    newCategoryList = newCategoryList.map(category => {
+                        if(category.id === id) {
+                            return update(category, {
                                 title: {$set: title}
                             })
                         }
-                        if(parentId) {
-                            newCategory = update(category, {
+                        else {
+                            return category
+                        }
+                    })
+                }
+                if(parentId !== null) {
+                    const category = state.categoryList.filter(x => x.id == id)[0]
+                    const oldParentId = category.parentId;
+                    newCategoryList = newCategoryList.map(category => {
+                        if(category.id === id) {
+                            return update(category, {
                                 parentId: {$set: parentId}
                             })
                         }
-                        return newCategory
-                    }
-                    else {
+                        if(category.id === oldParentId) {
+                            let newChildIdList = category.childIdList.filter(x => x !== id);
+                            return update(category, {
+                                childIdList: {$set: newChildIdList}
+                            })
+                        }
+                        else if(category.id === parentId) {
+                            let newChildIdList = category.childIdList.concat([id]);
+                            return update(category, {
+                                childIdList: {$set: newChildIdList}
+                            })
+                        }
                         return category
-                    }
-                })
-
+                    })
+                }
 
                 return update(state, {
                     categoryList: {$set: newCategoryList}
