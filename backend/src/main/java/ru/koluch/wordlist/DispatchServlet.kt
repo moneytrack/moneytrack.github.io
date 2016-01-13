@@ -26,7 +26,7 @@ class NewExpenseAction(val amount: Int, val categoryId: Long, val date: Date, va
 class EditExpenseAction(val id: Long, val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
 class DeleteExpenseAction(val id: Long) : Action(ACTION_DELETE_EXPENSE)
 class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
-class EditCategoryAction(val id: Long, val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
+class EditCategoryAction(val id: Long, val title: String?, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 class DeleteCategoryAction(val id: Long) : Action(ACTION_NEW_CATEGORY)
 
 
@@ -36,7 +36,7 @@ class DispatchServlet : HttpServlet() {
 
     override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
         val datastore = DatastoreServiceFactory.getDatastoreService();
-        
+
         val userPrincipal = req.userPrincipal
         if (userPrincipal == null) {
             res.writer.println("User is not authorized")
@@ -262,9 +262,13 @@ class DispatchServlet : HttpServlet() {
                     }
                 }
 
-                val entity = datastore.get(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
-                entity.setProperty(CATEGORY_PROP_TITLE, action.title);
-                entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
+                val entity = datastore.get(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.id))
+                if(action.title != null) {
+                    entity.setProperty(CATEGORY_PROP_TITLE, action.title);
+                }
+                if(action.parentId != null) {
+                    entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
+                }
                 val key = datastore.put(entity);
                 res.writer.println(key.id)
                 res.setStatus(HttpServletResponse.SC_OK)
@@ -297,7 +301,7 @@ class DispatchServlet : HttpServlet() {
                 val date = Date(actionJson.get(EXPENSE_PROP_DATE).long)
                 val comment = actionJson.get(EXPENSE_PROP_COMMENT).nullString
                 return NewExpenseAction(amount, categoryId, date, comment)
-            } 
+            }
             else if (type == ACTION_EDIT_EXPENSE) {
                 val id = actionJson.get(PROP_ID).long
                 val amount = actionJson.get(EXPENSE_PROP_AMOUNT).int
@@ -305,7 +309,7 @@ class DispatchServlet : HttpServlet() {
                 val date = Date(actionJson.get(EXPENSE_PROP_DATE).long)
                 val comment = actionJson.get(EXPENSE_PROP_COMMENT).nullString
                 return EditExpenseAction(id, amount, categoryId, date, comment)
-            } 
+            }
             else if (type == ACTION_NEW_CATEGORY) {
                 val title = actionJson.get(CATEGORY_PROP_TITLE).string
                 val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong
@@ -343,5 +347,3 @@ class ActionParseException : Exception {
 
     constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace)
 }
-
-

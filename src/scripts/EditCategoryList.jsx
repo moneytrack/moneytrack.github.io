@@ -28,7 +28,10 @@ const EditCategoryList = React.createClass({
 
     onEditFinished: function(e) {
         if(e.keyCode == 13) {
-            console.log("todo: save");
+            this.props.onRenameCategory(this.state.editingId, this.state.editingText)
+            this.setState(update(this.state, {
+                editing: {$set: false},
+            }))
         }
         else if(e.keyCode == 27) {
             this.setState(update(this.state, {

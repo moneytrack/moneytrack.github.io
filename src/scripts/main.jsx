@@ -151,6 +151,39 @@ ajax.get(DISPATCH_URL)
             }
             break;
 
+            case 'EDIT_CATEGORY': {
+                const id = parseFloat(action.id)
+                const title = action.title
+                const parentId = action.parentId
+
+                const newCategoryList = state.categoryList.map(category => {
+                    if(category.id === id) {
+                        let newCategory = category;
+                        if(title) {
+                            newCategory = update(category, {
+                                title: {$set: title}
+                            })
+                        }
+                        if(parentId) {
+                            newCategory = update(category, {
+                                parentId: {$set: parentId}
+                            })
+                        }
+                        return newCategory
+                    }
+                    else {
+                        return category
+                    }
+                })
+                
+
+                return update(state, {
+                    categoryList: {$set: newCategoryList}
+                })
+                //todo: handle "failed" case
+            }
+            break;
+
             case 'DELETE_CATEGORY': {
                 const parentId = find(state.categoryList, x => x.id === action.id).parentId || null; //todo: fix
 

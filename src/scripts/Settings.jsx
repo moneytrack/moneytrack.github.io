@@ -5,7 +5,7 @@ import TabsContainer from './TabsContainer'
 import UserSettings from './UserSettings'
 import EditCategoryList from './EditCategoryList'
 
-import {newExpense, deleteExpense, newCategory, deleteCategory} from './action-creators.js'
+import {newExpense, deleteExpense, newCategory, editCategory, deleteCategory} from './action-creators.js'
 
 const Settings = React.createClass({
 
@@ -19,6 +19,13 @@ const Settings = React.createClass({
         this.context.store.dispatch(newCategory({
             title,
             parentId
+        }))
+    },
+
+    onRenameCategory: function(id, title) {
+        this.context.store.dispatch(editCategory({
+            id,
+            title
         }))
     },
 
@@ -39,7 +46,9 @@ const Settings = React.createClass({
         return (
             <div className="statistics">
                 <TabsContainer titleList={["Categories","User settings"]} active={this.state.active} onSwitch={this.onSwitch}>
-                    <EditCategoryList onNewCategory={this.onNewCategory} onDeleteCategory={this.onDeleteCategory} />
+                    <EditCategoryList onNewCategory={this.onNewCategory}
+                                      onRenameCategory={this.onRenameCategory}
+                                      onDeleteCategory={this.onDeleteCategory} />
                     <UserSettings />
                 </TabsContainer>
             </div>

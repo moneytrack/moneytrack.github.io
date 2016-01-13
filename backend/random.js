@@ -230,18 +230,15 @@ function choose(arr) {
     return arr[parseInt(Math.random() * arr.length)]
 }
 
-const makeText = (function() {
-
-    return function(len) {
-        var result = [];
-        var count = len - (len * dev) + (len * dev * 2 * Math.random())
-        for(var i = 0; i < count; ++i) {
-            result.push(choose(words))
-        }
-
-        return result.join(" ");
+const makeText = function(len) {
+    var result = [];
+    var count = len - (len * dev) + (len * dev * 2 * Math.random())
+    for(var i = 0; i < count; ++i) {
+        result.push(choose(words))
     }
-})
+
+    return result.join(" ");
+}
 
 function makeNumber(num) {
     return num - (num * dev) + (num * dev * 2 * Math.random())
