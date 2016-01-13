@@ -155,8 +155,6 @@ ajax.get(DISPATCH_URL)
                 const title = action.title
                 const parentId = action.parentId
 
-
-
                 let newCategoryList = state.categoryList;
 
                 if(title !== null) {
@@ -204,17 +202,23 @@ ajax.get(DISPATCH_URL)
             break;
 
             case 'DELETE_CATEGORY': {
+                const id = action.id
 
-                let newCategoryList = state.categoryList.map(category => {
-                    if(category.id === parentId) {
-                        return update(category, {
-                            childIdList: {$set: category.childIdList.filter(x => x !== action.id)}
-                        })
-                    }
-                    else {
-                        return category;
-                    }
-                })
+                const category = state.categoryList.filter(x => x.id == id)[0]
+                const parentId = category.parentId
+
+                let newCategoryList = state.categoryList
+                    .filter(category => category.id !== id)
+                    .map(category => {
+                        if(category.id === parentId) {
+                            return update(category, {
+                                childIdList: {$set: category.childIdList.filter(x => x !== action.id)}
+                            })
+                        }
+                        else {
+                            return category;
+                        }
+                    })
 
                 return update(state, {
                     categoryList: {$set: newCategoryList},
