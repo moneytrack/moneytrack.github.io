@@ -41,7 +41,7 @@ var gulp = require('gulp'),
 
 var DEBUG_ROOT = './backend/target/backend-1.0-SNAPSHOT';
 var SRC_ROOT = './src';
-var PROD_ROOT = './public';
+var PROD_ROOT = './backend/src/main/webapp';
 
 
 

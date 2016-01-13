@@ -33,7 +33,7 @@ import ajax from './ajax'
 import Root from './Root.jsx'
 import {find} from './arrays'
 
-const DISPATCH_URL = "http://localhost:8081/dispatch"
+const DISPATCH_URL = "/dispatch"
 
 ajax.get(DISPATCH_URL)
 .then((response) => {
@@ -41,6 +41,9 @@ ajax.get(DISPATCH_URL)
 }, (err) => {
     console.error(err)
     console.error("Failed to load state, use default state");
+    if(err.code) {
+        window.location.replace("/auth");
+    }
     //todo: make default state reasonable
     return Promise.resolve({
         history: [],

@@ -40,12 +40,6 @@ const EditCategoryList = React.createClass({
             renamingId: {$set: category.id},
             renamingText: {$set: category.title},
         }))
-        window.a = this.refs;
-        for(var a in this.refs) {
-            console.log(a);
-        }
-        console.log(this.refs, this.refs.title_edit_input);
-        //ReactDOM.findDOMNode(this.refs["title_edit_input"]).focus();
     },
 
     onRenameFinished: function(e) {
@@ -97,7 +91,6 @@ const EditCategoryList = React.createClass({
     },
 
     onNewCategoryTitleChange: function(e){
-        console.log(e.target.value);
         this.setState(update(this.state, {
             newCategoryTitle: {$set: e.target.value},
         }))

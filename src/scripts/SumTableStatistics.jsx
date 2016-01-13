@@ -68,22 +68,17 @@ const SumTableStatistics = React.createClass({
 
     render: function () {
 
-        const {history, categoryList, rootCategoryId} = this.context.store.getState()
+        const {categoryList, rootCategoryId} = this.context.store.getState()
 
         const asc = (x,y) => x - y
 
         const yearMonthCategoryExpenseMap = this.getYearMonthCategoryExpenseMap()
 
-
         function recurseSum(data, category, month) {
             const childList = categoryList.filter(x => x.parentId === category.id)
-            if(childList.length > 0) {
-                const childSum = childList.map(child => recurseSum(data, child, month)).reduce((acc,x) => acc + x, 0)
-                return childSum;
-            }
-            else {
-                return data[category.id][month]
-            }
+            const childChildSum = childList.map(child => recurseSum(data, child, month)).reduce((acc,x) => acc + x, 0)
+            const selfChildSum = childList.map(child => data[child.id][month]).reduce((acc,x) => acc + x, 0)
+            return selfChildSum + childChildSum;
         }
 
         const renderDif = dif => {
@@ -120,8 +115,6 @@ const SumTableStatistics = React.createClass({
             const result = [];
             const categoryData = data[category.id];
 
-            const childList = categoryList.filter(cat => cat.parentId === category.id)
-
             result.push(<tr key={category.id}>
                             <td style={{paddingLeft: (level * 20) + "px"}} className={"sum-table-statistics__year__category"}>{category.title}</td>
                             {
@@ -129,7 +122,7 @@ const SumTableStatistics = React.createClass({
                                     const sum = categoryData[month] + recurseSum(data, category, month);
                                     let dif = null;
                                     if(categoryData[month - 1] ) {
-                                        const lastSum = categoryData[month - 1]  + recurseSum(data, category, month - 1)
+                                            const lastSum = categoryData[month - 1]  + recurseSum(data, category, month - 1)
                                         dif = lastSum ?  sum - lastSum : null
                                     }
                                     return (
@@ -142,12 +135,13 @@ const SumTableStatistics = React.createClass({
                             }
                       </tr>)
 
+
             if(this.state.showChild) {
                 let childrenRowList = []
                 categoryList.filter(cat => cat.parentId === category.id).forEach(child => {
                     childrenRowList.push(...renderCategory(data, child, level + 1))
                 })
-                if(this.state.showAtRoot && childrenRowList.length > 0) {
+                if(this.state.showAtRoot) {
                     childrenRowList.unshift(
                         <tr key={category.id + "-self"}>
                             <td style={{paddingLeft: ((level + 1) * 20) + "px"}} className={"sum-table-statistics__year__category"}>(at root)</td>

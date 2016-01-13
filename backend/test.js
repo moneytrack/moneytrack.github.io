@@ -54,7 +54,7 @@ function Sender() {
 
 Sender.prototype.sendAction = function (data) {
     return post({
-        url: "http://localhost:8080/dispatch",
+        url: "http://localhost:8081/dispatch",
         json: true,
         headers: this.cookies,
         body: data
@@ -137,6 +137,10 @@ var loginResponse = sender.post('http://localhost:8080/_ah/login?continue=%2Faut
 
 sender.get('http://localhost:8080/auth')
 
+var initialState = JSON.parse(sender.get('http://localhost:8081/dispatch').body)
+var rootCategoryId = initialState.rootCategoryId
+
+
 /*
     Categories:
         Home
@@ -151,7 +155,8 @@ sender.get('http://localhost:8080/auth')
 // Categories
 var homeCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Home"
+    title:"Home",
+    parentId: rootCategoryId
 })
 
 var paymentsCategoryId = dispatch({
@@ -174,7 +179,8 @@ var internetCategoryId = dispatch({
 
 var foodCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Food"
+    title:"Food",
+    parentId: rootCategoryId
 })
 
 var atWorkCategoryId = dispatch({
@@ -191,12 +197,14 @@ var atHomeCategoryId = dispatch({
 
 var transportCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Transport"
+    title:"Transport",
+    parentId: rootCategoryId
 })
 
 var familyCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Family"
+    title:"Family",
+    parentId: rootCategoryId
 })
 
 var presentsCategoryId = dispatch({

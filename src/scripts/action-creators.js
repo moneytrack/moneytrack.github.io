@@ -2,7 +2,7 @@
 
 import ajax from "./ajax"
 
-const DISPATCH_URL = "http://localhost:8081/dispatch"
+const DISPATCH_URL = "/dispatch" //todo: move to common place
 
 function asyncDispatch(cb) {
 	return dispatch => {
