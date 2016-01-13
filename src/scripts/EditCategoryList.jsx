@@ -1,43 +1,62 @@
 "use strict"
 import React from 'react'
+import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
 import {find} from './arrays'
+import ModalContainer from './ModalContainer'
+
+const RenameModal = React.createClass({
+    render: function(){
+        return (
+            <ModalContainer visible={this.props.editing}
+                            onCancel={this.props.onEditCanceled}
+                            onSave={this.props.onEditFinished}>
+                <label>New name: <input value={this.props.editingText} onChange={this.onEdit} ref="title_edit_input"/></label>
+                <button onClick={this.onEditFinished}>Save</button>
+            </ModalContainer>
+        )
+    }
+})
 
 const EditCategoryList = React.createClass({
     getInitialState: function() {
         return {
-            editing: false,
-            editingId: null,
-            editingText: null
+            renaming: false,
+            renamingId: null,
+            renamingText: null
         }
     },
 
     onEditTitleBegin: function(category) {
-
         this.setState(update(this.state, {
-            editing: {$set: true},
-            editingId: {$set: category.id},
-            editingText: {$set: category.title},
+            renaming: {$set: true},
+            renamingId: {$set: category.id},
+            renamingText: {$set: category.title},
+        }))
+        window.a = this.refs;
+        for(var a in this.refs) {
+            console.log(a);
+        }
+        console.log(this.refs, this.refs.title_edit_input);
+        //ReactDOM.findDOMNode(this.refs["title_edit_input"]).focus();
+    },
+
+    onRenameFinished: function(e) {
+        this.props.onRenameCategory(this.state.renamingId, this.state.renamingText)
+        this.setState(update(this.state, {
+            renaming: {$set: false},
         }))
     },
 
-    onEditFinished: function(e) {
-        if(e.keyCode == 13) {
-            this.props.onRenameCategory(this.state.editingId, this.state.editingText)
-            this.setState(update(this.state, {
-                editing: {$set: false},
-            }))
-        }
-        else if(e.keyCode == 27) {
-            this.setState(update(this.state, {
-                editing: {$set: false},
-            }))
-        }
+    onRenameCanceled: function(e) {
+        this.setState(update(this.state, {
+            renaming: {$set: false},
+        }))
     },
 
-    onEdit: function(e) {
+    onRename: function(e) {
         this.setState(update(this.state, {
-            editingText: {$set: e.target.value},
+            renamingText: {$set: e.target.value},
         }))
     },
 
@@ -96,10 +115,8 @@ const EditCategoryList = React.createClass({
                 return [
                     <div key={category.id} className={classes} >
                         <div className="edit-category-list__category__title"
-                             onClick={() => this.onEditTitleBegin(category)}>
-                            {(this.state.editing && this.state.editingId === category.id )
-                            ? <input value={this.state.editingText} onChange={this.onEdit} onKeyUp={this.onEditFinished}/>
-                            : category.title}
+                             onClick={() => this.onRenameTitleBegin(category)}>
+                            {category.title}
                         </div>
                         <button onClick={(e) => this.onDeleteCategory(e, category.id)}>Delete</button>
                         <select onChange={(e) => this.onMove(category.id, e)}>
@@ -119,10 +136,8 @@ const EditCategoryList = React.createClass({
             else {
                 return [
                     <div key={category.id} className={classes}>
-                        <div className="edit-category-list__category__title" onClick={() => this.onEditTitleBegin(category)}>
-                            {(this.state.editing && this.state.editingId === category.id )
-                                ? <input value={this.state.editingText} onChange={this.onEdit}  onKeyUp={this.onEditFinished}/>
-                                : category.title}
+                        <div className="edit-category-list__category__title" onClick={() => this.onRenameTitleBegin(category)}>
+                            {category.title}
                         </div>
                         {' '}<button  onClick={(e) => this.onDeleteCategory(e, category.id)} >Delete</button>
                         <select  onChange={(e) => this.onMove(category.id, e)}>
@@ -156,8 +171,22 @@ const EditCategoryList = React.createClass({
                 </div>
             </div>)
         }
+
+        const onShowInput = (input) => {
+            if(input) {
+                input.focus()
+                input.select()
+            }
+        }
+
         return  (
             <div className="edit-category-list">
+                <ModalContainer visible={this.state.renaming}
+                                onCancel={this.onRenameCanceled}
+                                onSave={this.onRenameFinished}>
+                    <label>New name: <input value={this.state.renamingText} onChange={this.onRename} ref={onShowInput}/></label>
+                    <button onClick={this.onRenameFinished}>Save</button>
+                </ModalContainer>
                 {children}
                 <div>
                     <label >New category: <input ref={"new_category_root"} /> </label>

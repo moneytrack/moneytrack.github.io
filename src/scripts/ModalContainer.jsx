@@ -8,11 +8,21 @@ const ModalContainer = React.createClass({
         }
     },
 
+    onSave: function(e) {
+        if(e.keyCode === 13 && this.props.onSave) {
+            this.props.onSave(e)
+        }
+        else if(e.keyCode === 27 && this.props.onCancel) {
+            this.props.onCancel(e)
+        }
+
+    },
+
     render: function() {
         return  (
             this.props.visible !== false
             ?
-            (<div className="modal-container" onClick={this.onCancel} ref="root">
+            (<div className="modal-container" onClick={this.onCancel} ref="root" onKeyUp={this.onSave}>
                 <div className="modal-container__column">
                     <div className="modal-container__column__cell">
                         {this.props.children}
