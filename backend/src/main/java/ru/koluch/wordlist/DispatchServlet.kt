@@ -25,17 +25,17 @@ abstract class Action(val type: String)
 class NewExpenseAction(val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
 class EditExpenseAction(val id: Long, val amount: Int, val categoryId: Long, val date: Date, val comment: String?) : Action(ACTION_NEW_EXPENSE)
 class DeleteExpenseAction(val id: Long) : Action(ACTION_DELETE_EXPENSE)
-class NewCategoryAction(val title: String, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
+class NewCategoryAction(val title: String, val parentId: Long) : Action(ACTION_NEW_CATEGORY)
 class EditCategoryAction(val id: Long, val title: String?, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 class DeleteCategoryAction(val id: Long) : Action(ACTION_NEW_CATEGORY)
 
 
 class DispatchServlet : HttpServlet() {
 
-    val gson = Gson()
+    val gson = GsonBuilder().serializeNulls().create()
 
     override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
-        val datastore = DatastoreServiceFactory.getDatastoreService();
+        val datastore = DatastoreServiceFactory.getDatastoreService()
 
         val userPrincipal = req.userPrincipal
         if (userPrincipal == null) {
@@ -103,9 +103,10 @@ class DispatchServlet : HttpServlet() {
                 return result
             }
 
+
             val stateJson = jsonObject(
                 STATE_HISTORY to collectExpenses(),
-                STATE_ROOT_CATEGORY_ID_LIST to collectCategoryIdList(null),
+                STATE_ROOT_CATEGORY_ID to userEntity.getProperty(USER_PROP_ROOT_CATEGORY_ID) as Long,
                 STATE_CATEGORY_LIST to collectCategories()
             )
 
@@ -254,6 +255,7 @@ class DispatchServlet : HttpServlet() {
                 res.setStatus(HttpServletResponse.SC_OK)
             }
             is EditCategoryAction -> {
+                //todo: do not allow editing of root category
                 if(action.parentId != null) {
                     if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
                         res.writer.println("Category with id '${action.parentId}' doesn't exists")
@@ -312,7 +314,7 @@ class DispatchServlet : HttpServlet() {
             }
             else if (type == ACTION_NEW_CATEGORY) {
                 val title = actionJson.get(CATEGORY_PROP_TITLE).string
-                val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).nullLong
+                val parentId = actionJson.get(CATEGORY_PROP_PARENT_ID).long
                 return NewCategoryAction(title, parentId)
             }
             else if (type == ACTION_DELETE_EXPENSE) {

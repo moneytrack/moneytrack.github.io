@@ -10,7 +10,7 @@ import moment from 'moment'
 const EditExpense = React.createClass({
 
     getInitialState: function(){
-        const {rootCategoryIdList, history} = this.context.store.getState()
+        const {rootCategoryId, categoryList, history} = this.context.store.getState()
 
         if(this.props.expenseId) {
             const expense = history.filter(x => x.id === this.props.expenseId)[0]
@@ -24,7 +24,8 @@ const EditExpense = React.createClass({
             }
         }
         else {
-            let firstCategoryId = rootCategoryIdList.length > 0 ? rootCategoryIdList[0] : -1;
+            let rootCategoryList = categoryList.filter(x => x.parentId === rootCategoryId)
+            let firstCategoryId = rootCategoryList.length > 0 ? rootCategoryList[0].id : -1;
             return {
                 amount: NumberInput.wrapState(0),
                 categoryId: firstCategoryId,
@@ -114,7 +115,7 @@ const EditExpense = React.createClass({
                             <td>
                                 <div  className="edit-expense__category-picker-wrapper">
                                     <CategoryPicker categoryList={this.context.store.getState().categoryList}
-                                                    rootCategoryIdList={this.context.store.getState().rootCategoryIdList}
+                                                    rootCategoryId={this.context.store.getState().rootCategoryId}
                                                     value={this.state.categoryId}
                                                     onChange={this.onChangeCategory}
                                                     editingEnabled={true}

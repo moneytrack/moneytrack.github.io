@@ -13,13 +13,21 @@ const val ACTION_EDIT_CATEGORY = "EDIT_CATEGORY"
 
 
 const val STATE_HISTORY = "history"
-const val STATE_ROOT_CATEGORY_ID_LIST = "rootCategoryIdList"
+const val STATE_ROOT_CATEGORY_ID = "rootCategoryId"
 const val STATE_CATEGORY_LIST = "categoryList"
 
 /*
 	Common props
 */
 const val PROP_ID = "id"
+
+/*
+    User props
+ */
+const val USER_KIND = "User";
+const val USER_PROP_NAME = "name"
+const val USER_PROP_ROOT_CATEGORY_ID = "rootCategoryId";
+
 
 /*
     Expense props

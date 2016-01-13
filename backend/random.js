@@ -18,7 +18,7 @@ var colors = require("colors/safe")
                 Internet
         Food
             Work
-            Home        
+            Home
 
     November 26, 2015:
         12:46 - 315 - Food/Work - Lunch (Teremok)
@@ -49,7 +49,7 @@ var colors = require("colors/safe")
 
 */
 function Sender() {
-    
+
 }
 
 Sender.prototype.sendAction = function (data) {
@@ -135,8 +135,11 @@ var loginResponse = sender.post('http://localhost:8081/_ah/login?continue=%2Faut
     'action':'Log In'
 }});
 
+
 sender.get('http://localhost:8081/auth')
 
+var initialState = JSON.parse(sender.get('http://localhost:8081/dispatch').body)
+var rootCategoryId = initialState.rootCategoryId
 /*
     Categories:
         Home
@@ -145,13 +148,14 @@ sender.get('http://localhost:8081/auth')
                 Internet
         Food
             Work
-            Home        
+            Home
 */
 
 // Categories
 var homeCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Home"
+    title:"Home",
+    parentId: rootCategoryId
 })
 
 var paymentsCategoryId = dispatch({
@@ -174,7 +178,8 @@ var internetCategoryId = dispatch({
 
 var foodCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Food"
+    title:"Food",
+    parentId: rootCategoryId
 })
 
 var atWorkCategoryId = dispatch({
@@ -191,12 +196,14 @@ var atHomeCategoryId = dispatch({
 
 var transportCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Transport"
+    title:"Transport",
+    parentId: rootCategoryId
 })
 
 var familyCategoryId = dispatch({
     type:"NEW_CATEGORY",
-    title:"Family"
+    title:"Family",
+    parentId: rootCategoryId
 })
 
 var presentsCategoryId = dispatch({

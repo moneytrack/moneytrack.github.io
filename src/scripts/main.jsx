@@ -41,9 +41,11 @@ ajax.get(DISPATCH_URL)
 }, (err) => {
     console.error(err)
     console.error("Failed to load state, use default state");
+    //todo: make default state reasonable
     return Promise.resolve({
         history: [],
-        categoryList: []
+        categoryList: [],
+        rootCategoryId: null
     });
 })
 .then((initState) => {
@@ -141,11 +143,8 @@ ajax.get(DISPATCH_URL)
                 })
                 newCategoryList = newCategoryList.concat([newCategory])
 
-                let newRootCategoryIdList = state.rootCategoryIdList.concat(parentId === null ? [id] : [])
-
                 return update(state, {
                     categoryList: {$set: newCategoryList},
-                    rootCategoryIdList: {$set: newRootCategoryIdList}
                 })
                 //todo: handle "failed" case
             }
@@ -175,7 +174,7 @@ ajax.get(DISPATCH_URL)
                         return category
                     }
                 })
-                
+
 
                 return update(state, {
                     categoryList: {$set: newCategoryList}
@@ -185,31 +184,20 @@ ajax.get(DISPATCH_URL)
             break;
 
             case 'DELETE_CATEGORY': {
-                const parentId = find(state.categoryList, x => x.id === action.id).parentId || null; //todo: fix
 
-                let newCategoryList;
-                let newRootCategoryIdList;
-                if(parentId != null) {
-                    newCategoryList = state.categoryList.map(category => {
-                        if(category.id === parentId) {
-                            return update(category, {
-                                childIdList: {$set: category.childIdList.filter(x => x !== action.id)}
-                            })
-                        }
-                        else {
-                            return category;
-                        }
-                    })
-                    newRootCategoryIdList = state.rootCategoryIdList
-                }
-                else {
-                    newCategoryList = state.categoryList
-                    newRootCategoryIdList = state.rootCategoryIdList.filter(x => x !== action.id)
-                }
+                let newCategoryList = state.categoryList.map(category => {
+                    if(category.id === parentId) {
+                        return update(category, {
+                            childIdList: {$set: category.childIdList.filter(x => x !== action.id)}
+                        })
+                    }
+                    else {
+                        return category;
+                    }
+                })
 
                 return update(state, {
                     categoryList: {$set: newCategoryList},
-                    rootCategoryIdList: {$set: newRootCategoryIdList}
                 })
                 //todo: handle "failed" case
             }

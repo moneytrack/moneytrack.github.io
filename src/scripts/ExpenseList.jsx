@@ -11,7 +11,7 @@ import ConfirmDialog from './ConfirmDialog'
 
 const ExpenseList = React.createClass({
 
-    
+
     render: function () {
         const {data} = this.props
 
@@ -35,14 +35,13 @@ const ExpenseList = React.createClass({
         }
 
         function collectCategoryAncestors(category) {
-            let parentId = category.parentId;
-            const result = [category];
-            while(parentId) {
-                let parent = categoryList.filter(x => x.id === parentId)[0];
-                result.unshift(parent)
-                parentId = parent.parentId;
+            let parent = categoryList.filter(x => x.id === category.parentId)[0];
+            if(parent.parentId !== null) {
+                return collectCategoryAncestors(parent).concat(category)
             }
-            return result;
+            else {
+                return [category]
+            }
         }
 
 

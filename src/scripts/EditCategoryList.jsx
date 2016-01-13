@@ -3,12 +3,6 @@ import React from 'react'
 import update from 'react-addons-update'
 
 const EditCategoryList = React.createClass({
-    propTypes: {
-        rootCategoryIdList: React.PropTypes.arrayOf(React.PropTypes.number),
-        categoryList: React.PropTypes.arrayOf(React.PropTypes.object),
-        allowEmpty: React.PropTypes.bool
-    },
-
     getInitialState: function() {
         return {
             editing: false,
@@ -105,9 +99,8 @@ const EditCategoryList = React.createClass({
     },
 
     render: function() {
-        let {rootCategoryIdList,categoryList} = this.context.store.getState();
-
-        const rootCategoryList = rootCategoryIdList.map(id => categoryList.filter(x => x.id === id)[0])
+        let {rootCategoryId,categoryList} = this.context.store.getState();
+        const rootCategoryList = categoryList.filter(category => category.parentId === rootCategoryId)
         const children = this.renderRecurse(rootCategoryList, 0)
         if(this.props.allowEmpty) {
             let classes = ["edit-category-list__category"]

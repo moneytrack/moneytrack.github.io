@@ -19,8 +19,6 @@ import javax.servlet.http.HttpServletResponse
  * Created: 29.12.2015 02:30
  */
 
-val USER_KIND = "User";
-val USER_PROP_NAME = "name"
 
 class AuthServlet : HttpServlet() {
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
@@ -38,10 +36,22 @@ class AuthServlet : HttpServlet() {
                 "\">sign out</a>.</p>");
 
             val datastore = DatastoreServiceFactory.getDatastoreService()
+
+            //todo: make transactional
             if (!datastore.exists(KeyFactory.createKey(USER_KIND, userPrincipal.name))) {
+
                 val newUserEntity = Entity(USER_KIND, userPrincipal.name)
-                newUserEntity.key
+                val userEntityKey = datastore.put(newUserEntity)
+
+                val rootCategoryEntity = Entity(CATEGORY_KIND, userEntityKey)
+                rootCategoryEntity.setProperty(CATEGORY_PROP_TITLE, "ROOT")
+                rootCategoryEntity.setProperty(CATEGORY_PROP_PARENT_ID, null)
+                rootCategoryEntity.setProperty(CATEGORY_PROP_ORDER, 0)
+                val rootCategoryKey = datastore.put(rootCategoryEntity)
+
+                newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootCategoryKey.id)
                 datastore.put(newUserEntity)
+
                 res.writer.println("<p>Account was created for this user</p>")
             }
 

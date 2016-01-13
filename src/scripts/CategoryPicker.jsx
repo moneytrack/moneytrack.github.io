@@ -4,7 +4,7 @@ import React from 'react'
 const CategoryPicker = React.createClass({
 
     propTypes: {
-        rootCategoryIdList: React.PropTypes.arrayOf(React.PropTypes.number),
+        rootCategoryId: React.PropTypes.number,
         categoryList: React.PropTypes.arrayOf(React.PropTypes.object),
         allowEmpty: React.PropTypes.bool,
         value: React.PropTypes.number // active category id
@@ -49,7 +49,7 @@ const CategoryPicker = React.createClass({
     },
 
     render: function() {
-        const rootCategoryList = this.props.rootCategoryIdList.map(id => this.props.categoryList.filter(x => x.id === id)[0])
+        const rootCategoryList = this.props.categoryList.filter(category => category.parentId === this.props.rootCategoryId)
         const children = this.renderRecurse(rootCategoryList, 0)
         if(this.props.allowEmpty) {
             let classes = ["category-picker__category"]

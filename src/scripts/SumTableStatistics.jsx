@@ -23,7 +23,7 @@ const SumTableStatistics = React.createClass({
 
     getYearMonthCategoryExpenseMap: function() {
 
-        const {history, categoryList, rootCategoryIdList} = this.context.store.getState()
+        const {history, categoryList} = this.context.store.getState()
 
         const yearMonthCategoryExpenseMap = {}
 
@@ -38,7 +38,7 @@ const SumTableStatistics = React.createClass({
                 yearMonthCategoryExpenseMap[year][month] = []
             }
             if(!(categoryId in yearMonthCategoryExpenseMap[year][month])) {
-                yearMonthCategoryExpenseMap[year][month][categoryId] = []   
+                yearMonthCategoryExpenseMap[year][month][categoryId] = []
             }
             yearMonthCategoryExpenseMap[year][month][categoryId].push(expense)
         })
@@ -67,8 +67,8 @@ const SumTableStatistics = React.createClass({
 
 
     render: function () {
-        
-        const {history, categoryList, rootCategoryIdList} = this.context.store.getState()
+
+        const {history, categoryList, rootCategoryId} = this.context.store.getState()
 
         const asc = (x,y) => x - y
 
@@ -82,7 +82,7 @@ const SumTableStatistics = React.createClass({
                 return childSum;
             }
             else {
-                return data[category.id][month] 
+                return data[category.id][month]
             }
         }
 
@@ -171,11 +171,11 @@ const SumTableStatistics = React.createClass({
             }
             return result;
         }
-        
+
         function renderTable(data) {
             let rows = [];
 
-            const rootCategoryList = categoryList.filter((category) => rootCategoryIdList.indexOf(category.id)!=-1);
+            const rootCategoryList = categoryList.filter(category => category.parentId === rootCategoryId);
             rootCategoryList.forEach((category) => {
                 rows.push(...renderCategory(data, category, 0))
             })
@@ -206,7 +206,7 @@ const SumTableStatistics = React.createClass({
 
         return (
             <TabsContainer className="sum-table-statistics"
-                           titleList={Object.keys(yearMonthCategoryExpenseMap).sort(asc)} 
+                           titleList={Object.keys(yearMonthCategoryExpenseMap).sort(asc)}
                            active={(this.state.activeYear || "").toString()}
                            onSwitch={(year) => {
                                 this.setState(update(this.state, {activeYear: {$set: year}}))
@@ -221,7 +221,7 @@ const SumTableStatistics = React.createClass({
                                                   onChange={this.onChangeChild}/> show child categories</label>
                                     <label><input type="checkbox"  disabled={!this.state.showChild} checked={this.state.showAtRoot}
                                           onChange={this.onChangeShotAtRoot}/> show 'at root'</label>
-            
+
                                     <label><input type="checkbox" checked={this.state.showDif}
                                                   onChange={this.onChangeShotDif}/> show difference</label>
                                 </div>
@@ -240,8 +240,8 @@ const SumTableStatistics = React.createClass({
                                                 )
                                             })
                                         }
-                                    </tr> 
-                                                       
+                                    </tr>
+
                                     {
                                         renderTable(data)
                                     }
