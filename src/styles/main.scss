@@ -76,6 +76,7 @@ a.pseudo.warning {
     &__category {
         margin: 0.1rem 0.3rem;
         padding: 0.2rem;
+        cursor: pointer;
 
         &__title {
             display: inline;
@@ -89,8 +90,14 @@ a.pseudo.warning {
             color: inherit;
         }
 
+        &__controls {
+            visibility: hidden;
+            display: inline;
+        }
+    }
 
-        cursor: pointer;
+    #{&}__category:hover #{&}__category__controls {
+        visibility: visible;
     }
 
     &__children {
@@ -100,6 +107,12 @@ a.pseudo.warning {
     &__empty {
         font-style: italic;
     }
+
+    a.pseudo {
+        font-size: 0.8rem;
+        margin: 0 0.8rem;
+    }
+
 
 }
 

@@ -44,7 +44,7 @@ class AuthServlet : HttpServlet() {
                 val userEntityKey = datastore.put(newUserEntity)
 
                 val rootCategoryEntity = Entity(CATEGORY_KIND, userEntityKey)
-                rootCategoryEntity.setProperty(CATEGORY_PROP_TITLE, "ROOT")
+                rootCategoryEntity.setProperty(CATEGORY_PROP_TITLE, "Root")
                 rootCategoryEntity.setProperty(CATEGORY_PROP_PARENT_ID, null)
                 rootCategoryEntity.setProperty(CATEGORY_PROP_ORDER, 0)
                 val rootCategoryKey = datastore.put(rootCategoryEntity)
