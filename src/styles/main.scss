@@ -74,14 +74,11 @@ a.pseudo.warning {
 
 .edit-category-list {
     &__category {
-        margin: 0.1rem 0.3rem;
-        padding: 0.2rem;
         cursor: pointer;
 
         &__title {
             display: inline;
-            border-bottom: 1px dashed #006DCE;
-            color: #006DCE;
+            font-weight: bold;
         }
 
         &--selected &__title {
@@ -94,11 +91,24 @@ a.pseudo.warning {
             visibility: hidden;
             display: inline;
         }
+
+        &__content {
+            display: inline-block;
+            padding: 0.4rem 0.4rem;
+        }
+
+    }
+
+    &__category:hover &__category__content {
+        background: #EEEFAA;
     }
 
     #{&}__category:hover #{&}__category__controls {
         visibility: visible;
+
     }
+
+
 
     &__children {
         padding-left: 20px;
@@ -106,6 +116,14 @@ a.pseudo.warning {
 
     &__empty {
         font-style: italic;
+    }
+
+    &__new-root-category {
+        margin: 1rem 0;
+
+        #{&}__link.pseudo {
+            margin: 0;
+        }
     }
 
     a.pseudo {

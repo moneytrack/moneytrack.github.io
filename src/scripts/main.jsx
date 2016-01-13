@@ -169,29 +169,31 @@ ajax.get(DISPATCH_URL)
                         }
                     })
                 }
-                if(parentId !== null) {
+                if (parentId !== null) {
                     const category = state.categoryList.filter(x => x.id == id)[0]
                     const oldParentId = category.parentId;
-                    newCategoryList = newCategoryList.map(category => {
-                        if(category.id === id) {
-                            return update(category, {
-                                parentId: {$set: parentId}
-                            })
-                        }
-                        if(category.id === oldParentId) {
-                            let newChildIdList = category.childIdList.filter(x => x !== id);
-                            return update(category, {
-                                childIdList: {$set: newChildIdList}
-                            })
-                        }
-                        else if(category.id === parentId) {
-                            let newChildIdList = category.childIdList.concat([id]);
-                            return update(category, {
-                                childIdList: {$set: newChildIdList}
-                            })
-                        }
-                        return category
-                    })
+                    if (oldParentId !== parentId) {
+                        newCategoryList = newCategoryList.map(category => {
+                            if (category.id === id) {
+                                return update(category, {
+                                    parentId: {$set: parentId}
+                                })
+                            }
+                            if (category.id === oldParentId) {
+                                let newChildIdList = category.childIdList.filter(x => x !== id);
+                                return update(category, {
+                                    childIdList: {$set: newChildIdList}
+                                })
+                            }
+                            else if (category.id === parentId) {
+                                let newChildIdList = category.childIdList.concat([id]);
+                                return update(category, {
+                                    childIdList: {$set: newChildIdList}
+                                })
+                            }
+                            return category
+                        })
+                    }
                 }
 
                 return update(state, {

@@ -49,10 +49,12 @@ const EditCategoryList = React.createClass({
     },
 
     onRenameFinished: function(e) {
-        this.props.onRenameCategory(this.state.renamingId, this.state.renamingText)
-        this.setState(update(this.state, {
-            mode: {$set: null},
-        }))
+        if(this.state.renamingText!=='') {
+            this.props.onRenameCategory(this.state.renamingId, this.state.renamingText)
+            this.setState(update(this.state, {
+                mode: {$set: null},
+            }))
+        }
     },
 
     onRenameCanceled: function(e) {
@@ -102,10 +104,12 @@ const EditCategoryList = React.createClass({
     },
 
     onNewCategoryFinished: function(){
-        this.props.onNewCategory(this.state.newCategoryTitle, this.state.newCategoryParentId)
-        this.setState(update(this.state, {
-            mode: {$set: ''},
-        }))
+        if(this.state.newCategoryTitle !== '') {
+            this.props.onNewCategory(this.state.newCategoryTitle, this.state.newCategoryParentId)
+            this.setState(update(this.state, {
+                mode: {$set: ''},
+            }))
+        }
     },
 
 
@@ -154,19 +158,21 @@ const EditCategoryList = React.createClass({
                 const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
                 return [
                     <div key={category.id} className={classes} >
-                        <div className="edit-category-list__category__title"
-                             onClick={() => this.onRenameTitleBegin(category)}>
-                            {category.title}
-                        </div>
-                        {' '}
-                        <div className="edit-category-list__category__controls">
-                            <a href="#" onClick={(e) => this.onRenameBegin(category)} className="pseudo">Rename</a>
-                            <a href="#" onClick={(e) => this.onNewCategoryBegin(category.id)} className="pseudo">Add sub-category</a>
-                            <select onChange={(e) => this.onMove(category.id, e)}>
-                                <option value={-1}>Move to...</option>
-                                {renderMoveToOptions(rootCategory, category.id)}
-                            </select>
-                            <a href="#" onClick={(e) => this.onDeleteCategory(e, category.id)} className="pseudo  warning">Delete</a>
+                        <div className="edit-category-list__category__content">
+                            <div className="edit-category-list__category__title"
+                                 onClick={() => this.onRenameTitleBegin(category)}>
+                                {category.title}
+                            </div>
+                            {' '}
+                            <div className="edit-category-list__category__controls">
+                                <a href="#" onClick={(e) => this.onRenameBegin(category)} className="pseudo">Rename</a>
+                                <a href="#" onClick={(e) => this.onNewCategoryBegin(category.id)} className="pseudo">Add sub-category...</a>
+                                <select onChange={(e) => this.onMove(category.id, e)}>
+                                    <option value={-1}>Move to...</option>
+                                    {renderMoveToOptions(rootCategory, category.id)}
+                                </select>
+                                <a href="#" onClick={(e) => this.onDeleteCategory(e, category.id)} className="pseudo  warning">Delete</a>
+                            </div>
                         </div>
 
                     </div>,
@@ -178,17 +184,19 @@ const EditCategoryList = React.createClass({
             else {
                 return [
                     <div key={category.id} className={classes}>
-                        <div className="edit-category-list__category__title" onClick={() => this.onRenameBegin(category)}>
-                            {category.title}
-                        </div>
-                        <div className="edit-category-list__category__controls">
-                            <a href="#" onClick={(e) => this.onRenameBegin(category)} className="pseudo">Rename</a>
-                            <a href="#" onClick={(e) => this.onNewCategoryBegin(category.id)} className="pseudo">Add sub-category</a>
-                            <select  onChange={(e) => this.onMove(category.id, e)}>
-                                <option value={-1}>Move to...</option>
-                                {renderMoveToOptions(rootCategory, category.id)}
-                            </select>
-                            <a href="#" onClick={(e) => this.onDeleteCategory(e, category.id)} className="pseudo warning">Delete</a>
+                        <div className="edit-category-list__category__content">
+                            <div className="edit-category-list__category__title" onClick={() => this.onRenameBegin(category)}>
+                                {category.title}
+                            </div>
+                            <div className="edit-category-list__category__controls">
+                                <a href="#" onClick={(e) => this.onRenameBegin(category)} className="pseudo">Rename</a>
+                                <a href="#" onClick={(e) => this.onNewCategoryBegin(category.id)} className="pseudo">Add sub-category...</a>
+                                <select  onChange={(e) => this.onMove(category.id, e)}>
+                                    <option value={-1}>Move to...</option>
+                                    {renderMoveToOptions(rootCategory, category.id)}
+                                </select>
+                                <a href="#" onClick={(e) => this.onDeleteCategory(e, category.id)} className="pseudo warning">Delete</a>
+                            </div>
                         </div>
                     </div>
                 ]
@@ -226,18 +234,17 @@ const EditCategoryList = React.createClass({
                                 onCancel={this.onRenameCanceled}
                                 onSave={this.onRenameFinished}>
                     <label>New title: <input value={this.state.renamingText} onChange={this.onRename} ref={onShowInput}/></label>
-                    <button onClick={this.onRenameFinished}>Save</button>
+                    <button onClick={this.onRenameFinished} disabled={this.state.renamingText===''}>Save</button>
                 </ModalContainer>
                 <ModalContainer visible={this.state.mode === 'NEW_CATEGORY'}
                                 onCancel={this.onNewCategoryCanceled}
                                 onSave={this.onNewCategoryFinished}>
                     <label>New category title: <input value={this.state.newCategoryTitle} onChange={this.onNewCategoryTitleChange} ref={onShowInput}/></label>
-                    <button onClick={this.onNewCategoryFinished}>Save</button>
+                    <button onClick={this.onNewCategoryFinished}  disabled={this.state.newCategoryTitle===''}>Save</button>
                 </ModalContainer>
                 {children}
-                <div>
-                    <label >New category: <input ref={"new_category_root"} /> </label>
-                    <button onClick={(e) => this.onNewCategory(e, null, "new_category_root")}>Add</button>
+                <div className="edit-category-list__new-root-category">
+                    <a href="#" className="pseudo edit-category-list__new-root-category__link"  onClick={(e) => this.onNewCategoryBegin(rootCategoryId)} >Add new root category...</a>
                 </div>
             </div>
         )
