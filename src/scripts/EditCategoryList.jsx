@@ -228,12 +228,14 @@ const EditCategoryList = React.createClass({
                                 onSave={this.onRenameFinished}>
                     <label>New title: <input value={this.state.renamingText} onChange={this.onRename} ref={onShowInput}/></label>
                     <button onClick={this.onRenameFinished} disabled={this.state.renamingText===''}>Save</button>
+                    <button onClick={this.onRenameCanceled}>Cancel</button>
                 </ModalContainer>
                 <ModalContainer visible={this.state.mode === 'NEW_CATEGORY'}
                                 onCancel={this.onNewCategoryCanceled}
                                 onSave={this.onNewCategoryFinished}>
                     <label>New category title: <input value={this.state.newCategoryTitle} onChange={this.onNewCategoryTitleChange} ref={onShowInput}/></label>
                     <button onClick={this.onNewCategoryFinished}  disabled={this.state.newCategoryTitle===''}>Save</button>
+                    <button onClick={this.onNewCategoryCanceled}>Cancel</button>
                 </ModalContainer>
                 {children}
                 <div className="edit-category-list__new-root-category">

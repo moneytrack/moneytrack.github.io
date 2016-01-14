@@ -472,3 +472,7 @@ a.pseudo.warning {
     font-size: 1.5rem;
     text-align: center;
     padding: 1rem; }
+  .unauthorized__button {
+    text-align: center; }
+    .unauthorized__button a {
+      border: 0; }
