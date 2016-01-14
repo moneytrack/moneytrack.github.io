@@ -52,22 +52,25 @@ a.pseudo.warning {
             color: #006DCE;
         }
 
+        &__empty {
+            font-style: italic;
+        }
+
         &--selected &__title {
             background: #EEEFAA;
             border-bottom: none;
             color: inherit;
         }
 
+        &--selected &__empty {
+            background: #EEEFAA;
+        }
 
         cursor: pointer;
     }
 
     &__children {
         padding-left: 20px;
-    }
-
-    &__empty {
-        font-style: italic;
     }
 
 }
@@ -189,6 +192,11 @@ a.pseudo.warning {
 
 .tabs-container {
     &__labels {
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
         &__label {
             padding: 0.5rem 1rem;
             background: #EEEFEE;
@@ -202,6 +210,8 @@ a.pseudo.warning {
 
     &__content {
         padding: 1rem;
+        display: flex;
+        justify-content: center;
     }
 }
 
@@ -296,7 +306,7 @@ a.pseudo.warning {
         }
 
         &__controls {
-            display: none;
+            visibility: hidden;
             padding-left: 1rem;
 
             a.pseudo {
@@ -309,7 +319,7 @@ a.pseudo.warning {
 
     #{$expense}:hover {
         #{$expense}__controls {
-            display: block;
+            visibility: visible;
         }
     }
 
