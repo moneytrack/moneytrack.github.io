@@ -400,10 +400,10 @@ a.pseudo.warning {
     font-style: italic;
     font-weight: bold;
     display: inline; }
-  .expense-list .expense-list__expense__category {
+  .expense-list .expense-list__expense__desc1 {
     font-size: 1rem;
     display: inline; }
-  .expense-list .expense-list__expense__comment {
+  .expense-list .expense-list__expense__desc2 {
     color: #ABABAB;
     font-size: 0.75rem;
     font-style: italic; }
@@ -465,6 +465,26 @@ a.pseudo.warning {
       color: red; }
     .sum-table-statistics__year__value__dif--minus {
       color: green; }
+    .sum-table-statistics__year__value__dif--zero {
+      color: #dedede; }
+
+.sum-table-statistics__year__total__title {
+  font-style: italic;
+  font-weight: bold;
+  padding: 0.25rem 0.8rem 0.25rem 0; }
+
+.sum-table-statistics__year__total__value {
+  padding: 0.25rem 0.8rem;
+  white-space: nowrap;
+  text-align: right;
+  font-weight: bold; }
+
+.sum-table-statistics__year__total__dif {
+  font-size: 0.75rem; }
+  .sum-table-statistics__year__total__dif--plus {
+    color: red; }
+  .sum-table-statistics__year__total__dif--minus {
+    color: green; }
 
 .unauthorized {
   margin: auto 0; }

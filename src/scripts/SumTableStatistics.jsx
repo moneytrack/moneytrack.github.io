@@ -17,7 +17,7 @@ const SumTableStatistics = React.createClass({
             activeYear: years[0],
             showChild: false,
             showAtRoot: false,
-            showDif: true
+            showDif: false
         }
     },
 
@@ -102,7 +102,7 @@ const SumTableStatistics = React.createClass({
                 }
                 else {
                     return (
-                        <div  className="sum-table-statistics__year__value__dif">&nbsp;</div>
+                        <div  className="sum-table-statistics__year__value__dif sum-table-statistics__year__value__dif--zero">0</div>
                     )
                 }
             }
@@ -166,6 +166,37 @@ const SumTableStatistics = React.createClass({
             return result;
         }
 
+        function renderTotal(data) {
+            var monthToTotal = {}
+            Object.keys(data).forEach(category => {
+                Object.keys(data[category]).forEach(month => {
+                    if(!monthToTotal[month]) {
+                        monthToTotal[month] = 0;
+                    }
+                    monthToTotal[month] += data[category][month]
+                })
+            })
+            return (
+                <tr key="total">
+                    <td className="sum-table-statistics__year__total__title">Total:</td>
+                    {
+                        Object.keys(monthToTotal).sort(asc).map( month => {
+                            const total = monthToTotal[month];
+                            const lastTotal = monthToTotal[month - 1];
+                            const dif = lastTotal ? total - lastTotal : null
+
+                            return (
+                                <td key={month} className="sum-table-statistics__year__total__value">
+                                    {format(total)}
+                                    {renderDif(dif)}
+                                </td>
+                            )
+                        })
+                    }
+                </tr>
+            )
+        }
+
         function renderTable(data) {
             let rows = [];
 
@@ -173,6 +204,8 @@ const SumTableStatistics = React.createClass({
             rootCategoryList.forEach((category) => {
                 rows.push(...renderCategory(data, category, 0))
             })
+
+            rows.push(renderTotal(data))
 
             return rows;
         }
