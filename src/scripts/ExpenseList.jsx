@@ -4,6 +4,7 @@ import update from 'react-addons-update'
 import InputMoment from 'input-moment'
 import moment from 'moment'
 
+import money from './money'
 import ModalContainer from './ModalContainer'
 import EditExpense from './EditExpense'
 import {editExpense} from './action-creators'
@@ -15,7 +16,14 @@ const ExpenseList = React.createClass({
     render: function () {
         const {data} = this.props
 
-        const {categoryList} = this.context.store.getState()
+        const {categoryList, userSettings} = this.context.store.getState()
+        const {currency} = userSettings
+        const currencySign = (currency === "USD") ? "$"
+                           : (currency === "EUR") ? String.fromCharCode(parseInt("8364"))
+                           : (currency === "RUR") ? String.fromCharCode(parseInt("8381"))
+                           : "";
+        const format = money.format(money.settings.byCurrency[currency]);
+
 
         function groupBy(arr, f) {
             const result = [];
@@ -70,7 +78,7 @@ const ExpenseList = React.createClass({
                                             <div>
                                                 <div  className="expense-list__expense__first-line">
                                                     <div className="expense-list__expense__amount">
-                                                        {expense.amount / 100} &#8381;
+                                                        {format(expense.amount)}
                                                     </div>
                                                     <div  className="expense-list__expense__category">
                                                        {' '} — {cats}

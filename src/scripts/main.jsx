@@ -229,6 +229,15 @@ ajax.get(DISPATCH_URL)
             }
             break;
 
+            case 'SET_CURRENCY': {
+                const {currency} = action
+                return update(state, {
+                    userSettings: {
+                        currency: {$set: currency}
+                    }
+                })
+            }
+            break;
 
             default:
                 console.warn("Unhandled action", action);

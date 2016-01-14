@@ -127,16 +127,14 @@ function money(rubels) {
     return Math.floor(rubels * 100)
 }
 
-sender.get('http://localhost:8081/clean')
-
 var loginResponse = sender.post('http://localhost:8081/_ah/login?continue=%2Fauth', {form: {
     'email':'test@example.com',
-    'continue':'/auth',
+    'continue':'/login',
     'action':'Log In'
 }});
 
 
-sender.get('http://localhost:8081/auth')
+sender.get('http://localhost:8081/login')
 
 var initialState = JSON.parse(sender.get('http://localhost:8081/dispatch').body)
 var rootCategoryId = initialState.rootCategoryId

@@ -10,11 +10,13 @@ const val ACTION_DELETE_EXPENSE = "DELETE_EXPENSE"
 const val ACTION_NEW_CATEGORY = "NEW_CATEGORY"
 const val ACTION_DELETE_CATEGORY = "DELETE_CATEGORY"
 const val ACTION_EDIT_CATEGORY = "EDIT_CATEGORY"
+const val ACTION_SET_CURRENCY = "SET_CURRENCY"
 
 
 const val STATE_HISTORY = "history"
 const val STATE_ROOT_CATEGORY_ID = "rootCategoryId"
 const val STATE_CATEGORY_LIST = "categoryList"
+const val STATE_USER_SETTINGS = "userSettings"
 
 /*
 	Common props
@@ -27,6 +29,7 @@ const val PROP_ID = "id"
 const val USER_KIND = "User";
 const val USER_PROP_NAME = "name"
 const val USER_PROP_ROOT_CATEGORY_ID = "rootCategoryId";
+const val USER_PROP_CURRENCY = "currency";
 
 
 /*

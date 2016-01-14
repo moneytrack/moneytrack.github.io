@@ -6,6 +6,7 @@ export default {
         const groupDelim = settings.groupDelim || " "
         const decimalDelim = settings.decimalDelim || "."
         const currency = settings.currency || ""
+        const currencyBefore = settings.currencyBefore || false
 
         let result = "";
         let dollars = parseInt(cents / 100)
@@ -23,8 +24,28 @@ export default {
         result += decimalDelim
         if(pennies < 10) result += "0"
         result += pennies
-        result += currency
+        if(currencyBefore) {
+            result = currency + result
+        }
+        else {
+            result = result + currency
+        }
 
         return result;
+    },
+
+    settings: {
+        byCurrency: {
+            USD: {
+                currency: "$",
+                currencyBefore: true
+            },
+            EUR: {
+                currency: " " + String.fromCharCode(parseInt("8364")),
+            },
+            RUR: {
+                currency: " " + String.fromCharCode(parseInt("8381")),
+            }
+        }
     }
 }

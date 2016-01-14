@@ -83,3 +83,12 @@ export const deleteCategory = ({id}) => {
 		}
 	})
 }
+
+export const setCurrency = ({currency}) => {
+	return asyncDispatch((result) => {
+		return {
+			type: 'SET_CURRENCY',
+			currency
+		}
+	})
+}

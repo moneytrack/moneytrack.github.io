@@ -46,6 +46,7 @@ class AuthServlet : HttpServlet() {
                         val rootCategoryKey = datastore.put(rootCategoryEntity)
 
                         newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootCategoryKey.id)
+                        newUserEntity.setProperty(USER_PROP_CURRENCY, "USD")
                         datastore.put(newUserEntity)
                     }
 

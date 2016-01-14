@@ -29,6 +29,8 @@ class NewCategoryAction(val title: String, val parentId: Long) : Action(ACTION_N
 class EditCategoryAction(val id: Long, val title: String?, val parentId: Long?) : Action(ACTION_NEW_CATEGORY)
 class DeleteCategoryAction(val id: Long) : Action(ACTION_NEW_CATEGORY)
 
+enum class Currency {USD, EUR, RUR}
+class SetCurrencyAction(val currency: Currency) : Action(ACTION_NEW_CATEGORY)
 
 class DispatchServlet : HttpServlet() {
 
@@ -107,7 +109,10 @@ class DispatchServlet : HttpServlet() {
             val stateJson = jsonObject(
                 STATE_HISTORY to collectExpenses(),
                 STATE_ROOT_CATEGORY_ID to userEntity.getProperty(USER_PROP_ROOT_CATEGORY_ID) as Long,
-                STATE_CATEGORY_LIST to collectCategories()
+                STATE_CATEGORY_LIST to collectCategories(),
+                STATE_USER_SETTINGS to jsonObject(
+                    USER_PROP_CURRENCY to userEntity.getProperty(USER_PROP_CURRENCY)
+                )
             )
 
             res.characterEncoding = "UTF-8";
@@ -276,6 +281,10 @@ class DispatchServlet : HttpServlet() {
                 res.setStatus(HttpServletResponse.SC_OK)
             }
 
+            is SetCurrencyAction -> {
+                userEntity.setProperty(USER_PROP_CURRENCY, action.currency.name)
+                datastore.put(userEntity)
+            }
             else -> {
                 res.writer.println("Unknown action type: ${action.type}")
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST)
@@ -330,6 +339,12 @@ class DispatchServlet : HttpServlet() {
             else if (type == ACTION_DELETE_CATEGORY) {
                 val id = actionJson.get(PROP_ID).long
                 return DeleteCategoryAction(id)
+            }
+
+            else if (type == ACTION_SET_CURRENCY) {
+                val currencyString = actionJson.get(USER_PROP_CURRENCY).string
+                val currency = Currency.valueOf(currencyString)
+                return SetCurrencyAction(currency)
             }
             throw ActionParseException("Unknown action type: " + type)
         } catch(e: Exception) {
