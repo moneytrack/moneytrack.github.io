@@ -18,10 +18,6 @@ const ExpenseList = React.createClass({
 
         const {categoryList, userSettings} = this.context.store.getState()
         const {currency} = userSettings
-        const currencySign = (currency === "USD") ? "$"
-                           : (currency === "EUR") ? String.fromCharCode(parseInt("8364"))
-                           : (currency === "RUR") ? String.fromCharCode(parseInt("8381"))
-                           : "";
         const format = money.format(money.settings.byCurrency[currency]);
 
 
@@ -68,7 +64,16 @@ const ExpenseList = React.createClass({
                                 group.map((expense) => {
                                     const category = categoryList.filter(x => x.id === expense.categoryId)[0]
 
-                                    const cats = collectCategoryAncestors(category).map(cat => cat.title).join(" / ")
+                                    var desc1;
+                                    var desc2;
+                                    if(!expense.comment) {
+                                        desc1 = collectCategoryAncestors(category).map(cat => cat.title).join(" / ");
+                                        desc2 = "";
+                                    }
+                                    else {
+                                        desc1 = expense.comment;
+                                        desc2 = collectCategoryAncestors(category).map(cat => cat.title).join(" / ");
+                                    }
 
                                     return (
                                         <div key={expense.id} className="expense-list__expense">
@@ -80,12 +85,12 @@ const ExpenseList = React.createClass({
                                                     <div className="expense-list__expense__amount">
                                                         {format(expense.amount)}
                                                     </div>
-                                                    <div  className="expense-list__expense__category">
-                                                       {' '} — {cats}
+                                                    <div  className="expense-list__expense__desc1">
+                                                        {' '} — {desc1}
                                                     </div>
                                                 </div>
-                                                <div  className="expense-list__expense__comment">
-                                                    {expense.comment}
+                                                <div  className="expense-list__expense__desc2">
+                                                    {desc2}
                                                 </div>
                                             </div>
                                             <div  className="expense-list__expense__controls" >

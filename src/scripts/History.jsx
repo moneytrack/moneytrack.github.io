@@ -111,24 +111,6 @@ const History = React.createClass({
         const {history, rootCategoryId, categoryList} = this.context.store.getState()
         const {filterDateFrom, filterDateTo, filterDateItem, filterCategory, filterComment} = this.state
 
-        function groupBy(arr, f) {
-            const result = [];
-            let group = null;
-            let lastGroupValue = null;
-            for(let i = 0; i<arr.length; ++i) {
-                let next = arr[i]
-                let newGroupValue = f(next)
-                if(group === null || f(next) !== lastGroupValue) {
-                    group = []
-                    result.push(group)
-                }
-                group.push(next)
-                lastGroupValue = newGroupValue
-            }
-            return result;
-        }
-
-
         const yearMonthMap = {};
         history.forEach((expense) => {
             let month = moment(expense.date).month()
@@ -148,9 +130,6 @@ const History = React.createClass({
         if(filterComment !== "") {
             filteredHistory = filteredHistory.filter(x => x.comment.indexOf(filterComment)!=-1)
         }
-
-        const sortedHistory = filteredHistory.sort((e1, e2) => e2.date - e1.date)
-        const expensesByDays = groupBy(filteredHistory, (expense) => moment(expense.date).format('YYYY MM DD'))
 
         /*
 
@@ -175,10 +154,6 @@ const History = React.createClass({
                                  onSave={this.onExpenseSave}
                                  onCancel={this.onExpenseEditCancel}/>
                 </ModalContainer>
-
-
-
-
 
                 <div className="history__results">
 
