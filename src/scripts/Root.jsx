@@ -13,6 +13,7 @@ import WaitIndicator from './WaitIndicator.jsx'
 import History from './History.jsx'
 import Statistics from './Statistics.jsx'
 import Settings from './Settings'
+import UserPanel from './UserPanel'
 
 const Root = React.createClass({
 
@@ -86,6 +87,7 @@ const Root = React.createClass({
 
                     </TabsContainer>
                     <WaitIndicator waiting={waiting}/>
+                    <UserPanel />
                 </div>
             )
         }

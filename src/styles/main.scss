@@ -175,6 +175,18 @@ a.pseudo.warning {
     padding: 0.25rem 0;
 }
 
+.user-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: #EEEFAA;
+    text-align: center;
+    font-size: 0.70rem;
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 0.75rem;
+}
+
 .tabs-container {
     &__labels {
         &__label {
