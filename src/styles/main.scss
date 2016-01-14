@@ -406,4 +406,15 @@ a.pseudo.warning {
         text-align: center;
         padding: 1rem;
     }
+
+    &__button {
+        text-align: center;
+
+        a {
+            border: 0;
+        }
+    }
+
+
+
 }
