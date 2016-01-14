@@ -19,7 +19,7 @@
  * Author:  Nikolay Mavrenkov <koluch@koluch.ru>
  * Created: 01.11.2015 23:04
  */
-import Promise from 'es6-promise'
+import {Promise} from 'es6-promise'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
@@ -41,14 +41,11 @@ ajax.get(DISPATCH_URL)
 }, (err) => {
     console.error(err)
     console.error("Failed to load state, use default state");
-    if(err.code) {
-        window.location.replace("/auth");
-    }
-    //todo: make default state reasonable
+    // if(err.code) {
+    //     window.location.replace("/auth");
+    // }
     return Promise.resolve({
-        history: [],
-        categoryList: [],
-        rootCategoryId: null
+        error: "UNAUTHORIZED"
     });
 })
 .then((initState) => {

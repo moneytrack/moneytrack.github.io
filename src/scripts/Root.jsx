@@ -52,38 +52,43 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {history, categoryList, waiting} = store.getState()
+        const {error, history, categoryList, waiting} = store.getState()
 
         let input;
         let prevValue = 0;
 
-        return (
-            <div>
-                <TabsContainer titleList={["Main", "History", "Statistics", "Settings"]}
-                               active={this.state.activeTab}
-                               onSwitch={this.onSwitchTab}>
-                    <div>
-                        <EditExpense onAdd={this.onAdd}/>
-                    </div>
+        if(error === "UNAUTHORIZED") {
+            return (
+                <h1>To use application you should be <a href="/login">authorized in Google</a></h1>
+            )
+        }
+        else {
+            return (
+                <div>
+                    <TabsContainer titleList={["Main", "History", "Statistics", "Settings"]}
+                                   active={this.state.activeTab}
+                                   onSwitch={this.onSwitchTab}>
+                        <div>
+                            <EditExpense onAdd={this.onAdd}/>
+                        </div>
 
-                    <div>
-                        <History onDelete={this.onDelete}/>
-                    </div>
+                        <div>
+                            <History onDelete={this.onDelete}/>
+                        </div>
 
-                    <div>
-                        <Statistics />
-                    </div>
+                        <div>
+                            <Statistics />
+                        </div>
 
-                    <div>
-                        <Settings />
-                    </div>
+                        <div>
+                            <Settings />
+                        </div>
 
-                </TabsContainer>
-                <WaitIndicator waiting={waiting}/>
-
-
-            </div>
-        )
+                    </TabsContainer>
+                    <WaitIndicator waiting={waiting}/>
+                </div>
+            )
+        }
     }
 })
 

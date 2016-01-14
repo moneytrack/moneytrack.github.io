@@ -15,7 +15,11 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>AuthServlet</servlet-name>
-        <url-pattern>/auth</url-pattern>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
     </servlet-mapping>
 
     <servlet>
