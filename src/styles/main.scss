@@ -397,3 +397,13 @@ a.pseudo.warning {
         }
     }
 }
+
+
+.unauthorized {
+    margin: auto 0;
+    &__caption {
+        font-size: 1.5rem;
+        text-align: center;
+        padding: 1rem;
+    }
+}

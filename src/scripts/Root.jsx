@@ -60,7 +60,9 @@ const Root = React.createClass({
 
         if(error === "UNAUTHORIZED") {
             return (
-                <h1>To use application you should be <a href="/login">authorized in Google</a></h1>
+                <div className="unauthorized">
+                    <div className="unauthorized__caption">To use this application you should be <a href="/login">authorized with Google Account</a></div>
+                </div>
             )
         }
         else {
