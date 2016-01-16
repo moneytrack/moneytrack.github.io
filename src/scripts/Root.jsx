@@ -19,7 +19,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Statistics"
+            activeTab: "Add expense"
         }
     },
 
@@ -58,8 +58,9 @@ const Root = React.createClass({
         let input;
         let prevValue = 0;
 
+        var content;
         if(error === "UNAUTHORIZED") {
-            return (
+            content = (
                 <div className="unauthorized">
                     <div className="unauthorized__caption">To use this application you should be authorized with Google Account</div>
                     <div className="unauthorized__button">
@@ -69,9 +70,9 @@ const Root = React.createClass({
             )
         }
         else {
-            return (
+            content = (
                 <div>
-                    <TabsContainer titleList={["Main", "History", "Statistics", "Settings"]}
+                    <TabsContainer titleList={["Add expense", "History", "Statistics", "Settings"]}
                                    active={this.state.activeTab}
                                    onSwitch={this.onSwitchTab}>
                         <div>
@@ -96,6 +97,15 @@ const Root = React.createClass({
                 </div>
             )
         }
+
+        return (<div>
+                    <div className="logo">
+                        <span className="logo__title__span">MONEYTRACK</span>
+                    </div>
+                    {content}
+                </div>)
+
+
     }
 })
 

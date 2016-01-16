@@ -24,20 +24,21 @@ const CategoryPicker = React.createClass({
                 classes.push("category-picker__category--selected")
             }
             classes = classes.join(" ")
+            const paddingStyle = {"paddingLeft":(5 + (20 * (level ) )) + "px"}
             if(childList.length > 0) {
                 const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
                 return [
-                    <div key={category.id} className={classes} onClick={() => this.onChange(category.id)}>
+                    <div key={category.id} className={classes} style={paddingStyle}  onClick={() => this.onChange(category.id)}>
                         <div className="category-picker__category__title">
                             {category.title}
                         </div>
                     </div>,
-                    <div key={category.id + '-children'} className="category-picker__children">{childListRendered}</div>
+                    childListRendered
                 ]
             }
             else {
                 return [
-                    <div key={category.id} className={classes} onClick={() => this.onChange(category.id)}>
+                    <div key={category.id} className={classes} style={paddingStyle}  onClick={() => this.onChange(category.id)}>
                         <div className="category-picker__category__title">
                             {category.title}
                         </div>

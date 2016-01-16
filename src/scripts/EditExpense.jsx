@@ -104,15 +104,41 @@ const EditExpense = React.createClass({
     render: function () {
         return (
             <form onSubmit={this.onSubmit} className="edit-expense">
-                <table>
-                    <tbody>
+                <div className="edit-expense__row">
+                    <table>
+                        <tbody>
                         <tr>
                             <td className="edit-expense__field__label">Amount: </td>
-                            <td><NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></td>
                         </tr>
                         <tr>
+                            <td className="edit-expense__field__input"><NumberInput  value={this.state.amount} onChange={this.onAmountChange}/></td>
+                        </tr>
+                        <tr>
+                            <td className="edit-expense__field__label">Date:</td>
+                        </tr>
+                        <tr>
+                            <td className="edit-expense__field__input">
+                                <DateTimePicker
+                                    value={this.state.date}
+                                    onChange={this.onChangeDate} />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="edit-expense__field__label">Comment:</td>
+                        </tr>
+                        <tr>
+                            <td className="edit-expense__field__input"><input value={this.state.comment} onChange={this.onChangeComment}/></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                    <table>
+                        <tbody>
+                        <tr>
                             <td className="edit-expense__field__label">Category: </td>
-                            <td>
+                        </tr>
+                        <tr>
+                            <td className="edit-expense__field__input">
                                 <div  className="edit-expense__category-picker-wrapper">
                                     <CategoryPicker categoryList={this.context.store.getState().categoryList}
                                                     rootCategoryId={this.context.store.getState().rootCategoryId}
@@ -123,36 +149,27 @@ const EditExpense = React.createClass({
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td className="edit-expense__field__label">Date:</td>
-                            <td>
-                                <DateTimePicker
-                                            value={this.state.date}
-                                            onChange={this.onChangeDate} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="edit-expense__field__label">Comment:</td>
-                            <td><input value={this.state.comment} onChange={this.onChangeComment}/></td>
-                        </tr>
-                        <tr>
-                            <td>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="edit-expense__controls">
+
                                 {
                                     this.state.mode === "NEW"
-                                    ? (<button type="submit" >Add</button>)
-                                    : (<button type="submit" >Save</button>)
+                                        ? (<button type="submit" >Add</button>)
+                                        : (<button type="submit" >Save</button>)
                                 }
                                 {
                                     this.state.mode === "EDIT"
-                                    ? (<button type="button" onClick={this.onCancel}>Cancel</button>)
-                                    : null
+                                        ? (<button type="button" onClick={this.onCancel}>Cancel</button>)
+                                        : null
                                 }
-                            </td>
-                            <td>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                </div>
+
+
+
+
             </form>
         )
     }
