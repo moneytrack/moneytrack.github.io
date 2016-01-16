@@ -155,35 +155,37 @@ const History = React.createClass({
                                  onCancel={this.onExpenseEditCancel}/>
                 </ModalContainer>
 
+
                 <div className="history__results">
 
 
                     {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
-                      ? (<div className="history__current-filter">
-                            <span className="history__current-filter__title">Showing records:</span>  <span>{
-                                moment(filterDateFrom).format("MMMM Do YYYY")
-                            }</span> — <span>{
-                                moment(filterDateTo).format("MMMM Do YYYY")
-                            }</span>
-                            {
-                                filterCategory !== null
+                        ? (<div className="history__current-filter">
+                        <span className="history__current-filter__title">Showing records:</span>  <span>{
+                        moment(filterDateFrom).format("MMMM Do YYYY")
+                    }</span> — <span>{
+                        moment(filterDateTo).format("MMMM Do YYYY")
+                    }</span>
+                        {
+                            filterCategory !== null
                                 ? <span>, in category &bdquo;{categoryList.filter(x => x.id === filterCategory)[0].title}&ldquo;</span>
                                 : null
-                            }
-                            {
-                                filterComment !== ""
+                        }
+                        {
+                            filterComment !== ""
                                 ? <span>, with comment, containing &bdquo;{filterComment}&ldquo;</span>
                                 : null
-                            }
-                        </div>)
-                      : null
+                        }
+                    </div>)
+                        : null
                     }
 
                     <ExpenseList
-                         data={filteredHistory}
-                         onEdit={this.onExpenseEdit}
-                         onDelete={this.onExpenseDelete}/>
+                        data={filteredHistory}
+                        onEdit={this.onExpenseEdit}
+                        onDelete={this.onExpenseDelete}/>
                 </div>
+
 
                 <div className="history__filters">
                     <div  className="history__title">Filter by date</div>
@@ -243,6 +245,7 @@ const History = React.createClass({
 
                 </div>
 
+
                 <div className="history__filters">
                     <div  className="history__title">Filter by category</div>
                     <div className="history__category-filter">
@@ -252,14 +255,17 @@ const History = React.createClass({
                             allowEmpty={true}
                             value={this.state.filterCategory}
                             onChange={this.onFilterByCategory}
-                         />
+                        />
                     </div>
 
                     <div  className="history__title">Filter by comment</div>
                     <div className="history__comment-filter">
                         <input type="text" value={this.state.filterComment} onChange={this.onFilterByComment} />
                     </div>
+
                 </div>
+
+
 
             </div>
         )

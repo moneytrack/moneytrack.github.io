@@ -26,6 +26,17 @@ a.pseudo.warning {
     border-bottom-color: red;
 }
 
+button {
+    border: 1px solid #EFEFEF;
+    background: #FBFBFB;
+    border-radius: 7px;
+    padding: 10px 15px;
+    /* box-shadow: 0px 0px 10px rgba(136, 136, 136, 0.16); */
+    margin: 5px;
+    font-weight: bold;
+    color: #5F5F5F;
+}
+
 .logo {
     text-align: center;
     padding: 2rem;
@@ -82,9 +93,7 @@ a.pseudo.warning {
     display: flex;
     flex-direction: column;
 
-    > table {
-        padding: 0 1.5rem;
-    }
+
 
 	> table > tbody > tr > td {
 		vertical-align: top;
@@ -94,6 +103,10 @@ a.pseudo.warning {
     &__row {
         display: flex;
         flex-direction: row;
+
+        > table {
+            margin: 0 1rem;
+        }
     }
 
 	&__field {
@@ -129,6 +142,8 @@ a.pseudo.warning {
     &__controls {
         display: flex;
         justify-content: center;
+
+
     }
 
 
@@ -263,6 +278,8 @@ a.pseudo.warning {
             padding: 0.5rem 1rem;
             background: #EEEFEE;
             display: inline-block;
+            border-radius: 5px;
+            margin: 0 5px;
         }
 
         &__label--active {
@@ -287,12 +304,12 @@ a.pseudo.warning {
     }
 
     &__filters {
-        width: 20%;
-        padding: 0rem 0rem 0rem 2rem;
+        width: 200px;
+        padding: 0rem 0rem 0rem 1rem;
     }
 
     &__results {
-        width: 60%;
+        width: 800px;
     }
 
     &__year-month-filter {

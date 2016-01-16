@@ -127,7 +127,9 @@ const EditExpense = React.createClass({
                             <td className="edit-expense__field__label">Comment:</td>
                         </tr>
                         <tr>
-                            <td className="edit-expense__field__input"><input value={this.state.comment} onChange={this.onChangeComment}/></td>
+                            <td className="edit-expense__field__input">
+                                <textarea  value={this.state.comment} onChange={this.onChangeComment} rows="3"/>
+                            </td>
                         </tr>
 
                         </tbody>
