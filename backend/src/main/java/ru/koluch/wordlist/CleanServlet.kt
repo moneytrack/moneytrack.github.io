@@ -22,24 +22,46 @@ import javax.servlet.http.HttpServletResponse
 class CleanServlet : HttpServlet() {
     override fun service(req: HttpServletRequest, res: HttpServletResponse) {
 
+        //todo: add captcha
+
         val datastore = DatastoreServiceFactory.getDatastoreService()
-        val query = Query()
-        query.setKeysOnly()
-        val preparedQuery = datastore.prepare(query)
 
-        var counter = 100
-        while(counter-->0) {
-            val entities: List<Entity> = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-            if(entities.isEmpty()) {
-                return;
-            }
-            for (entity in entities) {
-                datastore.delete(entity.key)
-            }
-
+        val userPrincipal = req.userPrincipal
+        if (userPrincipal == null) {
+            res.writer.println("User is not authorized")
+            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            return;
         }
-        throw RuntimeException("Too much entities")
 
+        val userEntity: Entity
+        try {
+            userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
+        } catch(e: EntityNotFoundException) {
+            res.writer.println("User account info not found, nothing to delete")
+            res.sendError(HttpServletResponse.SC_OK)
+            return;
+        }
+
+        val tx = datastore.beginTransaction();
+        try {
+            val query = Query(userEntity.key)
+            query.setKeysOnly()
+            val preparedQuery = datastore.prepare(tx, query)
+
+            val entities = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+            if(entities.size > 50000) { //todo: estimate this value
+                throw RuntimeException("Too many entities. Please, contact support")
+            }
+
+            for (entity in entities) {
+                datastore.delete(tx, entity.key)
+            }
+
+            tx.commit();
+        } catch(e: Exception) {
+            tx.rollback();
+            throw e;
+        }
 
     }
 }

@@ -19,7 +19,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Add expense"
+            activeTab: "Settings"
         }
     },
 
@@ -70,11 +70,20 @@ const Root = React.createClass({
             )
         }
         else {
+            const disabled = {}
+
+            if(history.length === 0) {
+                disabled["History"] = "You have no expenses yet"
+                disabled["Statistics"] = "You have no expenses yet"
+            }
+
+
             content = (
                 <div>
                     <TabsContainer titleList={["Add expense", "History", "Statistics", "Settings"]}
                                    active={this.state.activeTab}
-                                   onSwitch={this.onSwitchTab}>
+                                   onSwitch={this.onSwitchTab}
+                                   disabled={disabled}>
                         <div>
                             <EditExpense onAdd={this.onAdd}/>
                         </div>

@@ -127,7 +127,13 @@ gulp.task('images', function(){
         .pipe(gulp.dest(PROD_ROOT + '/images'))
 });
 
-gulp.task('default', ['html', 'vendor', 'scripts', 'styles', 'images']);
+gulp.task('fonts', function(){
+    var files = SRC_ROOT + '/fonts/**';
+    return gulp.src(files)
+        .pipe(gulp.dest(PROD_ROOT + '/fonts'))
+});
+
+gulp.task('default', ['html', 'vendor', 'scripts', 'styles', 'images', 'fonts']);
 
 
 //***************** Debug *****************
@@ -266,4 +272,11 @@ gulp.task('debug_images', function(){
         .pipe(gulp.dest(DEBUG_ROOT + '/images'))
 });
 
-gulp.task('debug', ['debug_html', 'debug_vendor', 'debug_scripts', 'debug_styles', 'debug_images']);
+gulp.task('debug_fonts', function(){
+    var files = SRC_ROOT + '/fonts/**';
+    return gulp.src(files)
+        .pipe(watch(files))
+        .pipe(gulp.dest(DEBUG_ROOT + '/fonts'))
+});
+
+gulp.task('debug', ['debug_html', 'debug_vendor', 'debug_scripts', 'debug_styles', 'debug_images', 'debug_fonts']);

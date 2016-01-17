@@ -23,6 +23,7 @@ const TabsContainer = React.createClass({
 
     render: function() {
 
+        var disabled = this.props.disabled || {}
 
         let activeTabIndex = this.props.titleList.indexOf(this.props.active)
         let className = "tabs-container" + (this.props.className ? " " + this.props.className : "")
@@ -33,7 +34,9 @@ const TabsContainer = React.createClass({
                     this.props.titleList.map((title) => (
                         title === this.props.active
                         ? <span key={title} className="tabs-container__labels__label tabs-container__labels__label--active">{title}</span>
-                        : <span key={title} className="tabs-container__labels__label"><a href="#" className="pseudo" onClick={this.onClick(title)}>{title}</a></span>
+                        : (!disabled[title]
+                             ? <span key={title} className="tabs-container__labels__label"><a href="#" className="pseudo" title={disabled[title]} onClick={this.onClick(title)}>{title}</a></span>
+                             : <span key={title} className="tabs-container__labels__label tabs-container__labels__label--disabled" title={disabled[title]}>{title}</span>)
                     ))
                 }
                 </div>

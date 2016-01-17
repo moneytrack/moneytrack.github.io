@@ -12,7 +12,7 @@ const EditExpense = React.createClass({
     getInitialState: function(){
         const {rootCategoryId, categoryList, history} = this.context.store.getState()
 
-        if(this.props.expenseId) {
+        if(typeof this.props.expenseId !== "undefined") {
             const expense = history.filter(x => x.id === this.props.expenseId)[0]
             return {
                 id: expense.id,
@@ -24,7 +24,7 @@ const EditExpense = React.createClass({
             }
         }
         else {
-            let rootCategoryList = categoryList.filter(x => x.parentId === rootCategoryId)
+            let rootCategoryList = categoryList.sort((c1,c2) => c1.order - c2.order).filter(x => x.parentId === rootCategoryId)
             let firstCategoryId = rootCategoryList.length > 0 ? rootCategoryList[0].id : -1;
             return {
                 amount: NumberInput.wrapState(0),
@@ -159,8 +159,8 @@ const EditExpense = React.createClass({
 
                                 {
                                     this.state.mode === "NEW"
-                                        ? (<button type="submit" >Add</button>)
-                                        : (<button type="submit" >Save</button>)
+                                        ? (<button disabled={NumberInput.unwrapState(this.state.amount) === 0} type="submit" >Add</button>)
+                                        : (<button disabled={NumberInput.unwrapState(this.state.amount) === 0} type="submit" >Save</button>)
                                 }
                                 {
                                     this.state.mode === "EDIT"

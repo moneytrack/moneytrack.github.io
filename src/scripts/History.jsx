@@ -136,7 +136,7 @@ const History = React.createClass({
             2015         2016
             ----         ----
             September    January
-            October      Febuary
+            October      February
             November
             December
 
@@ -147,128 +147,141 @@ const History = React.createClass({
             http://localhost:8080/#history/by-year/2016
         */
 
-        return (
-            <div className="history">
-                <ModalContainer visible={this.state.editingExpense} onCancel={this.onCancelEditingExpense}>
-                    <EditExpense expenseId={this.state.editingExpenseId}
-                                 onSave={this.onExpenseSave}
-                                 onCancel={this.onExpenseEditCancel}/>
-                </ModalContainer>
-
-
-                <div className="history__results">
-
-
-                    {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
-                        ? (<div className="history__current-filter">
-                        <span className="history__current-filter__title">Showing records:</span>  <span>{
-                        moment(filterDateFrom).format("MMMM Do YYYY")
-                    }</span> — <span>{
-                        moment(filterDateTo).format("MMMM Do YYYY")
-                    }</span>
-                        {
-                            filterCategory !== null
-                                ? <span>, in category &bdquo;{categoryList.filter(x => x.id === filterCategory)[0].title}&ldquo;</span>
-                                : null
-                        }
-                        {
-                            filterComment !== ""
-                                ? <span>, with comment, containing &bdquo;{filterComment}&ldquo;</span>
-                                : null
-                        }
-                    </div>)
-                        : null
-                    }
-
-                    <ExpenseList
-                        data={filteredHistory}
-                        onEdit={this.onExpenseEdit}
-                        onDelete={this.onExpenseDelete}/>
+        if(history.length === 0) {
+            return (
+                <div className="history">
+                    <div className="empty-history-msg">You have no expenses yet</div>
                 </div>
+            )
+        }
+        else {
+            return (
+                <div className="history">
+                    <ModalContainer visible={this.state.editingExpense} onCancel={this.onCancelEditingExpense}>
+                        <EditExpense expenseId={this.state.editingExpenseId}
+                                     onSave={this.onExpenseSave}
+                                     onCancel={this.onExpenseEditCancel}/>
+                    </ModalContainer>
+
+                    <div className="history__results">
 
 
-                <div className="history__filters">
-                    <div  className="history__title">Filter by date</div>
-                    <div className="history__year-month-filter">
-                    {
-                        keys(yearMonthMap).sort(desc).map((year) => (
-                            <div key={year} className="history__year-month-filter__year-block">
-                                {(filterDateItem === (year))
-                                  ? (
-                                        <div  className="history__year-month-filter__item history__year-month-filter__item--active history__year-month-filter__year"><span>
-                                            {year}:
-                                        </span></div>
-                                    )
-                                  : (
-                                        <div className="history__year-month-filter__year history__year-month-filter__item"><a href="#"
-                                            className="pseudo"
-                                            onClick={(e) => {e.preventDefault(); this.onFilterByYear(year)}}>
-                                            {year}:
-                                        </a></div>
-                                    )
-                                }
+                        {(filterDateFrom != 0 && filterDateTo != Number.MAX_VALUE)
+                            ? (<div className="history__current-filter">
+                            <span className="history__current-filter__title">Showing records:</span>  <span>{
+                            moment(filterDateFrom).format("MMMM Do YYYY")
+                        }</span> — <span>{
+                            moment(filterDateTo).format("MMMM Do YYYY")
+                        }</span>
+                            {
+                                filterCategory !== null
+                                    ?
+                                    <span>, in category &bdquo;{categoryList.filter(x => x.id === filterCategory)[0].title}&ldquo;</span>
+                                    : null
+                            }
+                            {
+                                filterComment !== ""
+                                    ? <span>, with comment, containing &bdquo;{filterComment}&ldquo;</span>
+                                    : null
+                            }
+                        </div>)
+                            : null
+                        }
+
+                        <ExpenseList
+                            data={filteredHistory}
+                            onEdit={this.onExpenseEdit}
+                            onDelete={this.onExpenseDelete}/>
+                    </div>
 
 
-                                {
-                                    yearMonthMap[year].sort(desc).map((month) => {
-                                        let m = moment().month(month).year(year)
-                                        if(filterDateItem === (year + "-" + month)) {
-                                            return (
-                                                <div key={month} className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active">
-                                                    <span>
-                                                        {m.format("MMMM")}
-                                                    </span>
-                                                </div>
-                                            )
-
-                                        }
-                                        else {
-                                            return (
-                                                <div key={month} className="history__year-month-filter__month history__year-month-filter__item">
-                                                    <a href="#"
-                                                       className="pseudo"
-                                                       onClick={(e) => {e.preventDefault(); this.onFilterByYearMonth(year, month)}}>
-                                                        {m.format("MMMM")}
-                                                    </a>
-                                                </div>
-                                            )
+                    <div className="history__filters">
+                        <div className="history__title">Filter by date</div>
+                        <div className="history__year-month-filter">
+                            {
+                                keys(yearMonthMap).sort(desc).map((year) => (
+                                    <div key={year} className="history__year-month-filter__year-block">
+                                        {(filterDateItem === (year))
+                                            ? (
+                                            <div
+                                                className="history__year-month-filter__item history__year-month-filter__item--active history__year-month-filter__year"><span>
+                                                {year}:
+                                            </span></div>
+                                        )
+                                            : (
+                                            <div
+                                                className="history__year-month-filter__year history__year-month-filter__item">
+                                                <a href="#"
+                                                   className="pseudo"
+                                                   onClick={(e) => {e.preventDefault(); this.onFilterByYear(year)}}>
+                                                    {year}:
+                                                </a></div>
+                                        )
                                         }
 
-                                    })
-                                }
-                            </div>
-                        ))
-                    }
+
+                                        {
+                                            yearMonthMap[year].sort(desc).map((month) => {
+                                                let m = moment().month(month).year(year)
+                                                if (filterDateItem === (year + "-" + month)) {
+                                                    return (
+                                                        <div key={month}
+                                                             className="history__year-month-filter__item history__year-month-filter__month history__year-month-filter__item--active">
+                                                        <span>
+                                                            {m.format("MMMM")}
+                                                        </span>
+                                                        </div>
+                                                    )
+
+                                                }
+                                                else {
+                                                    return (
+                                                        <div key={month}
+                                                             className="history__year-month-filter__month history__year-month-filter__item">
+                                                            <a href="#"
+                                                               className="pseudo"
+                                                               onClick={(e) => {e.preventDefault(); this.onFilterByYearMonth(year, month)}}>
+                                                                {m.format("MMMM")}
+                                                            </a>
+                                                        </div>
+                                                    )
+                                                }
+
+                                            })
+                                        }
+                                    </div>
+                                ))
+                            }
+                        </div>
+
+
                     </div>
 
+
+                    <div className="history__filters">
+                        <div className="history__title">Filter by category</div>
+                        <div className="history__category-filter">
+                            <CategoryPicker
+                                rootCategoryId={rootCategoryId}
+                                categoryList={categoryList}
+                                allowEmpty={true}
+                                emptyText="Do not filter by category"
+                                value={this.state.filterCategory}
+                                onChange={this.onFilterByCategory}
+                            />
+                        </div>
+
+                        <div className="history__title">Filter by comment</div>
+                        <div className="history__comment-filter">
+                            <input type="text" value={this.state.filterComment} onChange={this.onFilterByComment}/>
+                        </div>
+
+                    </div>
 
 
                 </div>
-
-
-                <div className="history__filters">
-                    <div  className="history__title">Filter by category</div>
-                    <div className="history__category-filter">
-                        <CategoryPicker
-                            rootCategoryId={rootCategoryId}
-                            categoryList={categoryList}
-                            allowEmpty={true}
-                            value={this.state.filterCategory}
-                            onChange={this.onFilterByCategory}
-                        />
-                    </div>
-
-                    <div  className="history__title">Filter by comment</div>
-                    <div className="history__comment-filter">
-                        <input type="text" value={this.state.filterComment} onChange={this.onFilterByComment} />
-                    </div>
-
-                </div>
-
-
-
-            </div>
-        )
+            )
+        }
     }
 })
 

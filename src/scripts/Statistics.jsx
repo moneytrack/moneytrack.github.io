@@ -10,7 +10,14 @@ const Statistics = React.createClass({
 
 
     render: function () {
-        
+        const {history} = this.context.store.getState()
+        if(history.length === 0) {
+            return (
+                <div className="sum-table-statistics">
+                    <div className="empty-history-msg">You have no expenses yet</div>
+                </div>
+            )
+        }
         return (
             <div className="statistics">
                 <SumTableStatistics />

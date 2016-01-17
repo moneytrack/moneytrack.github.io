@@ -6,9 +6,10 @@
  *
  * Created: 30.12.2015 22:03
  */
-var request = require("sync-request");
 var moment = require("moment")
-var colors = require("colors/safe")
+
+var common = require("./_common.js");
+
 /*
 
     Categories:
@@ -48,69 +49,12 @@ var colors = require("colors/safe")
 
 
 */
-function Sender() {
 
-}
-
-Sender.prototype.sendAction = function (data) {
-    return post({
-        url: "http://localhost:8081/dispatch",
-        json: true,
-        headers: this.cookies,
-        body: data
-    })
-};
-
-Sender.prototype.req = function(method, url, params) {
-    params = params || {}
-    params.followRedirects = false;
-    if(this.cookies) {
-        params.headers = params.headers || {}
-        params.headers["Cookie"] = this.cookies
-    }
-    console.log(colors.cyan("> " + method + " " + url))
-    console.log(colors.cyan("> " + JSON.stringify(params, undefined, 4)))
-    var result = request(method, url, params);
-
-    if(result.statusCode >= 400) {
-        console.log(colors.red("> " + result.body.toString("utf8")));
-        throw new Error(result)
-    }
-    console.log(colors.green("< " + result.statusCode + ": " + result.body.toString("utf8")))
-    if(result.headers['set-cookie']) {
-        var newCookies = result.headers['set-cookie']
-        this.cookies = newCookies.map((cookie) => {
-            return cookie.split(/\s*;\s*/)[0]
-        })
-    }
-    return {
-        body: result.body.toString("utf8"),
-        headers: result.headers
-    };
-}
-
-Sender.prototype.get = function(url, params) {
-    return this.req('GET', url, params);
-}
-
-Sender.prototype.post = function(url, params) {
-    if (params.form) {
-        params.body = []
-        for(var i in params.form) {
-            params.body.push(i + "=" + encodeURIComponent(params.form[i]))
-        }
-        params.body = params.body.join("&")
-        params.headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }
-    return this.req('POST', url, params);
-}
 
 
 /******************************************************************************/
 
-var sender = new Sender();
+var sender = new common.Sender();
 
 function dispatch(json)  {
     var result = sender.post('http://localhost:8081/dispatch', { json: json})
@@ -126,6 +70,8 @@ function time(str) {
 function money(rubels) {
     return Math.floor(rubels * 100)
 }
+
+sender.get('http://localhost:8081/clean')
 
 var loginResponse = sender.post('http://localhost:8081/_ah/login?continue=%2Fauth', {form: {
     'email':'test@example.com',
@@ -218,7 +164,7 @@ var presentsCategoryId = dispatch({
         15:17 - 20000 - Home/Payments/Rent
         20:52 - 1053.56 - Food/Home - Some goods (Okay)
 */
-var DAYS = 356
+var DAYS = 1
 var EXPENSE_PER_DAY = 3;
 var cats = [homeCategoryId, paymentsCategoryId, rentCategoryId, internetCategoryId,
  foodCategoryId, atWorkCategoryId, atHomeCategoryId, transportCategoryId, familyCategoryId, presentsCategoryId]

@@ -66,6 +66,39 @@ const EditCategoryList = React.createClass({
     /*
         Moving
      */
+
+    onMoveBegin: function(category) {
+        this.setState(update(this.state, {
+            mode: {$set: 'MOVE'},
+            moveCategoryId: {$set: category.id},
+            moveOldParentId: {$set: category.parentId},
+            moveNewParentId: {$set: category.parentId}
+        }))
+    },
+
+    onMoveFinished: function(e) {
+        if(this.state.moveNewParentId !== -1) {
+            console.log("state", this.state);
+            this.props.onMoveCategory(this.state.moveCategoryId, this.state.moveNewParentId)
+            this.setState(update(this.state, {
+                mode: {$set: null},
+            }))
+        }
+    },
+
+    onMoveCanceled: function(e) {
+        this.setState(update(this.state, {
+            mode: {$set: null},
+        }))
+    },
+
+    onMoveParentChange: function(e) {
+        this.setState(update(this.state, {
+            mode: {$set: 'MOVE'},
+            moveNewParentId: {$set: parseInt(e.target.value)}
+        }))
+    },
+
     onMove: function(id, e) {
         const toId = parseInt(e.target.value);
         if(id >= 0) {
@@ -76,11 +109,11 @@ const EditCategoryList = React.createClass({
     /*
         New category
      */
-    onNewCategoryBegin: function(parentId) {
+    onNewCategoryBegin: function(parent) {
         this.setState(update(this.state, {
             mode: {$set: 'NEW_CATEGORY'},
             newCategoryTitle: {$set: ''},
-            newCategoryParentId:  {$set: parentId}
+            newCategoryParentId:  {$set: parent.id}
         }))
     },
 
@@ -109,13 +142,75 @@ const EditCategoryList = React.createClass({
     /*
         Delete
      */
-    onDeleteCategory: function(e, id) {
-        e.preventDefault()
-        this.props.onDeleteCategory(id)
+    onDeleteCategory: function(category) {
+        this.props.onDeleteCategory(category.id)
     },
 
     renderRecurse: function(list, level) {
         let {categoryList, rootCategoryId} = this.context.store.getState();
+
+
+
+        let rootCategory = categoryList.filter(x => x.id === rootCategoryId)[0]
+
+        let sorted = list.slice().sort((c1, c2) => c1.order - c2.order)
+        return sorted.map((category) => {
+            const childList = category.childIdList.map(id => categoryList.filter(x => x.id === id)[0])
+            let classes = ["edit-category-list__category"]
+            classes = classes.join(" ")
+
+            let childListHtml = null
+            if(childList.length > 0) {
+                const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level + 1) : ""
+                childListHtml = (
+                    <div key={category.id + '-children'} className="edit-category-list__children">
+                        {childListRendered}
+                    </div>
+                )
+            }
+            return [
+                <div key={category.id} className={classes} >
+                    <div className="edit-category-list__category__content">
+                        <div className="edit-category-list__category__title">
+                            {category.title}
+                        </div>
+                        {' '}
+                        <div className="edit-category-list__category__controls">
+                            <i title="Rename..." onClick={(e) => this.onRenameBegin(category)} className="icon icon-pen icon1x" aria-hidden="true"/>
+                            <i title="Add sub category..." onClick={(e) => this.onNewCategoryBegin(category)} className="icon icon-plus icon1x" aria-hidden="true"/>
+                            <i title="Move..." onClick={(e) => this.onMoveBegin(category)}  className="icon icon-reply icon1x" aria-hidden="true"/>
+                            <i  title="Delete..."  onClick={(e) => this.onDeleteCategory(category)}  className="icon icon-trash_can icon1x warning" aria-hidden="true"/>
+                        </div>
+                    </div>
+                </div>,
+                childListHtml
+            ]
+        })
+    },
+
+    render: function() {
+        let {rootCategoryId,categoryList} = this.context.store.getState();
+        const rootCategory = categoryList.filter(x => x.id === rootCategoryId)[0]
+        const rootCategoryList = categoryList.filter(category => category.parentId === rootCategoryId)
+        const children = this.renderRecurse(rootCategoryList, 0)
+        if(this.props.allowEmpty) {
+            let classes = ["edit-category-list__category"]
+            if(this.props.value === null) {
+                classes.push("edit-category-list__category--selected")
+            }
+            classes = classes.join(" ")
+            children.unshift(<div key="empty" className={classes} >
+                <div className="edit-category-list__empty" >
+                    Do not filter by category
+                </div>
+            </div>)
+        }
+
+        const onShowInput = (input) => {
+            if(input) {
+                input.focus()
+            }
+        }
 
         function renderMoveToOptions(category, current, level = 0) {
 
@@ -140,87 +235,6 @@ const EditCategoryList = React.createClass({
             return childOptionList
         }
 
-        let rootCategory = categoryList.filter(x => x.id === rootCategoryId)[0]
-
-        let sorted = list.slice().sort((c1, c2) => c1.order - c2.order)
-        return sorted.map((category) => {
-            const childList = category.childIdList.map(id => categoryList.filter(x => x.id === id)[0])
-            let classes = ["edit-category-list__category"]
-            classes = classes.join(" ")
-            if(childList.length > 0) {
-                const childListRendered = childList.length > 0 ? this.renderRecurse(childList, level+1) : ""
-                return [
-                    <div key={category.id} className={classes} >
-                        <div className="edit-category-list__category__content">
-                            <div className="edit-category-list__category__title"
-                                 onClick={() => this.onRenameTitleBegin(category)}>
-                                {category.title}
-                            </div>
-                            {' '}
-                            <div className="edit-category-list__category__controls">
-                                <a href="#" onClick={(e) => this.onRenameBegin(category)} className="pseudo">Rename</a>
-                                <a href="#" onClick={(e) => this.onNewCategoryBegin(category.id)} className="pseudo">Add sub-category...</a>
-                                <select onChange={(e) => this.onMove(category.id, e)}>
-                                    <option value={-1}>Move to...</option>
-                                    {renderMoveToOptions(rootCategory, category.id)}
-                                </select>
-                                <a href="#" onClick={(e) => this.onDeleteCategory(e, category.id)} className="pseudo  warning">Delete</a>
-                            </div>
-                        </div>
-
-                    </div>,
-                    <div key={category.id + '-children'} className="edit-category-list__children">
-                        {childListRendered}
-                    </div>
-                ]
-            }
-            else {
-                return [
-                    <div key={category.id} className={classes}>
-                        <div className="edit-category-list__category__content">
-                            <div className="edit-category-list__category__title" onClick={() => this.onRenameBegin(category)}>
-                                {category.title}
-                            </div>
-                            <div className="edit-category-list__category__controls">
-                                <a href="#" onClick={(e) => this.onRenameBegin(category)} className="pseudo">Rename</a>
-                                <a href="#" onClick={(e) => this.onNewCategoryBegin(category.id)} className="pseudo">Add sub-category...</a>
-                                <select  onChange={(e) => this.onMove(category.id, e)}>
-                                    <option value={-1}>Move to...</option>
-                                    {renderMoveToOptions(rootCategory, category.id)}
-                                </select>
-                                <a href="#" onClick={(e) => this.onDeleteCategory(e, category.id)} className="pseudo warning">Delete</a>
-                            </div>
-                        </div>
-                    </div>
-                ]
-            }
-
-        })
-    },
-
-    render: function() {
-        let {rootCategoryId,categoryList} = this.context.store.getState();
-        const rootCategoryList = categoryList.filter(category => category.parentId === rootCategoryId)
-        const children = this.renderRecurse(rootCategoryList, 0)
-        if(this.props.allowEmpty) {
-            let classes = ["edit-category-list__category"]
-            if(this.props.value === null) {
-                classes.push("edit-category-list__category--selected")
-            }
-            classes = classes.join(" ")
-            children.unshift(<div key="empty" className={classes} >
-                <div className="edit-category-list__empty" >
-                    Do not filter by category
-                </div>
-            </div>)
-        }
-
-        const onShowInput = (input) => {
-            if(input) {
-                input.focus()
-            }
-        }
-
         return  (
             <div className="edit-category-list">
                 <ModalContainer visible={this.state.mode === 'RENAME'}
@@ -237,9 +251,20 @@ const EditCategoryList = React.createClass({
                     <button onClick={this.onNewCategoryFinished}  disabled={this.state.newCategoryTitle===''}>Save</button>
                     <button onClick={this.onNewCategoryCanceled}>Cancel</button>
                 </ModalContainer>
+                <ModalContainer visible={this.state.mode === 'MOVE'}
+                                onCancel={this.onMoveCanceled}
+                                onSave={this.onMoveFinished}>
+                    <label>Move to:{' '}
+                        <select onChange={this.onMoveParentChange} value={this.state.moveNewParentId}>
+                            {renderMoveToOptions(rootCategory, this.state.moveCategoryId)}
+                        </select>
+                    </label>
+                    <button onClick={this.onMoveFinished} disabled={this.state.moveNewParentId === this.state.moveOldParentId}>Save</button>
+                    <button onClick={this.onMoveCanceled}>Cancel</button>
+                </ModalContainer>
                 {children}
                 <div className="edit-category-list__new-root-category">
-                    <a href="#" className="pseudo edit-category-list__new-root-category__link"  onClick={(e) => this.onNewCategoryBegin(rootCategoryId)} >Add new root category...</a>
+                    <a href="#" className="pseudo edit-category-list__new-root-category__link"  onClick={(e) => this.onNewCategoryBegin(rootCategory)} >Add new root category...</a>
                 </div>
             </div>
         )

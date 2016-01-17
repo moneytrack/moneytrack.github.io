@@ -68,7 +68,7 @@ const SumTableStatistics = React.createClass({
 
     render: function () {
 
-        const {categoryList, rootCategoryId} = this.context.store.getState()
+        const {history, categoryList, rootCategoryId} = this.context.store.getState()
 
         const asc = (x,y) => x - y
 
@@ -231,6 +231,13 @@ const SumTableStatistics = React.createClass({
             return result;
         }
 
+        if(history.length === 0) {
+            return (
+                <div className="sum-table-statistics">
+                    <div className="empty-history-msg">You have no expenses yet</div>
+                </div>
+            )
+        }
         return (
             <TabsContainer className="sum-table-statistics"
                            titleList={Object.keys(yearMonthCategoryExpenseMap).sort(asc)}

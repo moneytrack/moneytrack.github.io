@@ -36,18 +36,18 @@ class AuthServlet : HttpServlet() {
                     //todo: make transactional
                     if (!datastore.exists(KeyFactory.createKey(USER_KIND, userPrincipal.name))) {
 
+                        val tx = datastore.beginTransaction();
+
                         val newUserEntity = Entity(USER_KIND, userPrincipal.name)
-                        val userEntityKey = datastore.put(newUserEntity)
+                        val userEntityKey = datastore.put(tx, newUserEntity)
 
-                        val rootCategoryEntity = Entity(CATEGORY_KIND, userEntityKey)
-                        rootCategoryEntity.setProperty(CATEGORY_PROP_TITLE, "Root")
-                        rootCategoryEntity.setProperty(CATEGORY_PROP_PARENT_ID, null)
-                        rootCategoryEntity.setProperty(CATEGORY_PROP_ORDER, 0)
-                        val rootCategoryKey = datastore.put(rootCategoryEntity)
+                        val rootId = createDefaultCategories(tx, userEntityKey, datastore).key.id
 
-                        newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootCategoryKey.id)
+                        newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootId)
                         newUserEntity.setProperty(USER_PROP_CURRENCY, "USD")
-                        datastore.put(newUserEntity)
+                        datastore.put(tx, newUserEntity)
+
+                        tx.commit();
                     }
 
                     //todo: need to think about security in this place. Is it save to take redirect url from params?
@@ -70,7 +70,27 @@ class AuthServlet : HttpServlet() {
                 res.writer.println("Unknown uri: " + req.requestURI);
             }
         }
+    }
+
+    private fun createDefaultCategories(tx: Transaction, ancestor: Key, datastore: DatastoreService): Entity {
+
+        val root = createCategory(ancestor, "Root", null, 0)
+        val rootId = datastore.put(tx, root).id
+
+        datastore.put(tx, createCategory(ancestor, "Transport", rootId, 0))
+        datastore.put(tx, createCategory(ancestor, "Food", rootId, 0))
+        datastore.put(tx, createCategory(ancestor, "Self care", rootId, 0))
+        datastore.put(tx, createCategory(ancestor, "Сlothes", rootId, 0))
+
+        return root;
+    }
 
 
+    private fun createCategory(ancestor: Key, title: String, parent: Long?, order: Long = 0): Entity {
+        val entity = Entity(CATEGORY_KIND, ancestor)
+        entity.setProperty(CATEGORY_PROP_TITLE, title)
+        entity.setProperty(CATEGORY_PROP_PARENT_ID, parent)
+        entity.setProperty(CATEGORY_PROP_ORDER, order)
+        return entity;
     }
 }
