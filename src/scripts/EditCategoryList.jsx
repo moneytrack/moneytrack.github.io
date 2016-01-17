@@ -144,10 +144,18 @@ const EditCategoryList = React.createClass({
      */
 
     onDeleteBegin: function(category) {
-        this.setState(update(this.state, {
-            mode: {$set: 'DELETE'},
-            deleteId: {$set: category.id}
-        }))
+        const {history} = this.context.store.getState();
+        const categoryExpenseList = history.filter(x => x.categoryId === category.id)
+
+        if(categoryExpenseList.length === 0) {
+            this.props.onDeleteCategory(category.id)
+        }
+        else {
+            this.setState(update(this.state, {
+                mode: {$set: 'DELETE'},
+                deleteId: {$set: category.id}
+            }))
+        }
     },
 
     onDeleteCanceled: function(){
@@ -208,7 +216,7 @@ const EditCategoryList = React.createClass({
     },
 
     render: function() {
-        let {rootCategoryId,categoryList} = this.context.store.getState();
+        let {rootCategoryId,categoryList, history} = this.context.store.getState();
         const rootCategory = categoryList.filter(x => x.id === rootCategoryId)[0]
         const rootCategoryList = categoryList.filter(category => category.parentId === rootCategoryId)
         const children = this.renderRecurse(rootCategoryList, 0)
@@ -254,6 +262,8 @@ const EditCategoryList = React.createClass({
             return childOptionList
         }
 
+        const expensesForDelete = history.filter(x => x.categoryId === this.state.deleteId).length
+
         return  (
             <div className="edit-category-list">
                 <ModalContainer visible={this.state.mode === 'RENAME'}
@@ -285,7 +295,15 @@ const EditCategoryList = React.createClass({
                                 onCancel={this.onDeleteCanceled}
                                 onSave={this.onDeleteFinished}>
                     <div className="modal-container__msg warning">Are you sure that you want to delete this category?</div>
-                    <div className="modal-container__msg warning">All expenses from this category will be deleted too!</div>
+                    <div className="modal-container__msg warning">
+                        {
+                            expensesForDelete > 0
+                            ? (expensesForDelete > 1
+                               ? "You have " + expensesForDelete + " expenses in this category, all of them will be deleted too!"
+                               : "You have 1 expense in this category, it will be removed too!")
+                           : null
+                        }
+                    </div>
                     <div className="modal-container__controls">
                         <button className="warning" onClick={this.onDeleteFinished}>Delete</button>
                         <button onClick={this.onDeleteCanceled}>Cancel</button>
