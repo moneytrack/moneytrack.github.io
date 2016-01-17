@@ -51,6 +51,12 @@ button:disabled {
     color: rgba(95, 95, 95, 0.25);
 }
 
+button.warning {
+    border: 1px solid #8C0000;
+    background: #CA0000;
+    color: white;
+}
+
 input, textarea {
     border-radius: 5px;
     border: 1px solid #D8D8D8;
@@ -188,7 +194,7 @@ input, textarea {
         }
 
         &__controls {
-            opacity: 0.1;
+            opacity: 0.075;
             display: inline;
         }
 
@@ -204,11 +210,8 @@ input, textarea {
     }
 
     #{&}__category:hover #{&}__category__controls {
-        //visibility: visible;
         opacity: 1;
     }
-
-
 
     &__children {
         padding-left: 20px;
@@ -264,6 +267,19 @@ input, textarea {
             border-radius: 4px;
             padding: 0.5rem
         }
+    }
+
+    &__msg {
+        margin: 1rem;
+    }
+
+    &__msg.warning {
+        color: #C70000;
+    }
+
+    &__controls {
+        text-align: center;
+        margin: 1rem 0 0;
     }
 }
 

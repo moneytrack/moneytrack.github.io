@@ -142,8 +142,27 @@ const EditCategoryList = React.createClass({
     /*
         Delete
      */
-    onDeleteCategory: function(category) {
-        this.props.onDeleteCategory(category.id)
+
+    onDeleteBegin: function(category) {
+        this.setState(update(this.state, {
+            mode: {$set: 'DELETE'},
+            deleteId: {$set: category.id}
+        }))
+    },
+
+    onDeleteCanceled: function(){
+        this.setState(update(this.state, {
+            mode: {$set: ''},
+        }))
+    },
+
+    onDeleteFinished: function(){
+        if(this.state.newCategoryTitle !== '') {
+            this.props.onDeleteCategory(this.state.deleteId)
+            this.setState(update(this.state, {
+                mode: {$set: ''},
+            }))
+        }
     },
 
     renderRecurse: function(list, level) {
@@ -179,7 +198,7 @@ const EditCategoryList = React.createClass({
                             <i title="Rename..." onClick={(e) => this.onRenameBegin(category)} className="icon icon-pen icon1x" aria-hidden="true"/>
                             <i title="Add sub category..." onClick={(e) => this.onNewCategoryBegin(category)} className="icon icon-plus icon1x" aria-hidden="true"/>
                             <i title="Move..." onClick={(e) => this.onMoveBegin(category)}  className="icon icon-reply icon1x" aria-hidden="true"/>
-                            <i  title="Delete..."  onClick={(e) => this.onDeleteCategory(category)}  className="icon icon-trash_can icon1x warning" aria-hidden="true"/>
+                            <i  title="Delete..."  onClick={(e) => this.onDeleteBegin(category)}  className="icon icon-trash_can icon1x warning" aria-hidden="true"/>
                         </div>
                     </div>
                 </div>,
@@ -261,6 +280,16 @@ const EditCategoryList = React.createClass({
                     </label>
                     <button onClick={this.onMoveFinished} disabled={this.state.moveNewParentId === this.state.moveOldParentId}>Save</button>
                     <button onClick={this.onMoveCanceled}>Cancel</button>
+                </ModalContainer>
+                <ModalContainer visible={this.state.mode === 'DELETE'}
+                                onCancel={this.onDeleteCanceled}
+                                onSave={this.onDeleteFinished}>
+                    <div className="modal-container__msg warning">Are you sure that you want to delete this category?</div>
+                    <div className="modal-container__msg warning">All expenses from this category will be deleted too!</div>
+                    <div className="modal-container__controls">
+                        <button className="warning" onClick={this.onDeleteFinished}>Delete</button>
+                        <button onClick={this.onDeleteCanceled}>Cancel</button>
+                    </div>
                 </ModalContainer>
                 {children}
                 <div className="edit-category-list__new-root-category">
