@@ -2,7 +2,7 @@
 
 import ajax from "./ajax"
 
-const DISPATCH_URL = "/dispatch" //todo: move to common place
+const DISPATCH_URL = window.context.backend_url + "/dispatch" //todo: move to common place
 
 function asyncDispatch(cb) {
 	return dispatch => {

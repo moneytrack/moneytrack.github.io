@@ -33,7 +33,7 @@ import ajax from './ajax'
 import Root from './Root.jsx'
 import {find} from './arrays'
 
-const DISPATCH_URL = "/dispatch"
+const DISPATCH_URL = window.context.backend_url + "/dispatch"
 
 ajax.get(DISPATCH_URL)
 .then((response) => {

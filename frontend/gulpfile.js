@@ -39,9 +39,9 @@ var gulp = require('gulp'),
     packageJson = require('./package.json');
 
 
-var DEBUG_ROOT = './backend/target/backend-1.0-SNAPSHOT';
+var DEBUG_ROOT = '../backend/target/backend-1.0-SNAPSHOT';
 var SRC_ROOT = './src';
-var PROD_ROOT = './backend/src/main/webapp';
+var PROD_ROOT = './dist';
 
 
 
@@ -80,7 +80,14 @@ gulp.task('vendor', function(){
         .on('error', onError)
 });
 
-gulp.task('scripts', function(){
+gulp.task('scripts_context', function(){
+    var files = SRC_ROOT + '/scripts/context_prod.js';
+    return gulp.src(files)
+        .pipe(rename('context.js'))
+        .pipe(gulp.dest(PROD_ROOT + '/scripts'))
+});
+
+gulp.task('scripts', ['scripts_context'], function(){
     var bundler = browserify(SRC_ROOT + '/scripts/main.jsx', {
         debug: false,
         cache: {},
@@ -145,7 +152,8 @@ gulp.task('debug_html', function(){
         .pipe(gulp.dest(DEBUG_ROOT))
 });
 
-gulp.task('debug_vendor', function(){
+
+gulp.task('debug_vendor',  function(){
     var bundler = browserify('./.noop.js', {
         debug: true,
         cache: {},
@@ -198,7 +206,15 @@ gulp.task('debug_vendor', function(){
 
 });
 
-gulp.task('debug_scripts', function(){
+gulp.task('debug_scripts_context', function(){
+    var files = SRC_ROOT + '/scripts/context_debug.js';
+    return gulp.src(files)
+        .pipe(watch(files))
+        .pipe(rename('context.js'))
+        .pipe(gulp.dest(DEBUG_ROOT + '/scripts'))
+});
+
+gulp.task('debug_scripts', ['debug_scripts_context'], function(){
     var bundler = browserify(SRC_ROOT + '/scripts/main.jsx', {
         debug: true,
         cache: {},
@@ -224,7 +240,7 @@ gulp.task('debug_scripts', function(){
         notifier.notify({
           'title': 'ERROR',
           'message': err.message
-        });        
+        });
     }
 
     function rebundle() {

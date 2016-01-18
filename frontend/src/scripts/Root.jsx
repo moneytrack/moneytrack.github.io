@@ -61,7 +61,7 @@ const Root = React.createClass({
                 <div className="unauthorized">
                     <div className="unauthorized__caption">To use this application you should be authorized with Google Account</div>
                     <div className="unauthorized__button">
-                        <a href="/login"><img className="unhovered" src="images/google_signin_buttons/web/1x/btn_google_signin_light_normal_web.png"/></a>
+                        <a href={window.context.backend_url + "/login?redirect=" + encodeURIComponent(window.location.href)}><img className="unhovered" src="images/google_signin_buttons/web/1x/btn_google_signin_light_normal_web.png"/></a>
                     </div>
                 </div>
             )
