@@ -19,7 +19,7 @@ const Root = React.createClass({
 
     getInitialState: function() {
         return {
-            activeTab: "Settings"
+            activeTab: "Add expense"
         }
     },
 
@@ -53,10 +53,7 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {error, history, categoryList, waiting} = store.getState()
-
-        let input;
-        let prevValue = 0;
+        const {error, history, waiting} = store.getState()
 
         var content;
         if(error === "UNAUTHORIZED") {
@@ -76,7 +73,6 @@ const Root = React.createClass({
                 disabled["History"] = "You have no expenses yet"
                 disabled["Statistics"] = "You have no expenses yet"
             }
-
 
             content = (
                 <div>
