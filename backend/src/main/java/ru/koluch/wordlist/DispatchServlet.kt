@@ -32,17 +32,20 @@ class DeleteCategoryAction(val id: Long) : Action(ACTION_NEW_CATEGORY)
 enum class Currency {USD, EUR, RUR}
 class SetCurrencyAction(val currency: Currency) : Action(ACTION_NEW_CATEGORY)
 
-class DispatchServlet : HttpServlet() {
+class DispatchServlet : Servlet() {
 
     val gson = GsonBuilder().serializeNulls().create()
 
-    override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
+
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        super.doGet(req, resp)
+
         val datastore = DatastoreServiceFactory.getDatastoreService()
 
         val userPrincipal = req.userPrincipal
         if (userPrincipal == null) {
-            res.writer.println("User is not authorized")
-            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            resp.writer.println("User is not authorized")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
@@ -50,8 +53,8 @@ class DispatchServlet : HttpServlet() {
         try {
             userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
         } catch(e: EntityNotFoundException) {
-            res.writer.println("User account info not found. Try to log out and then sign in again.")
-            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            resp.writer.println("User account info not found. Try to log out and then sign in again.")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
@@ -115,9 +118,9 @@ class DispatchServlet : HttpServlet() {
                 )
             )
 
-            res.characterEncoding = "UTF-8";
-            res.writer.println(gson.toJson(stateJson))
-            res.setStatus(HttpServletResponse.SC_OK)
+            resp.characterEncoding = "UTF-8";
+            resp.writer.println(gson.toJson(stateJson))
+            resp.setStatus(HttpServletResponse.SC_OK)
             return
         }
 

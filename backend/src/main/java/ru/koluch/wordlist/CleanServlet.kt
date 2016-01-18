@@ -19,8 +19,10 @@ import javax.servlet.http.HttpServletResponse
  * Created: 29.12.2015 02:30
  */
 
-class CleanServlet : HttpServlet() {
-    override fun service(req: HttpServletRequest, res: HttpServletResponse) {
+class CleanServlet : Servlet() {
+
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        super.doGet(req, resp)
 
         //todo: add captcha
 
@@ -28,8 +30,8 @@ class CleanServlet : HttpServlet() {
 
         val userPrincipal = req.userPrincipal
         if (userPrincipal == null) {
-            res.writer.println("User is not authorized")
-            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            resp.writer.println("User is not authorized")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
@@ -37,8 +39,8 @@ class CleanServlet : HttpServlet() {
         try {
             userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
         } catch(e: EntityNotFoundException) {
-            res.writer.println("User account info not found, nothing to delete")
-            res.sendError(HttpServletResponse.SC_OK)
+            resp.writer.println("User account info not found, nothing to delete")
+            resp.sendError(HttpServletResponse.SC_OK)
             return;
         }
 

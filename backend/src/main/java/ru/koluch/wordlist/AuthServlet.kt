@@ -20,9 +20,11 @@ import javax.servlet.http.HttpServletResponse
  */
 
 
-class AuthServlet : HttpServlet() {
+class AuthServlet : Servlet() {
 
-    override fun service(req: HttpServletRequest, res: HttpServletResponse) {
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        super.doGet(req, resp)
+
         val userService = UserServiceFactory.getUserService();
         when (req.requestURI) {
             "/login" -> {
@@ -52,22 +54,22 @@ class AuthServlet : HttpServlet() {
 
                     //todo: need to think about security in this place. Is it save to take redirect url from params?
                     val redirect: String = req.getParameter("redirect") ?: "/";
-                    res.sendRedirect(redirect);
+                    resp.sendRedirect(redirect);
                 } else {
-                    res.sendRedirect(userService.createLoginURL(thisURL))
+                    resp.sendRedirect(userService.createLoginURL(thisURL))
                 }
             }
             "/logout" -> {
                 val userPrincipal = req.userPrincipal
                 if (userPrincipal != null) {
-                    res.sendRedirect(userService.createLogoutURL("/"))
+                    resp.sendRedirect(userService.createLogoutURL("/"))
                 } else {
-                    res.sendError(HttpServletResponse.SC_UNAUTHORIZED)
-                    res.writer.println("User is not authorized");
+                    resp.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                    resp.writer.println("User is not authorized");
                 }
             }
             else -> {
-                res.writer.println("Unknown uri: " + req.requestURI);
+                resp.writer.println("Unknown uri: " + req.requestURI);
             }
         }
     }
