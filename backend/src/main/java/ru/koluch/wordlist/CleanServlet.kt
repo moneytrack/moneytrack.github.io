@@ -28,43 +28,34 @@ class CleanServlet : Servlet() {
 
         val datastore = DatastoreServiceFactory.getDatastoreService()
 
-        val tx = datastore.beginTransaction();
-        try {
-            val userPrincipal = req.userPrincipal
-            if (userPrincipal == null) {
-                resp.writer.println("User is not authorized")
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN)
-                return;
-            }
-
-            val userEntity: Entity
-            try {
-                userEntity = datastore.get(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
-            } catch(e: EntityNotFoundException) {
-                resp.writer.println("User account info not found, nothing to delete")
-                resp.sendError(HttpServletResponse.SC_OK)
-                return;
-            }
-
-            val query = Query(userEntity.key)
-            query.setKeysOnly()
-            val preparedQuery = datastore.prepare(tx, query)
-
-            val entities = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-            if(entities.size > 50000) { //todo: estimate this value
-                throw RuntimeException("Too many entities. Please, contact support")
-            }
-
-            for (entity in entities) {
-                datastore.delete(tx, entity.key)
-            }
-
-            tx.commit()
-        } finally {
-            if(tx.isActive) {
-                tx.rollback();
-            }
+        val userPrincipal = req.userPrincipal
+        if (userPrincipal == null) {
+            resp.writer.println("User is not authorized")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
+            return;
         }
 
+        datastore.inTransaction {tx ->
+            val userEntity = datastore.getNull(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
+            if(userEntity == null) {
+                resp.writer.println("User account info not found, nothing to delete")
+                resp.sendError(HttpServletResponse.SC_OK)
+            }
+            else {
+                val query = Query(userEntity.key)
+                query.setKeysOnly()
+                val preparedQuery = datastore.prepare(tx, query)
+
+                val entities = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                if (entities.size > 50000) {
+                    //todo: estimate this value
+                    throw RuntimeException("Too many entities. Please, contact support")
+                }
+
+                for (entity in entities) {
+                    datastore.delete(tx, entity.key)
+                }
+            }
+        }
     }
 }

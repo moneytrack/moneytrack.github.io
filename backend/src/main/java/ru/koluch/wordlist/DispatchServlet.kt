@@ -49,9 +49,9 @@ class DispatchServlet : Servlet() {
             return;
         }
 
-        val tx = datastore.beginTransaction();
+//        val tx = datastore.beginTransaction();
 
-        try {
+        datastore.inTransaction(fun(tx) {
             val userEntity: Entity
             try {
                 userEntity = datastore.get(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
@@ -126,12 +126,7 @@ class DispatchServlet : Servlet() {
                 resp.setStatus(HttpServletResponse.SC_OK)
                 return
             }
-
-        } finally {
-            if(tx.isActive) {
-                tx.rollback()
-            }
-        }
+        })
 
     }
 
@@ -140,15 +135,16 @@ class DispatchServlet : Servlet() {
 
         val datastore = DatastoreServiceFactory.getDatastoreService();
 
-        val tx = datastore.beginTransaction();
+        val userPrincipal = req.userPrincipal
+        if (userPrincipal == null) {
+            resp.writer.println("User is not authorized")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
+            return;
+        }
 
-        try {
-            val userPrincipal = req.userPrincipal
-            if (userPrincipal == null) {
-                resp.writer.println("User is not authorized")
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN)
-                return;
-            }
+
+        datastore.inTransaction(fun(tx) {
+
 
             val userEntity: Entity
             try {
@@ -226,7 +222,7 @@ class DispatchServlet : Servlet() {
                     childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, action.parentId))
                     val childList = datastore.prepare(tx, childQuery).asList(FetchOptions.Builder.withDefaults())
 
-                    val maxOrder: Long = childList.fold(0L, {acc, child ->
+                    val maxOrder: Long = childList.fold(0L, { acc, child ->
                         val order = (child.getProperty(CATEGORY_PROP_ORDER) as Long?) ?: 0
                         Math.max(acc, order)
                     })
@@ -272,7 +268,7 @@ class DispatchServlet : Servlet() {
                 }
                 is EditCategoryAction -> {
                     //todo: do not allow editing of root category
-                    if(action.parentId != null) {
+                    if (action.parentId != null) {
                         if (!datastore.exists(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
                             resp.writer.println("Category with id '${action.parentId}' doesn't exists")
                             resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
@@ -281,10 +277,10 @@ class DispatchServlet : Servlet() {
                     }
 
                     val entity = datastore.get(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.id))
-                    if(action.title != null) {
+                    if (action.title != null) {
                         entity.setProperty(CATEGORY_PROP_TITLE, action.title);
                     }
-                    if(action.parentId != null) {
+                    if (action.parentId != null) {
                         entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
                     }
                     val key = datastore.put(tx, entity);
@@ -302,12 +298,7 @@ class DispatchServlet : Servlet() {
                     return
                 }
             }
-        } finally {
-            if(tx.isActive) {
-                tx.rollback();
-            }
-        }
-
+        })
     }
 
     fun parseAction(body: String): Action {

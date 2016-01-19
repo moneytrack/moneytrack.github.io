@@ -2,6 +2,7 @@ package ru.koluch.wordlist
 
 import com.google.appengine.api.datastore.*
 import com.google.appengine.api.datastore.Query.FilterOperator.EQUAL
+import java.util.*
 
 /**
  * Copyright (c) 2015 Nikolai Mavrenkov <koluch@koluch.ru>
@@ -31,5 +32,30 @@ fun DatastoreService.getNull(transaction: Transaction, key: Key): Entity? {
         return this.get(key)
     } catch(e: EntityNotFoundException) {
         return null;
+    }
+}
+
+val MAX_TRANSACTION_REPEAT_COUNT = 10
+fun DatastoreService.inTransaction(f: (Transaction) -> Unit) {
+    val tx = this.beginTransaction();
+    try {
+        var success = false;
+        var tryCount = MAX_TRANSACTION_REPEAT_COUNT
+        while(!success) {
+            try {
+                f(tx)
+                success = true;
+                tx.commit()
+            } catch(e: ConcurrentModificationException) {
+                tx.rollback();
+                if(--tryCount == 0) {
+                    throw RuntimeException("Transaction try count exceeded")
+                }
+            }
+        }
+    } finally {
+        if(tx.isActive) {
+            tx.rollback()
+        }
     }
 }

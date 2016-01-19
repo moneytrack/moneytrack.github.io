@@ -35,8 +35,7 @@ class AuthServlet : Servlet() {
                 if (userPrincipal != null) {
                     val datastore = DatastoreServiceFactory.getDatastoreService()
 
-                    val tx = datastore.beginTransaction();
-                    try {
+                    datastore.inTransaction { tx ->
                         val userEntity = datastore.getNull(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
                         if(userEntity == null) {
                             val newUserEntity = Entity(USER_KIND, userPrincipal.name)
@@ -47,11 +46,6 @@ class AuthServlet : Servlet() {
                             newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootId)
                             newUserEntity.setProperty(USER_PROP_CURRENCY, "USD")
                             datastore.put(tx, newUserEntity)
-                            tx.commit()
-                        }
-                    } finally {
-                        if(tx.isActive) {
-                            tx.rollback();
                         }
                     }
 
