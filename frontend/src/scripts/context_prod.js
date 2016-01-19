@@ -7,5 +7,6 @@
  * Created: 18.01.2016 05:19
  */
  window.context = {
+     env: "PROD",
      backend_url: "https://ru-koluch-moneytrack-backend.appspot.com"
  }

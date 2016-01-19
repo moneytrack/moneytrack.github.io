@@ -33,6 +33,10 @@ import ajax from './ajax'
 import Root from './Root.jsx'
 import {find} from './arrays'
 
+if(window.context.env === "PROD" && window.location.protocol === "http:") {
+    window.location.href = window.location.href.replace(/^http/, "https")
+}
+
 const DISPATCH_URL = window.context.backend_url + "/dispatch"
 
 ajax.get(DISPATCH_URL)

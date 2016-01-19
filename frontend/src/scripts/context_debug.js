@@ -7,5 +7,6 @@
  * Created: 18.01.2016 05:19
  */
  window.context = {
+     env: "DEBUG",
      backend_url: "http://localhost:8081"
  }
