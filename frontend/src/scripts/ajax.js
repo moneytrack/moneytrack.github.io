@@ -85,6 +85,7 @@ module.exports.post = (url, body) => {
             }
         }
 
+        xmlhttp.withCredentials = true;
         xmlhttp.open("POST", url, true);
         xmlhttp.send(JSON.stringify(body));
 

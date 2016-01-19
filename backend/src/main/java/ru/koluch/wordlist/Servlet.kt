@@ -14,7 +14,7 @@ import kotlin.text.startsWith
  */
 open class Servlet : HttpServlet() {
 
-    val allowedOrigin = "http://moneytrack.github.io"
+    val allowedOrigin = "https://moneytrack.github.io"
 
     override fun doOptions(req: HttpServletRequest, resp: HttpServletResponse) {
         super.doOptions(req, resp)

@@ -126,14 +126,15 @@ class DispatchServlet : Servlet() {
 
     }
 
-    override fun doPost(req: HttpServletRequest, res: HttpServletResponse) {
+    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        super.doPost(req, resp)
 
         val datastore = DatastoreServiceFactory.getDatastoreService();
 
         val userPrincipal = req.userPrincipal
         if (userPrincipal == null) {
-            res.writer.println("User is not authorized")
-            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            resp.writer.println("User is not authorized")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
@@ -141,15 +142,15 @@ class DispatchServlet : Servlet() {
         try {
             userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
         } catch(e: EntityNotFoundException) {
-            res.writer.println("User account info not found. Try to log out and then sign in again.")
-            res.sendError(HttpServletResponse.SC_FORBIDDEN)
+            resp.writer.println("User account info not found. Try to log out and then sign in again.")
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
             return;
         }
 
         val body = req.reader.readText()
         if (body.equals("")) {
-            res.writer.println("Missing request body")
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+            resp.writer.println("Missing request body")
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
 
@@ -157,15 +158,15 @@ class DispatchServlet : Servlet() {
         try {
             action = parseAction(body)
         } catch(e: ActionParseException) {
-            res.writer.println("Unable to parse action JSON: ${e.message}")
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+            resp.writer.println("Unable to parse action JSON: ${e.message}")
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
             return
         }
         when (action) {
             is NewExpenseAction -> {
                 if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
-                    res.writer.println("Category with id '${action.categoryId}' doesn't exists")
-                    res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                    resp.writer.println("Category with id '${action.categoryId}' doesn't exists")
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                     return
                 }
 
@@ -175,13 +176,13 @@ class DispatchServlet : Servlet() {
                 entity.setProperty(EXPENSE_PROP_DATE, action.date)
                 entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 val key = datastore.put(entity);
-                res.writer.println(key.id)
-                res.setStatus(HttpServletResponse.SC_OK)
+                resp.writer.println(key.id)
+                resp.setStatus(HttpServletResponse.SC_OK)
             }
             is EditExpenseAction -> {
                 if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
-                    res.writer.println("Category with id '${action.categoryId}' doesn't exists")
-                    res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                    resp.writer.println("Category with id '${action.categoryId}' doesn't exists")
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                     return
                 }
 
@@ -191,12 +192,12 @@ class DispatchServlet : Servlet() {
                 entity.setProperty(EXPENSE_PROP_DATE, action.date)
                 entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
                 val key = datastore.put(entity);
-                res.writer.println(key.id)
-                res.setStatus(HttpServletResponse.SC_OK)
+                resp.writer.println(key.id)
+                resp.setStatus(HttpServletResponse.SC_OK)
             }
             is DeleteExpenseAction -> {
                 datastore.delete(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
-                res.setStatus(HttpServletResponse.SC_OK)
+                resp.setStatus(HttpServletResponse.SC_OK)
             }
 
             is NewCategoryAction -> {
@@ -207,8 +208,8 @@ class DispatchServlet : Servlet() {
                 entity.setProperty(CATEGORY_PROP_TITLE, action.title);
                 if (action.parentId != null) {
                     if (!datastore.exists(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId), userEntity.key)) {
-                        res.writer.println("Parent category with id '${action.parentId}' doesn't exists")
-                        res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                        resp.writer.println("Parent category with id '${action.parentId}' doesn't exists")
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
                     }
                 };
@@ -228,8 +229,8 @@ class DispatchServlet : Servlet() {
 
                 tx.commit()
 
-                res.writer.println(key.id)
-                res.setStatus(HttpServletResponse.SC_OK)
+                resp.writer.println(key.id)
+                resp.setStatus(HttpServletResponse.SC_OK)
             }
             is DeleteCategoryAction -> {
                 val tx = datastore.beginTransaction();
@@ -260,14 +261,14 @@ class DispatchServlet : Servlet() {
                 }
                 remove(action.id)
                 tx.commit()
-                res.setStatus(HttpServletResponse.SC_OK)
+                resp.setStatus(HttpServletResponse.SC_OK)
             }
             is EditCategoryAction -> {
                 //todo: do not allow editing of root category
                 if(action.parentId != null) {
                     if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
-                        res.writer.println("Category with id '${action.parentId}' doesn't exists")
-                        res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                        resp.writer.println("Category with id '${action.parentId}' doesn't exists")
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
                     }
                 }
@@ -280,8 +281,8 @@ class DispatchServlet : Servlet() {
                     entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
                 }
                 val key = datastore.put(entity);
-                res.writer.println(key.id)
-                res.setStatus(HttpServletResponse.SC_OK)
+                resp.writer.println(key.id)
+                resp.setStatus(HttpServletResponse.SC_OK)
             }
 
             is SetCurrencyAction -> {
@@ -289,8 +290,8 @@ class DispatchServlet : Servlet() {
                 datastore.put(userEntity)
             }
             else -> {
-                res.writer.println("Unknown action type: ${action.type}")
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                resp.writer.println("Unknown action type: ${action.type}")
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                 return
             }
         }
@@ -365,5 +366,4 @@ class ActionParseException : Exception {
 
     constructor(cause: Throwable?) : super(cause)
 
-    constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace)
 }
