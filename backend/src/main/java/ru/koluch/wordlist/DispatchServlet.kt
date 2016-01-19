@@ -49,79 +49,88 @@ class DispatchServlet : Servlet() {
             return;
         }
 
-        val userEntity: Entity
+        val tx = datastore.beginTransaction();
+
         try {
-            userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
-        } catch(e: EntityNotFoundException) {
-            resp.writer.println("User account info not found. Try to log out and then sign in again.")
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
-            return;
-        }
+            val userEntity: Entity
+            try {
+                userEntity = datastore.get(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
+            } catch(e: EntityNotFoundException) {
+                resp.writer.println("User account info not found. Try to log out and then sign in again.")
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return;
+            }
 
-        val body = req.reader.readText()
-        if (body.equals("")) {
+            val body = req.reader.readText()
+            if (body.equals("")) {
 
-            fun collectExpenses(): JsonArray {
-                val query = Query(EXPENSE_KIND, userEntity.key)
-                query.addSort(EXPENSE_PROP_DATE, Query.SortDirection.DESCENDING)
-                val preparedQuery = datastore.prepare(query)
-                val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val result = jsonArray()
-                expenseList.forEach { expenseEntity ->
-                    result.add(jsonObject (
-                        PROP_ID to expenseEntity.key.id,
-                        EXPENSE_PROP_AMOUNT to expenseEntity.getProperty(EXPENSE_PROP_AMOUNT),
-                        EXPENSE_PROP_CATEGORY_ID to expenseEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
-                        EXPENSE_PROP_DATE to (expenseEntity.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
-                        EXPENSE_PROP_COMMENT to expenseEntity.getProperty(EXPENSE_PROP_COMMENT)
-                    ))
+                fun collectExpenses(): JsonArray {
+                    val query = Query(EXPENSE_KIND, userEntity.key)
+                    query.addSort(EXPENSE_PROP_DATE, Query.SortDirection.DESCENDING)
+                    val preparedQuery = datastore.prepare(tx, query)
+                    val expenseList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                    val result = jsonArray()
+                    expenseList.forEach { expenseEntity ->
+                        result.add(jsonObject (
+                            PROP_ID to expenseEntity.key.id,
+                            EXPENSE_PROP_AMOUNT to expenseEntity.getProperty(EXPENSE_PROP_AMOUNT),
+                            EXPENSE_PROP_CATEGORY_ID to expenseEntity.getProperty(EXPENSE_PROP_CATEGORY_ID),
+                            EXPENSE_PROP_DATE to (expenseEntity.getProperty(EXPENSE_PROP_DATE) as Date).getTime(),
+                            EXPENSE_PROP_COMMENT to expenseEntity.getProperty(EXPENSE_PROP_COMMENT)
+                        ))
+                    }
+                    return result
                 }
-                return result
-            }
 
-            fun collectCategoryIdList(parent: Long?): JsonArray {
-                val query = Query(CATEGORY_KIND, userEntity.key).setFilter(
-                    FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, parent)
-                )
-                val preparedQuery = datastore.prepare(query)
-                val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val idList = categoryList.map { categoryEntity -> categoryEntity.key.id }
-                val result = jsonArray()
-                result.addAll(idList)
-                return result
-            }
-
-            fun collectCategories(): JsonArray {
-                val query = Query(CATEGORY_KIND, userEntity.key)
-                val preparedQuery = datastore.prepare(query)
-                val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
-                val result = jsonArray()
-                categoryList.forEach { categoryEntity ->
-                    result.add( jsonObject(
-                        PROP_ID to categoryEntity.key.id,
-                        CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
-                        CATEGORY_PROP_PARENT_ID to categoryEntity.getProperty(CATEGORY_PROP_PARENT_ID),
-                        CATEGORY_PROP_ORDER to categoryEntity.getProperty(CATEGORY_PROP_ORDER),
-                        CATEGORY_PROP_CHILD_ID_LIST to collectCategoryIdList(categoryEntity.key.id)
-                    ))
+                fun collectCategoryIdList(parent: Long?): JsonArray {
+                    val query = Query(CATEGORY_KIND, userEntity.key).setFilter(
+                        FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, parent)
+                    )
+                    val preparedQuery = datastore.prepare(tx, query)
+                    val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                    val idList = categoryList.map { categoryEntity -> categoryEntity.key.id }
+                    val result = jsonArray()
+                    result.addAll(idList)
+                    return result
                 }
-                return result
+
+                fun collectCategories(): JsonArray {
+                    val query = Query(CATEGORY_KIND, userEntity.key)
+                    val preparedQuery = datastore.prepare(tx, query)
+                    val categoryList = preparedQuery.asList(FetchOptions.Builder.withDefaults())
+                    val result = jsonArray()
+                    categoryList.forEach { categoryEntity ->
+                        result.add( jsonObject(
+                            PROP_ID to categoryEntity.key.id,
+                            CATEGORY_PROP_TITLE to categoryEntity.getProperty(CATEGORY_PROP_TITLE),
+                            CATEGORY_PROP_PARENT_ID to categoryEntity.getProperty(CATEGORY_PROP_PARENT_ID),
+                            CATEGORY_PROP_ORDER to categoryEntity.getProperty(CATEGORY_PROP_ORDER),
+                            CATEGORY_PROP_CHILD_ID_LIST to collectCategoryIdList(categoryEntity.key.id)
+                        ))
+                    }
+                    return result
+                }
+
+
+                val stateJson = jsonObject(
+                    STATE_HISTORY to collectExpenses(),
+                    STATE_ROOT_CATEGORY_ID to userEntity.getProperty(USER_PROP_ROOT_CATEGORY_ID) as Long,
+                    STATE_CATEGORY_LIST to collectCategories(),
+                    STATE_USER_SETTINGS to jsonObject(
+                        USER_PROP_CURRENCY to userEntity.getProperty(USER_PROP_CURRENCY)
+                    )
+                )
+
+                resp.characterEncoding = "UTF-8";
+                resp.writer.println(gson.toJson(stateJson))
+                resp.setStatus(HttpServletResponse.SC_OK)
+                return
             }
 
-
-            val stateJson = jsonObject(
-                STATE_HISTORY to collectExpenses(),
-                STATE_ROOT_CATEGORY_ID to userEntity.getProperty(USER_PROP_ROOT_CATEGORY_ID) as Long,
-                STATE_CATEGORY_LIST to collectCategories(),
-                STATE_USER_SETTINGS to jsonObject(
-                    USER_PROP_CURRENCY to userEntity.getProperty(USER_PROP_CURRENCY)
-                )
-            )
-
-            resp.characterEncoding = "UTF-8";
-            resp.writer.println(gson.toJson(stateJson))
-            resp.setStatus(HttpServletResponse.SC_OK)
-            return
+        } finally {
+            if(tx.isActive) {
+                tx.rollback()
+            }
         }
 
     }
@@ -131,168 +140,171 @@ class DispatchServlet : Servlet() {
 
         val datastore = DatastoreServiceFactory.getDatastoreService();
 
-        val userPrincipal = req.userPrincipal
-        if (userPrincipal == null) {
-            resp.writer.println("User is not authorized")
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
-            return;
-        }
+        val tx = datastore.beginTransaction();
 
-        val userEntity: Entity
         try {
-            userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
-        } catch(e: EntityNotFoundException) {
-            resp.writer.println("User account info not found. Try to log out and then sign in again.")
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
-            return;
-        }
+            val userPrincipal = req.userPrincipal
+            if (userPrincipal == null) {
+                resp.writer.println("User is not authorized")
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return;
+            }
 
-        val body = req.reader.readText()
-        if (body.equals("")) {
-            resp.writer.println("Missing request body")
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
-            return
-        }
+            val userEntity: Entity
+            try {
+                userEntity = datastore.get(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
+            } catch(e: EntityNotFoundException) {
+                resp.writer.println("User account info not found. Try to log out and then sign in again.")
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return;
+            }
 
-        val action: Action
-        try {
-            action = parseAction(body)
-        } catch(e: ActionParseException) {
-            resp.writer.println("Unable to parse action JSON: ${e.message}")
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
-            return
-        }
-        when (action) {
-            is NewExpenseAction -> {
-                if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
-                    resp.writer.println("Category with id '${action.categoryId}' doesn't exists")
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
-                    return
+            val body = req.reader.readText()
+            if (body.equals("")) {
+                resp.writer.println("Missing request body")
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                return
+            }
+
+            val action: Action
+            try {
+                action = parseAction(body)
+            } catch(e: ActionParseException) {
+                resp.writer.println("Unable to parse action JSON: ${e.message}")
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                return
+            }
+            when (action) {
+                is NewExpenseAction -> {
+                    if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
+                        resp.writer.println("Category with id '${action.categoryId}' doesn't exists")
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                        return
+                    }
+
+                    val entity = Entity(EXPENSE_KIND, userEntity.key)
+                    entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
+                    entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
+                    entity.setProperty(EXPENSE_PROP_DATE, action.date)
+                    entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
+                    val key = datastore.put(entity);
+                    resp.writer.println(key.id)
+                    resp.setStatus(HttpServletResponse.SC_OK)
+                }
+                is EditExpenseAction -> {
+                    if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
+                        resp.writer.println("Category with id '${action.categoryId}' doesn't exists")
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                        return
+                    }
+
+                    val entity = datastore.get(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+                    entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
+                    entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
+                    entity.setProperty(EXPENSE_PROP_DATE, action.date)
+                    entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
+                    val key = datastore.put(entity);
+                    resp.writer.println(key.id)
+                    resp.setStatus(HttpServletResponse.SC_OK)
+                }
+                is DeleteExpenseAction -> {
+                    datastore.delete(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
+                    resp.setStatus(HttpServletResponse.SC_OK)
                 }
 
-                val entity = Entity(EXPENSE_KIND, userEntity.key)
-                entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
-                entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
-                entity.setProperty(EXPENSE_PROP_DATE, action.date)
-                entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
-                val key = datastore.put(entity);
-                resp.writer.println(key.id)
-                resp.setStatus(HttpServletResponse.SC_OK)
-            }
-            is EditExpenseAction -> {
-                if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.categoryId))) {
-                    resp.writer.println("Category with id '${action.categoryId}' doesn't exists")
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
-                    return
-                }
+                is NewCategoryAction -> {
+                    val entity = Entity(CATEGORY_KIND, userEntity.key)
 
-                val entity = datastore.get(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
-                entity.setProperty(EXPENSE_PROP_AMOUNT, action.amount);
-                entity.setProperty(EXPENSE_PROP_CATEGORY_ID, action.categoryId);
-                entity.setProperty(EXPENSE_PROP_DATE, action.date)
-                entity.setProperty(EXPENSE_PROP_COMMENT, action.comment)
-                val key = datastore.put(entity);
-                resp.writer.println(key.id)
-                resp.setStatus(HttpServletResponse.SC_OK)
-            }
-            is DeleteExpenseAction -> {
-                datastore.delete(KeyFactory.createKey(userEntity.key, EXPENSE_KIND, action.id))
-                resp.setStatus(HttpServletResponse.SC_OK)
-            }
-
-            is NewCategoryAction -> {
-                val entity = Entity(CATEGORY_KIND, userEntity.key)
-
-                val tx = datastore.beginTransaction();
-
-                entity.setProperty(CATEGORY_PROP_TITLE, action.title);
-                if (action.parentId != null) {
-                    if (!datastore.exists(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId), userEntity.key)) {
+                    entity.setProperty(CATEGORY_PROP_TITLE, action.title);
+                    if (!datastore.exists(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
                         resp.writer.println("Parent category with id '${action.parentId}' doesn't exists")
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         return
                     }
-                };
-
-                val childQuery = Query(CATEGORY_KIND, userEntity.key)
-                childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, action.parentId))
-                val childList = datastore.prepare(tx, childQuery).asList(FetchOptions.Builder.withDefaults())
-
-                val maxOrder: Long = childList.fold(0L, {acc, child ->
-                    val order = (child.getProperty(CATEGORY_PROP_ORDER) as Long?) ?: 0
-                    Math.max(acc, order)
-                })
-
-                entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
-                entity.setProperty(CATEGORY_PROP_ORDER, maxOrder + 1)
-                val key = datastore.put(tx, entity);
-
-                tx.commit()
-
-                resp.writer.println(key.id)
-                resp.setStatus(HttpServletResponse.SC_OK)
-            }
-            is DeleteCategoryAction -> {
-                val tx = datastore.beginTransaction();
-
-                fun remove(categoryId: Long) {
-
 
                     val childQuery = Query(CATEGORY_KIND, userEntity.key)
-                    childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, categoryId))
-                    val childList = datastore.prepare(childQuery).asList(FetchOptions.Builder.withDefaults())
+                    childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, action.parentId))
+                    val childList = datastore.prepare(tx, childQuery).asList(FetchOptions.Builder.withDefaults())
 
-                    val expensesQuery = Query(EXPENSE_KIND, userEntity.key)
-                    expensesQuery.setFilter(FilterPredicate(EXPENSE_PROP_CATEGORY_ID, EQUAL, categoryId))
-                    val expenseList = datastore.prepare(expensesQuery).asList(FetchOptions.Builder.withDefaults())
+                    val maxOrder: Long = childList.fold(0L, {acc, child ->
+                        val order = (child.getProperty(CATEGORY_PROP_ORDER) as Long?) ?: 0
+                        Math.max(acc, order)
+                    })
 
-                    // Remove childs
-                    for (child in childList) {
-                        remove(child.key.id)
+                    entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId)
+                    entity.setProperty(CATEGORY_PROP_ORDER, maxOrder + 1)
+                    val key = datastore.put(tx, entity);
+
+                    tx.commit()
+
+                    resp.writer.println(key.id)
+                    resp.setStatus(HttpServletResponse.SC_OK)
+                }
+                is DeleteCategoryAction -> {
+
+                    fun remove(categoryId: Long) {
+
+
+                        val childQuery = Query(CATEGORY_KIND, userEntity.key)
+                        childQuery.setFilter(FilterPredicate(CATEGORY_PROP_PARENT_ID, EQUAL, categoryId))
+                        val childList = datastore.prepare(childQuery).asList(FetchOptions.Builder.withDefaults())
+
+                        val expensesQuery = Query(EXPENSE_KIND, userEntity.key)
+                        expensesQuery.setFilter(FilterPredicate(EXPENSE_PROP_CATEGORY_ID, EQUAL, categoryId))
+                        val expenseList = datastore.prepare(expensesQuery).asList(FetchOptions.Builder.withDefaults())
+
+                        // Remove childs
+                        for (child in childList) {
+                            remove(child.key.id)
+                        }
+
+                        // Remove expenses
+                        for (expense in expenseList) {
+                            datastore.delete(tx, expense.key)
+                        }
+
+                        datastore.delete(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, categoryId))
+
+                    }
+                    remove(action.id)
+                    tx.commit()
+                    resp.setStatus(HttpServletResponse.SC_OK)
+                }
+                is EditCategoryAction -> {
+                    //todo: do not allow editing of root category
+                    if(action.parentId != null) {
+                        if (!datastore.exists(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
+                            resp.writer.println("Category with id '${action.parentId}' doesn't exists")
+                            resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                            return
+                        }
                     }
 
-                    // Remove expenses
-                    for (expense in expenseList) {
-                        datastore.delete(tx, expense.key)
+                    val entity = datastore.get(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.id))
+                    if(action.title != null) {
+                        entity.setProperty(CATEGORY_PROP_TITLE, action.title);
                     }
-
-                    datastore.delete(tx, KeyFactory.createKey(userEntity.key, CATEGORY_KIND, categoryId))
-
-                }
-                remove(action.id)
-                tx.commit()
-                resp.setStatus(HttpServletResponse.SC_OK)
-            }
-            is EditCategoryAction -> {
-                //todo: do not allow editing of root category
-                if(action.parentId != null) {
-                    if (!datastore.exists(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.parentId))) {
-                        resp.writer.println("Category with id '${action.parentId}' doesn't exists")
-                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
-                        return
+                    if(action.parentId != null) {
+                        entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
                     }
+                    val key = datastore.put(tx, entity);
+                    resp.writer.println(key.id)
+                    resp.setStatus(HttpServletResponse.SC_OK)
                 }
 
-                val entity = datastore.get(KeyFactory.createKey(userEntity.key, CATEGORY_KIND, action.id))
-                if(action.title != null) {
-                    entity.setProperty(CATEGORY_PROP_TITLE, action.title);
+                is SetCurrencyAction -> {
+                    userEntity.setProperty(USER_PROP_CURRENCY, action.currency.name)
+                    datastore.put(userEntity)
                 }
-                if(action.parentId != null) {
-                    entity.setProperty(CATEGORY_PROP_PARENT_ID, action.parentId);
+                else -> {
+                    resp.writer.println("Unknown action type: ${action.type}")
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                    return
                 }
-                val key = datastore.put(entity);
-                resp.writer.println(key.id)
-                resp.setStatus(HttpServletResponse.SC_OK)
             }
-
-            is SetCurrencyAction -> {
-                userEntity.setProperty(USER_PROP_CURRENCY, action.currency.name)
-                datastore.put(userEntity)
-            }
-            else -> {
-                resp.writer.println("Unknown action type: ${action.type}")
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
-                return
+        } finally {
+            if(tx.isActive) {
+                tx.rollback();
             }
         }
 

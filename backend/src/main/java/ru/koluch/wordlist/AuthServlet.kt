@@ -35,21 +35,24 @@ class AuthServlet : Servlet() {
                 if (userPrincipal != null) {
                     val datastore = DatastoreServiceFactory.getDatastoreService()
 
-                    //todo: make transactional
-                    if (!datastore.exists(KeyFactory.createKey(USER_KIND, userPrincipal.name))) {
+                    val tx = datastore.beginTransaction();
+                    try {
+                        val userEntity = datastore.getNull(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
+                        if(userEntity == null) {
+                            val newUserEntity = Entity(USER_KIND, userPrincipal.name)
+                            val userEntityKey = datastore.put(tx, newUserEntity)
 
-                        val tx = datastore.beginTransaction();
+                            val rootId = createDefaultCategories(tx, userEntityKey, datastore).key.id
 
-                        val newUserEntity = Entity(USER_KIND, userPrincipal.name)
-                        val userEntityKey = datastore.put(tx, newUserEntity)
-
-                        val rootId = createDefaultCategories(tx, userEntityKey, datastore).key.id
-
-                        newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootId)
-                        newUserEntity.setProperty(USER_PROP_CURRENCY, "USD")
-                        datastore.put(tx, newUserEntity)
-
-                        tx.commit();
+                            newUserEntity.setProperty(USER_PROP_ROOT_CATEGORY_ID, rootId)
+                            newUserEntity.setProperty(USER_PROP_CURRENCY, "USD")
+                            datastore.put(tx, newUserEntity)
+                            tx.commit()
+                        }
+                    } finally {
+                        if(tx.isActive) {
+                            tx.rollback();
+                        }
                     }
 
                     //todo: need to think about security in this place. Is it save to take redirect url from params?

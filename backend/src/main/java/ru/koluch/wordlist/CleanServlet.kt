@@ -28,24 +28,24 @@ class CleanServlet : Servlet() {
 
         val datastore = DatastoreServiceFactory.getDatastoreService()
 
-        val userPrincipal = req.userPrincipal
-        if (userPrincipal == null) {
-            resp.writer.println("User is not authorized")
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN)
-            return;
-        }
-
-        val userEntity: Entity
-        try {
-            userEntity = datastore.get(KeyFactory.createKey(USER_KIND, userPrincipal.name))
-        } catch(e: EntityNotFoundException) {
-            resp.writer.println("User account info not found, nothing to delete")
-            resp.sendError(HttpServletResponse.SC_OK)
-            return;
-        }
-
         val tx = datastore.beginTransaction();
         try {
+            val userPrincipal = req.userPrincipal
+            if (userPrincipal == null) {
+                resp.writer.println("User is not authorized")
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return;
+            }
+
+            val userEntity: Entity
+            try {
+                userEntity = datastore.get(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
+            } catch(e: EntityNotFoundException) {
+                resp.writer.println("User account info not found, nothing to delete")
+                resp.sendError(HttpServletResponse.SC_OK)
+                return;
+            }
+
             val query = Query(userEntity.key)
             query.setKeysOnly()
             val preparedQuery = datastore.prepare(tx, query)
@@ -59,10 +59,11 @@ class CleanServlet : Servlet() {
                 datastore.delete(tx, entity.key)
             }
 
-            tx.commit();
-        } catch(e: Exception) {
-            tx.rollback();
-            throw e;
+            tx.commit()
+        } finally {
+            if(tx.isActive) {
+                tx.rollback();
+            }
         }
 
     }
