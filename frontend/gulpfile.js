@@ -214,7 +214,7 @@ gulp.task('debug_scripts_context', function(){
         .pipe(gulp.dest(DEBUG_ROOT + '/scripts'))
 });
 
-gulp.task('debug_scripts', ['debug_scripts_context'], function(){
+gulp.task('debug_scripts', function(){
     var bundler = browserify(SRC_ROOT + '/scripts/main.jsx', {
         debug: true,
         cache: {},
@@ -295,4 +295,4 @@ gulp.task('debug_fonts', function(){
         .pipe(gulp.dest(DEBUG_ROOT + '/fonts'))
 });
 
-gulp.task('debug', ['debug_html', 'debug_vendor', 'debug_scripts', 'debug_styles', 'debug_images', 'debug_fonts']);
+gulp.task('debug', ['debug_html', 'debug_vendor', 'debug_scripts', 'debug_styles', 'debug_images', 'debug_fonts', 'debug_scripts_context']);
