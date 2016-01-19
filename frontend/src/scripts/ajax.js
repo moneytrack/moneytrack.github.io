@@ -39,6 +39,7 @@ module.exports.get = (url) => {
             }
         }
 
+        xmlhttp.withCredentials = true;
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
     })

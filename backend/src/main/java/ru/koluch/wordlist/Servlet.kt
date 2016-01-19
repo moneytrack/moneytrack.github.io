@@ -20,6 +20,7 @@ open class Servlet : HttpServlet() {
         super.doOptions(req, resp)
         resp.addHeader("Access-Control-Allow-Origin", allowedOrigin)
         resp.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        resp.addHeader("Access-Control-Allow-Credentials", "true")
     }
 
     override fun doTrace(req: HttpServletRequest, resp: HttpServletResponse) {
@@ -49,6 +50,7 @@ open class Servlet : HttpServlet() {
     private fun setAndCheckOrigin(req: HttpServletRequest, resp: HttpServletResponse) {
         resp.addHeader("Access-Control-Allow-Origin", allowedOrigin)
         resp.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        resp.addHeader("Access-Control-Allow-Credentials", "true")
 
         val referer = req.getHeader("Referer")
         if (referer == null || !referer.startsWith(allowedOrigin)) {
