@@ -18,11 +18,21 @@ import kotlin.text.startsWith
  */
 open class Servlet : HttpServlet() {
 
-    val allowedOrigin = "https://moneytrack.github.io"
+    val env = Properties()
+
+    override fun init(config: ServletConfig) {
+        super.init(config)
+        if(SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+            env.load(config.servletContext.getResourceAsStream("/WEB-INF/env_prod.properties"))
+        }
+        else {
+            env.load(config.servletContext.getResourceAsStream("/WEB-INF/env_dev.properties"))
+        }
+    }
 
     override fun doOptions(req: HttpServletRequest, resp: HttpServletResponse) {
         super.doOptions(req, resp)
-        resp.addHeader("Access-Control-Allow-Origin", allowedOrigin)
+        resp.addHeader("Access-Control-Allow-Origin", env.getProperty("allowOrigin"))
         resp.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         resp.addHeader("Access-Control-Allow-Credentials", "true")
     }
@@ -52,14 +62,14 @@ open class Servlet : HttpServlet() {
     }
 
     private fun setAndCheckOrigin(req: HttpServletRequest, resp: HttpServletResponse) {
-        resp.addHeader("Access-Control-Allow-Origin", allowedOrigin)
+        resp.addHeader("Access-Control-Allow-Origin", env.getProperty("allowOrigin"))
         resp.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         resp.addHeader("Access-Control-Allow-Credentials", "true")
 
 
         if(SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
             val referer = req.getHeader("Referer")
-            if (referer == null || !referer.startsWith(allowedOrigin)) {
+            if (referer == null || !referer.startsWith(env.getProperty("allowOrigin"))) {
                 throw RuntimeException("Bad referer")
             }
         }
