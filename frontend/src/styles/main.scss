@@ -297,6 +297,21 @@ input, textarea {
     padding: 0.25rem 0;
 }
 
+.error-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #CE0000;
+    width: 100%;
+    text-align: center;
+    font-size: 0.70rem;
+    color: white;
+    font-weight: bold;
+    opacity: 0.75;
+    padding: 0.25rem 0;
+    z-index: 9999;
+}
+
 .user-panel {
     position: fixed;
     top: 0;

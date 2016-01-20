@@ -10,6 +10,7 @@ import NumberInput from './NumberInput.jsx'
 import EditExpense from './EditExpense.jsx'
 import TabsContainer from './TabsContainer.jsx'
 import WaitIndicator from './WaitIndicator.jsx'
+import ErrorPanel from './ErrorPanel.jsx'
 import History from './History.jsx'
 import Statistics from './Statistics.jsx'
 import Settings from './Settings'
@@ -53,7 +54,7 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {error, history, waiting} = store.getState()
+        const {error = null, history, waiting, ajaxError} = store.getState()
 
         var content;
         if(error === "UNAUTHORIZED") {
@@ -99,6 +100,7 @@ const Root = React.createClass({
 
                     </TabsContainer>
                     <WaitIndicator waiting={waiting}/>
+                    <ErrorPanel isError={error !== null} />
                     <UserPanel />
                 </div>
             )

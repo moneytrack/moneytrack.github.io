@@ -58,11 +58,17 @@ ajax.get(DISPATCH_URL)
         const {type, status} = action
         switch(type) {
             case 'WAIT': {
-                return update(state, {waiting: {$set:true} })
+                return update(state, {
+                    waiting: {$set:true},
+                })
             }
 
             case 'STOP_WAIT': {
                 return update(state, {waiting: {$set:false} })
+            }
+
+            case 'ERROR': {
+                return update(state, {error: {$set:true} })
             }
 
             case 'NEW_EXPENSE': {
