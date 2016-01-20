@@ -54,7 +54,7 @@ const Root = React.createClass({
 
     render: function () {
         const {store} = this.context
-        const {error = null, history, waiting, ajaxError} = store.getState()
+        const {error = null, history, waiting} = store.getState()
 
         var content;
         if(error === "UNAUTHORIZED") {
