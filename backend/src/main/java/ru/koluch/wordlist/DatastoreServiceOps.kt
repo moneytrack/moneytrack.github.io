@@ -29,21 +29,22 @@ fun DatastoreService.getNull(key: Key): Entity? {
 
 fun DatastoreService.getNull(transaction: Transaction, key: Key): Entity? {
     try {
-        return this.get(key)
+        return this.get(transaction, key)
     } catch(e: EntityNotFoundException) {
         return null;
     }
 }
 
 val MAX_TRANSACTION_REPEAT_COUNT = 10
-fun DatastoreService.inTransaction(f: (Transaction) -> Unit) {
+fun <T> DatastoreService.inTransaction(f: (Transaction) -> T): T {
     val tx = this.beginTransaction();
     try {
         var success = false;
+        var result: T? = null;
         var tryCount = MAX_TRANSACTION_REPEAT_COUNT
         while(!success) {
             try {
-                f(tx)
+                result = f(tx)
                 success = true;
                 tx.commit()
             } catch(e: ConcurrentModificationException) {
@@ -53,6 +54,7 @@ fun DatastoreService.inTransaction(f: (Transaction) -> Unit) {
                 }
             }
         }
+        return result!!;
     } finally {
         if(tx.isActive) {
             tx.rollback()

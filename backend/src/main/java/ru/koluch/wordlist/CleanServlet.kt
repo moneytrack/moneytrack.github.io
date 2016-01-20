@@ -39,7 +39,6 @@ class CleanServlet : Servlet() {
             val userEntity = datastore.getNull(tx, KeyFactory.createKey(USER_KIND, userPrincipal.name))
             if(userEntity == null) {
                 resp.writer.println("User account info not found, nothing to delete")
-                resp.sendError(HttpServletResponse.SC_OK)
             }
             else {
                 val query = Query(userEntity.key)
@@ -56,6 +55,7 @@ class CleanServlet : Servlet() {
                     datastore.delete(tx, entity.key)
                 }
             }
+            resp.setStatus(HttpServletResponse.SC_OK)
         }
     }
 }

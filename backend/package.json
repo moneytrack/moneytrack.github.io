@@ -1,0 +1,12 @@
+{
+  "description": "Backend",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/koluch/moneytrack"
+  },
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "sync-request": "^3.0.0"
+  }
+}

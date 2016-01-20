@@ -15,7 +15,6 @@ function asyncDispatch(cb) {
 	    	console.log("error", err);
 			dispatch({type:"STOP_WAIT"})
 			dispatch({type:"ERROR"})
-			//dispatch(cb(err))
 	    })
 	}
 }
