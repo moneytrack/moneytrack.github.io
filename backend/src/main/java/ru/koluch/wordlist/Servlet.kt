@@ -1,8 +1,12 @@
 package ru.koluch.wordlist
 
+import com.google.appengine.api.utils.SystemProperty
+import java.util.*
+import javax.servlet.ServletConfig
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.collections.get
 import kotlin.text.startsWith
 
 /**
@@ -52,9 +56,12 @@ open class Servlet : HttpServlet() {
         resp.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         resp.addHeader("Access-Control-Allow-Credentials", "true")
 
-        val referer = req.getHeader("Referer")
-        if (referer == null || !referer.startsWith(allowedOrigin)) {
-            throw RuntimeException("Bad referer")
+
+        if(SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+            val referer = req.getHeader("Referer")
+            if (referer == null || !referer.startsWith(allowedOrigin)) {
+                throw RuntimeException("Bad referer")
+            }
         }
     }
 }
