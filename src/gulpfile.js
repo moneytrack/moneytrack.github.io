@@ -40,18 +40,18 @@ var gulp = require('gulp'),
 
 
 var DEBUG_ROOT = './debug';
-var SRC_ROOT = './src';
+var SRC_ROOT = '.';
 var PROD_ROOT = '..';
 
 
 
-gulp.task('html', function(){
-    var files = SRC_ROOT + '/**.html';
+gulp.task('static', function(){
+    var files = SRC_ROOT + '/static/**/*';
     return gulp.src(files)
         .pipe(gulp.dest(PROD_ROOT))
 });
 
-gulp.task('vendor', function(){
+gulp.task('scripts_vendor', function(){
     var bundler = browserify('./.noop.js', {
         debug: false,
         cache: {},
@@ -87,7 +87,7 @@ gulp.task('scripts_context', function(){
         .pipe(gulp.dest(PROD_ROOT + '/scripts'))
 });
 
-gulp.task('scripts', ['scripts_context'], function(){
+gulp.task('scripts', function(){
     var bundler = browserify(SRC_ROOT + '/scripts/main.jsx', {
         debug: false,
         cache: {},
@@ -128,32 +128,20 @@ gulp.task('styles', function(){
         .pipe(gulp.dest(PROD_ROOT + '/styles'))
 });
 
-gulp.task('images', function(){
-    var files = SRC_ROOT + '/images/**';
-    return gulp.src(files)
-        .pipe(gulp.dest(PROD_ROOT + '/images'))
-});
-
-gulp.task('fonts', function(){
-    var files = SRC_ROOT + '/fonts/**';
-    return gulp.src(files)
-        .pipe(gulp.dest(PROD_ROOT + '/fonts'))
-});
-
-gulp.task('default', ['html', 'vendor', 'scripts', 'styles', 'images', 'fonts']);
+gulp.task('default', ['static', 'scripts_vendor', 'scripts_context', 'scripts', 'styles']);
 
 
 //***************** Debug *****************
 
-gulp.task('debug_html', function(){
-    var files = SRC_ROOT + '/**.html';
+gulp.task('debug_static', function(){
+    var files = SRC_ROOT + '/static/**/*';
     return gulp.src(files)
         .pipe(watch(files))
         .pipe(gulp.dest(DEBUG_ROOT))
 });
 
 
-gulp.task('debug_vendor',  function(){
+gulp.task('debug_scripts_vendor',  function(){
     var bundler = browserify('./.noop.js', {
         debug: true,
         cache: {},
@@ -280,19 +268,4 @@ gulp.task('debug_styles', ['__debug_styles'], function(){
     var files = SRC_ROOT + '/styles/**.scss';
     return gulp.watch(files, ['__debug_styles'])
 });
-
-gulp.task('debug_images', function(){
-    var files = SRC_ROOT + '/images/**';
-    return gulp.src(files)
-        .pipe(watch(files))
-        .pipe(gulp.dest(DEBUG_ROOT + '/images'))
-});
-
-gulp.task('debug_fonts', function(){
-    var files = SRC_ROOT + '/fonts/**';
-    return gulp.src(files)
-        .pipe(watch(files))
-        .pipe(gulp.dest(DEBUG_ROOT + '/fonts'))
-});
-
-gulp.task('debug', ['debug_html', 'debug_vendor', 'debug_scripts', 'debug_styles', 'debug_images', 'debug_fonts', 'debug_scripts_context']);
+gulp.task('debug', ['debug_static', 'debug_styles', 'debug_scripts_vendor', 'debug_scripts', 'debug_scripts_context']);
