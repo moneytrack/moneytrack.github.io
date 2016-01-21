@@ -30,7 +30,7 @@ var gulp = require('gulp'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     watchify = require('watchify'),
-    anybar = require('anybar')
+    anybar = require('anybar'),
     fs = require('fs'),
     babelify = require('babelify'),
     babelPresetEs2015 = require('babel-preset-es2015'),
@@ -41,7 +41,7 @@ var gulp = require('gulp'),
 
 var DEBUG_ROOT = './debug';
 var SRC_ROOT = './src';
-var PROD_ROOT = './dist';
+var PROD_ROOT = '..';
 
 
 
@@ -101,7 +101,7 @@ gulp.task('scripts', ['scripts_context'], function(){
     }
 
     // Register all dependencies as external (they are loaded via vendor bundle)
-    Object.keys(packageJson.dependencies).forEach((dep) => {
+    Object.keys(packageJson.dependencies).forEach(function(dep){
         bundler.external(dep)
     })
 
@@ -224,7 +224,7 @@ gulp.task('debug_scripts', function(){
     });
 
     // Register all dependencies as external (they are loaded via vendor bundle)
-    Object.keys(packageJson.dependencies).forEach((dep) => {
+    Object.keys(packageJson.dependencies).forEach(function(dep){
         bundler.external(dep)
     })
 
