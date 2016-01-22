@@ -50,7 +50,7 @@ const DateTimePicker = React.createClass({
     render: function () {
         const {timestamp, moment} = this.props.value
         return (
-            <div>
+            <div className="date-time-picker">
                 <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
                 {  this.state.visible
                    ? <ModalContainer onCancel={this.onCancel}>

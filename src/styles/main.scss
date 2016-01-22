@@ -1,4 +1,3 @@
-@import './node_modules/input-moment/dist/input-moment';
 @import 'mfglabs_iconset';
 
 html {
@@ -242,9 +241,6 @@ input, textarea {
 
 }
 
-.m-input-moment {
-    background: white;
-}
 
 .modal-container {
     position: fixed;
@@ -632,7 +628,60 @@ input, textarea {
             border: 0;
         }
     }
+}
 
 
+.date-time-picker {
+    .m-input-moment {
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
 
+        .tab {
+            display: none;
+        }
+
+        .tab.is-active {
+            display: block
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+
+        }
+
+        .m-calendar {
+            table td {
+                text-align: center;
+                padding: 5px;
+                cursor: pointer;
+            }
+
+            table thead td {
+                font-weight: bold;
+                cursor: default;
+            }
+
+            td.current-day {
+                background: #EEEFAA;
+                font-weight: bold;
+            }
+
+            td.next-month, td.prev-month {
+                color: #B5B5B5;
+            }
+
+            .toolbar {
+                display: flex;
+                justify-content: space-between;
+
+                .current-date {
+                    font-style: italic;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
 }
