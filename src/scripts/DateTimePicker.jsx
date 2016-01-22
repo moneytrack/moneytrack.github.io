@@ -7,6 +7,58 @@ import _moment from 'moment'
 import ModalContainer from './ModalContainer'
 import DropDownContainer from './DropDownContainer'
 
+const DateTimePickerModal = React.createClass({
+
+    render: function() {
+
+        const timestamp = 1453474169224
+
+        const days = [0,1,2,3,4,5,6]
+        const weeks = [0,1,2,3,4,5]
+
+        var m = _moment(timestamp);
+
+        m.date(1)
+        m.subtract('days', m.day())
+        var start = m.valueOf();
+
+        return (
+            <div>
+                <h1>{m.format("dddd, MMMM Do YYYY (dddd), h:mm:ss a") + " - " + m.day()}</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            {
+                                days.map(dayI => (
+                                    <td key={dayI}>{dayI}</td>
+                                ))
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {
+                            weeks.map(week => (
+                                <tr key={"week_" + week}>
+                                    {
+                                        days.map(day => (
+                                            <td key={"week_"+week+"day_" + day}>
+                                                {_moment(start).add('weeks', week).add('days', day).format("DD")}
+                                            </td>
+                                        ))
+                                    }
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+})
+
+
 const DateTimePicker = React.createClass({
 
     getInitialState: function() {
@@ -54,10 +106,7 @@ const DateTimePicker = React.createClass({
                 <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
                 {  this.state.visible
                    ? <ModalContainer onCancel={this.onCancel}>
-                        <InputMoment
-                            moment={moment}
-                            onChange={this.onChangeDate}
-                            onSave={this.onSaveDate} />
+                        <DateTimePickerModal/>
                      </ModalContainer>
                    : <span/>  
                 }
