@@ -3,14 +3,15 @@ import React from 'react'
 import update from 'react-addons-update'
 import moment from 'moment'
 
-import TabsContainer from './../presentational/TabsContainer'
-import money from './../../money'
-import {asc,desc} from './../../arrays'
+import TabsContainer from '../presentational/TabsContainer'
+import money from '../../money'
+import {asc,desc} from '../../arrays'
 
 const format = money.format()
 const {keys} = Object
 
 const SumTableStatistics = React.createClass({
+
     getInitialState: function() {
         let years = Object.keys(this.getYearMonthCategoryExpenseMap()).map(x => parseInt(x)).sort(desc)
         return {
@@ -23,7 +24,7 @@ const SumTableStatistics = React.createClass({
 
     getYearMonthCategoryExpenseMap: function() {
 
-        const {history, categoryList} = this.context.store.getState()
+        const {history} = this.context.store.getState()
 
         const yearMonthCategoryExpenseMap = {}
 
@@ -64,7 +65,6 @@ const SumTableStatistics = React.createClass({
             showDif: {$set: !this.state.showDif}
         }))
     },
-
 
     render: function () {
 

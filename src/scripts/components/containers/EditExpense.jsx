@@ -2,9 +2,9 @@
 import React from 'react'
 import update from 'react-addons-update'
 
-import NumberInput from './../presentational/NumberInput.jsx'
-import CategoryPicker from './../presentational/CategoryPicker.jsx'
-import DateTimePicker from './../presentational/DateTimePicker.jsx'
+import NumberInput from '../presentational/NumberInput.jsx'
+import CategoryPicker from '../presentational/CategoryPicker.jsx'
+import DateTimePicker from '../presentational/DateTimePicker.jsx'
 import moment from 'moment'
 
 const EditExpense = React.createClass({
@@ -79,8 +79,6 @@ const EditExpense = React.createClass({
     },
 
     onChangeDate: function(date) {
-        console.log("new date", moment(date).format("dddd, MMMM Do YYYY, h:mm:ss a"));
-
         this.setState(update(this.state, {
             date: {$set:date}
         }))

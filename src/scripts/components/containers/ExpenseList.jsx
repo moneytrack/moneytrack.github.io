@@ -4,13 +4,12 @@ import update from 'react-addons-update'
 import InputMoment from 'input-moment'
 import moment from 'moment'
 
-import money from './../../money'
-import ModalContainer from './../presentational/ModalContainer'
+import money from '../../money'
+import ModalContainer from '../presentational/ModalContainer'
 import EditExpense from './EditExpense'
-import {editExpense} from './../../action-creators'
+import {editExpense} from '../../action-creators'
 
 const ExpenseList = React.createClass({
-
 
     render: function () {
         const {data} = this.props

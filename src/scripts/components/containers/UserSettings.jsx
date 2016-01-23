@@ -2,7 +2,7 @@
 import React from 'react'
 import update from 'react-addons-update'
 
-import {setCurrency} from './../../action-creators'
+import {setCurrency} from '../../action-creators'
 
 const UserSettings = React.createClass({
 

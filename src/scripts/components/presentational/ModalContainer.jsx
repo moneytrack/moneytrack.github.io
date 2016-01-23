@@ -2,6 +2,7 @@
 import React from 'react'
 
 const ModalContainer = React.createClass({
+
     onCancel: function(e) {
         if(e.target === this.refs.root && this.props.onCancel) {
             this.props.onCancel(e)

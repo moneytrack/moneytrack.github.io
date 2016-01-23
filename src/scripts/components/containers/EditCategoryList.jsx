@@ -2,21 +2,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
-import {find} from './../../arrays'
-import ModalContainer from './../presentational/ModalContainer'
-
-const RenameModal = React.createClass({
-    render: function(){
-        return (
-            <ModalContainer visible={this.props.editing}
-                            onCancel={this.props.onEditCanceled}
-                            onSave={this.props.onEditFinished}>
-                <label>New name: <input value={this.props.editingText} onChange={this.onEdit} ref="title_edit_input"/></label>
-                <button onClick={this.onEditFinished}>Save</button>
-            </ModalContainer>
-        )
-    }
-})
+import {find} from '../../arrays'
+import ModalContainer from '../presentational/ModalContainer'
 
 const EditCategoryList = React.createClass({
     getInitialState: function() {
@@ -29,7 +16,6 @@ const EditCategoryList = React.createClass({
             newCategoryParentId: null
         }
     },
-
 
     /*
         Renaming
@@ -78,7 +64,6 @@ const EditCategoryList = React.createClass({
 
     onMoveFinished: function(e) {
         if(this.state.moveNewParentId !== -1) {
-            console.log("state", this.state);
             this.props.onMoveCategory(this.state.moveCategoryId, this.state.moveNewParentId)
             this.setState(update(this.state, {
                 mode: {$set: null},
@@ -97,13 +82,6 @@ const EditCategoryList = React.createClass({
             mode: {$set: 'MOVE'},
             moveNewParentId: {$set: parseInt(e.target.value)}
         }))
-    },
-
-    onMove: function(id, e) {
-        const toId = parseInt(e.target.value);
-        if(id >= 0) {
-            this.props.onMoveCategory(id, toId)
-        }
     },
 
     /*

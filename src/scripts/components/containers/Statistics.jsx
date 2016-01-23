@@ -5,7 +5,6 @@ import moment from 'moment'
 
 import SumTableStatistics from './SumTableStatistics'
 
-
 const Statistics = React.createClass({
 
 

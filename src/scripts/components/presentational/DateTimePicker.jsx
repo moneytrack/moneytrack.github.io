@@ -109,31 +109,6 @@ const DatePicker = React.createClass({
         }))
     },
 
-    onPrevYear: function() {
-        const {year, month} = this.state;
-        const m = _moment(1);
-        m.year(year)
-        m.month(month)
-        m.subtract(1, "year");
-
-        this.setState(update(this.state, {
-            year: {$set: m.year()},
-        }))
-    },
-
-    onNextYear: function() {
-        const {year, month} = this.state;
-        const m = _moment(1);
-        m.year(year)
-        m.month(month)
-        m.add(1, "year");
-
-        this.setState(update(this.state, {
-            year: {$set: m.year()},
-        }))
-    },
-
-
     render: function() {
         const {timestamp} = this.props
         const {year, month} = this.state;

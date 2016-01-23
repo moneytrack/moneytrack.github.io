@@ -18,7 +18,6 @@ const HorSpinner = React.createClass({
                 </div>
                 <button type="button" className="h-counter__button h-counter__button--up" onClick={this.props.onUp}><div className="arrow-right"></div></button>
             </div>
-
         )
     }
 })

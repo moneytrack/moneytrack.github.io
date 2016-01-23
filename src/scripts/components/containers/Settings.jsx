@@ -1,11 +1,11 @@
 "use strict"
 import React from 'react'
 import update from 'react-addons-update'
-import TabsContainer from './../presentational/TabsContainer'
+import TabsContainer from '../presentational/TabsContainer'
 import UserSettings from './UserSettings'
 import EditCategoryList from './EditCategoryList'
 
-import {newExpense, deleteExpense, newCategory, editCategory, deleteCategory} from './../../action-creators.js'
+import {newExpense, deleteExpense, newCategory, editCategory, deleteCategory} from '../../action-creators.js'
 
 const Settings = React.createClass({
 

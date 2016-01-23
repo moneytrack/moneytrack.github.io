@@ -4,17 +4,17 @@ import React from 'react'
 import moment from 'moment'
 import update from 'react-addons-update'
 
-import {newExpense, deleteExpense, newCategory} from './../../action-creators.js'
+import {newExpense, deleteExpense, newCategory} from '../../action-creators.js'
 
-import NumberInput from './../presentational/NumberInput.jsx'
+import NumberInput from '../presentational/NumberInput.jsx'
 import EditExpense from './EditExpense.jsx'
-import TabsContainer from './../presentational/TabsContainer.jsx'
-import WaitIndicator from './../presentational/WaitIndicator.jsx'
-import ErrorPanel from './../presentational/ErrorPanel.jsx'
+import TabsContainer from '../presentational/TabsContainer.jsx'
+import WaitIndicator from '../presentational/WaitIndicator.jsx'
+import ErrorPanel from '../presentational/ErrorPanel.jsx'
 import History from './History.jsx'
 import Statistics from './Statistics.jsx'
 import Settings from './Settings'
-import UserPanel from './../presentational/UserPanel'
+import UserPanel from '../presentational/UserPanel'
 
 const Root = React.createClass({
 
