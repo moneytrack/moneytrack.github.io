@@ -56,10 +56,11 @@ button.warning {
     color: white;
 }
 
-input, textarea {
+input, textarea, .pseudo-input-text {
     border-radius: 5px;
     border: 1px solid #E8E8E8;
     padding: 0.3rem 0.5rem;
+    font-size: 1rem;
 }
 
 
@@ -686,6 +687,10 @@ input, textarea {
         &__controls {
             padding: 0.2rem;
         }
+    }
+
+    .pseudo-input-text {
+        cursor: pointer;
     }
 
 
