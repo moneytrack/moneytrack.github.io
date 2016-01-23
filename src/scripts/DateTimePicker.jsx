@@ -92,6 +92,7 @@ const DatePicker = React.createClass({
         m.subtract(1, "month");
 
         this.setState(update(this.state, {
+            year: {$set: m.year()},
             month: {$set: m.month()},
         }))
     },
@@ -104,6 +105,7 @@ const DatePicker = React.createClass({
         m.add(1, "month");
 
         this.setState(update(this.state, {
+            year: {$set: m.year()},
             month: {$set: m.month()},
         }))
     },
@@ -154,11 +156,8 @@ const DatePicker = React.createClass({
         return (
             <div className="date-picker">
 
-                <HSpinner onUp={this.onNextYear} onDown={this.onPrevYear}>
-                    <div className="date-picker__years__title">{showing.format("YYYY")}</div>
-                </HSpinner>
                 <HSpinner onUp={this.onNextMonth} onDown={this.onPrevMonth}>
-                    <div className="date-picker__months__title">{showing.format("MMMM")}</div>
+                    <div className="date-picker__months__title">{showing.format("YYYY, MMMM")}</div>
                 </HSpinner>
 
                 <table className="date-picker__calendar">
