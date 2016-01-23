@@ -662,10 +662,11 @@ button.warning {
   background: #CA0000;
   color: white; }
 
-input, textarea {
+input, textarea, .pseudo-input-text {
   border-radius: 5px;
   border: 1px solid #E8E8E8;
-  padding: 0.3rem 0.5rem; }
+  padding: 0.3rem 0.5rem;
+  font-size: 1rem; }
 
 .arrow-up, .arrow-down, .arrow-right, .arrow-left {
   width: 0;
@@ -1090,6 +1091,9 @@ input, textarea {
     border-bottom: none; }
   .date-time-picker__modal-content__controls {
     padding: 0.2rem; }
+
+.date-time-picker .pseudo-input-text {
+  cursor: pointer; }
 
 .date-picker {
   display: -webkit-flex;
