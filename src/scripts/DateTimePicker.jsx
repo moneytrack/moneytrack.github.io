@@ -10,19 +10,17 @@ import DropDownContainer from './DropDownContainer'
 const DateTimePickerModal = React.createClass({
 
     getInitialState: function() {
-        const timestamp = 1453474169224
+        const {timestamp} = this.props
         var m = _moment(timestamp);
 
         return {
             timestamp: timestamp,
             year: m.year(),
             month: m.month(),
-            //week: m.week(),
-            //day: m.day(),
         }
     },
 
-    onChangeTime: function(year, month, week, day) {
+    onChange: function(year, month, week, day) {
 
         console.log(year, month, week, day);
 
@@ -89,17 +87,12 @@ const DateTimePickerModal = React.createClass({
 
 
     render: function() {
-        console.log(this.state);
-
         const {timestamp, year, month} = this.state;
 
         const days = [0,1,2,3,4,5,6]
         const weeks = [0,1,2,3,4,5]
 
-
         var now = _moment(timestamp);
-
-        console.log(now.format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
         var showing = _moment(1);
 
@@ -143,7 +136,7 @@ const DateTimePickerModal = React.createClass({
                                             var date = _moment(start).add(week, 'weeks').add(day, 'days');
                                             return (
                                                 <td key={"week_"+week+"_day_" + day}
-                                                    onClick={(e) => this.onChangeTime(date.year(), date.month(), date.week(), date.day())}>
+                                                    onClick={(e) => this.onChange(date.year(), date.month(), date.week(), date.day())}>
                                                     {
                                                         (date.week() === now.week() && date.day() == now.day() && date.year() === now.year() && date.month() === now.month())
                                                         ? "[" + date.format("D") + "]"
@@ -212,7 +205,7 @@ const DateTimePicker = React.createClass({
                 <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
                 {  this.state.visible
                    ? <ModalContainer onCancel={this.onCancel}>
-                        <DateTimePickerModal/>
+                        <DateTimePickerModal timestamp={Date.now()}/>
                      </ModalContainer>
                    : <span/>  
                 }
