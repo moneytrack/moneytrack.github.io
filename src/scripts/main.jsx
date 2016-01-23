@@ -30,7 +30,7 @@ import {Provider} from 'react-redux'
 import moment from 'moment'
 
 import ajax from './ajax'
-import Root from './Root.jsx'
+import Root from './components/containers/Root.jsx'
 import {find} from './arrays'
 
 if(window.context.env === "PROD" && window.location.protocol === "http:") {

@@ -6,7 +6,6 @@ import _moment from 'moment'
 
 import ModalContainer from './ModalContainer'
 import TabsContainer from './TabsContainer'
-import DropDownContainer from './DropDownContainer'
 import VSpinner from './VSpinner'
 import HSpinner from './HSpinner'
 

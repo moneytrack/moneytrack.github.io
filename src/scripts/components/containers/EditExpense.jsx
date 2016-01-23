@@ -2,9 +2,9 @@
 import React from 'react'
 import update from 'react-addons-update'
 
-import NumberInput from './NumberInput.jsx'
-import CategoryPicker from './CategoryPicker.jsx'
-import DateTimePicker from './DateTimePicker.jsx'
+import NumberInput from './../presentational/NumberInput.jsx'
+import CategoryPicker from './../presentational/CategoryPicker.jsx'
+import DateTimePicker from './../presentational/DateTimePicker.jsx'
 import moment from 'moment'
 
 const EditExpense = React.createClass({

@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 
-import { isNumber, getNumber } from './numbers'
+import { isNumber, getNumber } from './../../numbers'
 
 
 const NumberInput = React.createClass({

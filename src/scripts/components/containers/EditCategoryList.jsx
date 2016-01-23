@@ -2,8 +2,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
-import {find} from './arrays'
-import ModalContainer from './ModalContainer'
+import {find} from './../../arrays'
+import ModalContainer from './../presentational/ModalContainer'
 
 const RenameModal = React.createClass({
     render: function(){

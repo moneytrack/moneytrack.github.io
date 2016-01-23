@@ -3,9 +3,9 @@ import React from 'react'
 import update from 'react-addons-update'
 import moment from 'moment'
 
-import TabsContainer from './TabsContainer'
-import money from './money'
-import {asc,desc} from './arrays'
+import TabsContainer from './../presentational/TabsContainer'
+import money from './../../money'
+import {asc,desc} from './../../arrays'
 
 const format = money.format()
 const {keys} = Object

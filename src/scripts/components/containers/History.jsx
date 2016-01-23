@@ -4,13 +4,12 @@ import update from 'react-addons-update'
 import InputMoment from 'input-moment'
 import moment from 'moment'
 
-import ModalContainer from './ModalContainer'
+import ModalContainer from './../presentational/ModalContainer'
 import EditExpense from './EditExpense'
-import {editExpense} from './action-creators'
-import ConfirmDialog from './ConfirmDialog'
+import {editExpense} from './../../action-creators'
 import ExpenseList from './ExpenseList'
-import CategoryPicker from './CategoryPicker'
-import {asc,desc} from './arrays'
+import CategoryPicker from './../presentational/CategoryPicker'
+import {asc,desc} from './../../arrays'
 const {keys} = Object
 
 const History = React.createClass({
