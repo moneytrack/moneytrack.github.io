@@ -7,7 +7,8 @@ import _moment from 'moment'
 import ModalContainer from './ModalContainer'
 import TabsContainer from './TabsContainer'
 import DropDownContainer from './DropDownContainer'
-
+import VSpinner from './VSpinner'
+import HSpinner from './HSpinner'
 
 const TimePicker = React.createClass({
 
@@ -47,20 +48,12 @@ const TimePicker = React.createClass({
 
         return (
             <div className="time-picker">
-                <div className="ver-counter">
-                    <button type="button" className="ver-counter__button ver-counter__button--up" onClick={this.onHoursUp}><div className="arrow-up"></div></button>
-                    <div className="ver-counter__middle" >
-                        <input  className="time-picker__input" value={m.format("HH")} readOnly={true}/>
-                    </div>
-                    <button type="button" className="ver-counter__button ver-counter__button--down" onClick={this.onHoursDown}><div className="arrow-down"></div></button>
-                </div>
-                <div className="ver-counter">
-                    <button type="button" className="ver-counter__button ver-counter__button--up" onClick={this.onMinutesUp}><div className="arrow-up"></div></button>
-                    <div className="ver-counter__middle" >
-                        <input className="time-picker__input" value={m.format("mm")} readOnly={true}/>
-                    </div>
-                    <button type="button" className="ver-counter__button ver-counter__button--down" onClick={this.onMinutesDown}><div className="arrow-down"></div></button>
-                </div>
+                <VSpinner onUp={this.onHoursUp} onDown={this.onHoursDown}>
+                    <input  className="time-picker__input" value={m.format("HH")} readOnly={true}/>
+                </VSpinner>
+                <VSpinner onUp={this.onMinutesUp} onDown={this.onMinutesDown}>
+                    <input className="time-picker__input" value={m.format("mm")} readOnly={true}/>
+                </VSpinner>
             </div>
         )
     }
@@ -161,21 +154,12 @@ const DatePicker = React.createClass({
         return (
             <div className="date-picker">
 
-                <div className="hor-counter">
-                    <button type="button" className="hor-counter__button hor-counter__button--down" onClick={this.onPrevYear}><div className="arrow-left"></div></button>
-                    <div className="hor-counter__middle">
-                        <div className="date-picker__years__title">{showing.format("YYYY")}</div>
-                    </div>
-                    <button type="button" className="hor-counter__button hor-counter__button--up" onClick={this.onNextYear}><div className="arrow-right"></div></button>
-                </div>
-
-                <div className="hor-counter">
-                    <button type="button" className="hor-counter__button hor-counter__button--down" onClick={this.onPrevMonth}><div className="arrow-left"></div></button>
-                    <div className="hor-counter__middle">
-                        <div className="date-picker__months__title">{showing.format("MMMM")}</div>
-                    </div>
-                    <button type="button" className="hor-counter__button hor-counter__button--up" onClick={this.onNextMonth}><div className="arrow-right"></div></button>
-                </div>
+                <HSpinner onUp={this.onNextYear} onDown={this.onPrevYear}>
+                    <div className="date-picker__years__title">{showing.format("YYYY")}</div>
+                </HSpinner>
+                <HSpinner onUp={this.onNextMonth} onDown={this.onPrevMonth}>
+                    <div className="date-picker__months__title">{showing.format("MMMM")}</div>
+                </HSpinner>
 
                 <table className="date-picker__calendar">
                     <thead>
