@@ -824,5 +824,9 @@ input, textarea, .pseudo-input-text {
         &--down {
             border-radius: 5px 0 0 5px;
         }
+
+        &--up, &--down {
+            padding: 6px 10px;
+        }
     }
 }
