@@ -39,6 +39,28 @@ const TimePicker = React.createClass({
         this.props.onChange(m.valueOf())
     },
 
+    onChangeHours: function(e) {
+        let hours = e.target.value.substring(1);
+        if(parseInt(hours) >= 24) {
+            hours = "0" + hours.substr(1)
+        }
+        const {timestamp} = this.props
+        const m = _moment(timestamp)
+        m.hours(parseInt(hours))
+        this.props.onChange(m.valueOf())
+    },
+
+
+    onChangeMinutes: function(e) {
+        let minutes = e.target.value.substring(1);
+        if(parseInt(minutes) >= 60) {
+            minutes = "0" + minutes.substr(1)
+        }
+        const {timestamp} = this.props
+        const m = _moment(timestamp)
+        m.minutes(parseInt(minutes))
+        this.props.onChange(m.valueOf())
+    },
 
     render: function(){
         const {timestamp} = this.props
@@ -48,10 +70,10 @@ const TimePicker = React.createClass({
         return (
             <div className="time-picker">
                 <VSpinner onUp={this.onHoursUp} onDown={this.onHoursDown}>
-                    <input  className="time-picker__input" value={m.format("HH")} readOnly={true}/>
+                    <input  className="time-picker__input" value={m.format("HH")} onChange={this.onChangeHours}/>
                 </VSpinner>
                 <VSpinner onUp={this.onMinutesUp} onDown={this.onMinutesDown}>
-                    <input className="time-picker__input" value={m.format("mm")} readOnly={true}/>
+                    <input className="time-picker__input" value={m.format("mm")}  onChange={this.onChangeMinutes}/>
                 </VSpinner>
             </div>
         )
@@ -245,10 +267,6 @@ const DateTimePicker = React.createClass({
         )
     }
 })
-
-DateTimePicker.contextTypes = {
-    store: React.PropTypes.object
-}
 
 DateTimePicker.unwrapState = function(value) {
     return value.timestamp
