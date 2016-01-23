@@ -37,7 +37,7 @@ a.pseudo.warning {
 }
 
 button {
-    border: 1px solid #EFEFEF;
+    border: 1px solid #E8E8E8;
     background: #FBFBFB;
     border-radius: 7px;
     padding: 10px 15px;
@@ -58,9 +58,40 @@ button.warning {
 
 input, textarea {
     border-radius: 5px;
-    border: 1px solid #D8D8D8;
+    border: 1px solid #E8E8E8;
     padding: 0.3rem 0.5rem;
 }
+
+
+.arrow-up, .arrow-down, .arrow-right, .arrow-left {
+    width: 0;
+    height: 0;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.arrow-up {
+    border-top: none;
+    border-bottom-color: black;
+}
+
+.arrow-down {
+    border-top-color: black;
+    border-bottom: none;
+}
+
+.arrow-right {
+    border-left-color: black;
+    border-right: none;
+}
+
+.arrow-left {
+    border-right-color: black;
+    border-left: none;
+}
+
+/****************/
 
 .logo {
     text-align: center;
@@ -632,56 +663,138 @@ input, textarea {
 
 
 .date-time-picker {
-    .m-input-moment {
-        background: white;
+    &__modal-content {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        align-items: center;
+    }
+}
 
-        .tab {
-            display: none;
+.date-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__years, &__months {
+        display: flex;
+        align-items: center;
+    }
+
+    &__years {
+        &__title {
+            font-weight: bold;
+            font-style: italic;
+            padding: 0 1rem;
+        }
+    }
+
+    &__months {
+        &__title {
+            font-weight: bold;
+            padding: 0 1rem;
+        }
+    }
+
+    &__calendar {
+        &__header {
+            font-weight: bold;
         }
 
-        .tab.is-active {
-            display: block
-        }
+        &__day {
+            text-align: center;
+            padding: 0.35rem 0.5rem;
+            cursor: default;
 
-        .options {
-            display: flex;
-            justify-content: center;
-
-        }
-
-        .m-calendar {
-            table td {
-                text-align: center;
-                padding: 5px;
-                cursor: pointer;
-            }
-
-            table thead td {
-                font-weight: bold;
-                cursor: default;
-            }
-
-            td.current-day {
+            &--active {
                 background: #EEEFAA;
-                font-weight: bold;
             }
 
-            td.next-month, td.prev-month {
-                color: #B5B5B5;
+            &--another-month {
+                color: #CCCCCC;
             }
+        }
+    }
+}
 
-            .toolbar {
-                display: flex;
-                justify-content: space-between;
+.time-picker {
+    display: flex;
+    flex-direction: row;
 
-                .current-date {
-                    font-style: italic;
-                    font-weight: bold;
-                }
-            }
+    &__input {
+        font-size: 2rem;
+        width: 40px;
+        text-align: center;
+        border: none;
+    }
+
+}
+
+.ver-counter {
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    margin: 0.3rem;
+
+
+
+    &__middle {
+        border-left: 1px solid #E8E8E8;
+        border-right: 1px solid #E8E8E8;
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+    }
+
+
+    &__button {
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        outline: none;
+
+        &--up {
+            border-radius: 5px 5px 0 0;
+        }
+
+        &--down {
+            border-radius: 0 0 5px 5px;
+        }
+    }
+}
+
+
+.hor-counter {
+
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    margin: 0.3rem;
+
+
+    &__middle {
+        border-bottom: 1px solid #E8E8E8;
+        border-top: 1px solid #E8E8E8;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+
+    &__button {
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        outline: none;
+
+        &--up {
+            border-radius: 0 5px 5px 0;
+        }
+
+        &--down {
+            border-radius: 5px 0 0 5px;
         }
     }
 }

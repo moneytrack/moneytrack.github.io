@@ -18,7 +18,7 @@ const EditExpense = React.createClass({
                 id: expense.id,
                 amount: NumberInput.wrapState(expense.amount / 100),
                 categoryId: expense.categoryId,
-                date: DateTimePicker.wrapState(expense.date),
+                date: expense.date,
                 comment: expense.comment,
                 mode: 'EDIT'
             }
@@ -29,7 +29,7 @@ const EditExpense = React.createClass({
             return {
                 amount: NumberInput.wrapState(0),
                 categoryId: firstCategoryId,
-                date: DateTimePicker.wrapState(moment().valueOf()),
+                date: moment().valueOf(),
                 comment: '',
                 mode: 'NEW'
             }
@@ -45,7 +45,7 @@ const EditExpense = React.createClass({
                 amount: Math.floor(NumberInput.unwrapState(this.state.amount) * 100),
                 categoryId: this.state.categoryId,
                 comment: this.state.comment,
-                date: DateTimePicker.unwrapState(this.state.date)
+                date: this.state.date
             })
             this.setState(this.getInitialState())
         }
@@ -56,7 +56,7 @@ const EditExpense = React.createClass({
                 amount: Math.floor(NumberInput.unwrapState(this.state.amount) * 100),
                 categoryId: this.state.categoryId,
                 comment: this.state.comment,
-                date: DateTimePicker.unwrapState(this.state.date)
+                date: this.state.date
             })
         }
         else {
@@ -79,6 +79,8 @@ const EditExpense = React.createClass({
     },
 
     onChangeDate: function(date) {
+        console.log("new date", moment(date).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+
         this.setState(update(this.state, {
             date: {$set:date}
         }))
@@ -119,7 +121,7 @@ const EditExpense = React.createClass({
                         <tr>
                             <td className="edit-expense__field__input">
                                 <DateTimePicker
-                                    value={this.state.date}
+                                    timestamp={this.state.date}
                                     onChange={this.onChangeDate} />
                             </td>
                         </tr>

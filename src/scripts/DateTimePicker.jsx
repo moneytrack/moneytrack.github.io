@@ -7,14 +7,71 @@ import _moment from 'moment'
 import ModalContainer from './ModalContainer'
 import DropDownContainer from './DropDownContainer'
 
-const DateTimePickerModal = React.createClass({
+
+const TimePicker = React.createClass({
+
+    onHoursUp: function(){
+        const {timestamp} = this.props
+        const m = _moment(timestamp)
+        m.add(1, 'hours')
+        this.props.onChange(m.valueOf())
+    },
+
+    onHoursDown: function(){
+        const {timestamp} = this.props
+        const m = _moment(timestamp)
+        m.subtract(1, 'hours')
+        this.props.onChange(m.valueOf())
+    },
+
+    onMinutesUp: function(){
+        const {timestamp} = this.props
+        const m = _moment(timestamp)
+        m.add(1, 'minutes')
+        this.props.onChange(m.valueOf())
+    },
+
+    onMinutesDown: function(){
+        const {timestamp} = this.props
+        const m = _moment(timestamp)
+        m.subtract(1, 'minutes')
+        this.props.onChange(m.valueOf())
+    },
+
+
+    render: function(){
+        const {timestamp} = this.props
+
+        const m = _moment(timestamp)
+
+        return (
+            <div className="time-picker">
+                <div className="ver-counter">
+                    <button type="button" className="ver-counter__button ver-counter__button--up" onClick={this.onHoursUp}><div className="arrow-up"></div></button>
+                    <div className="ver-counter__middle" >
+                        <input  className="time-picker__input" value={m.format("HH")} readOnly={true}/>
+                    </div>
+                    <button type="button" className="ver-counter__button ver-counter__button--down" onClick={this.onHoursDown}><div className="arrow-down"></div></button>
+                </div>
+                <div className="ver-counter">
+                    <button type="button" className="ver-counter__button ver-counter__button--up" onClick={this.onMinutesUp}><div className="arrow-up"></div></button>
+                    <div className="ver-counter__middle" >
+                        <input className="time-picker__input" value={m.format("mm")} readOnly={true}/>
+                    </div>
+                    <button type="button" className="ver-counter__button ver-counter__button--down" onClick={this.onMinutesDown}><div className="arrow-down"></div></button>
+                </div>
+            </div>
+        )
+    }
+})
+
+const DatePicker = React.createClass({
 
     getInitialState: function() {
         const {timestamp} = this.props
         var m = _moment(timestamp);
 
         return {
-            timestamp: timestamp,
             year: m.year(),
             month: m.month(),
         }
@@ -22,9 +79,7 @@ const DateTimePickerModal = React.createClass({
 
     onChange: function(year, month, week, day) {
 
-        console.log(year, month, week, day);
-
-        const {timestamp} = this.state;
+        const {timestamp} = this.props;
 
         const m = _moment(timestamp)
         m.year(year)
@@ -32,9 +87,7 @@ const DateTimePickerModal = React.createClass({
         m.week(week)
         m.day(day)
 
-        this.setState(update(this.state, {
-            timestamp: {$set: m.valueOf()},
-        }))
+        this.props.onChange(m.valueOf())
     },
 
     onPrevMonth: function() {
@@ -87,13 +140,13 @@ const DateTimePickerModal = React.createClass({
 
 
     render: function() {
-        const {timestamp, year, month} = this.state;
+        const {timestamp} = this.props
+        const {year, month} = this.state;
 
         const days = [0,1,2,3,4,5,6]
         const weeks = [0,1,2,3,4,5]
 
         var now = _moment(timestamp);
-
         var showing = _moment(1);
 
         showing.year(year)
@@ -105,23 +158,30 @@ const DateTimePickerModal = React.createClass({
         var start = mStart.valueOf();
 
         return (
-            <div>
-                <h3>
-                    <button type="button" onClick={(e) => this.onPrevYear()}> left </button>
-                    {showing.format("YYYY")}
-                    <button type="button" onClick={(e) => this.onNextYear()}> right </button>
-                </h3>
-                <h3>
-                    <button type="button" onClick={(e) => this.onPrevMonth()}> left </button>
-                    {showing.format("MMMM")}
-                    <button type="button" onClick={(e) => this.onNextMonth()}> right </button>
-                </h3>
-                <table>
+            <div className="date-picker">
+
+                <div className="hor-counter">
+                    <button type="button" className="hor-counter__button hor-counter__button--down" onClick={this.onPrevYear}><div className="arrow-left"></div></button>
+                    <div className="hor-counter__middle">
+                        <div className="date-picker__years__title">{showing.format("YYYY")}</div>
+                    </div>
+                    <button type="button" className="hor-counter__button hor-counter__button--up" onClick={this.onNextYear}><div className="arrow-right"></div></button>
+                </div>
+
+                <div className="hor-counter">
+                    <button type="button" className="hor-counter__button hor-counter__button--down" onClick={this.onPrevMonth}><div className="arrow-left"></div></button>
+                    <div className="hor-counter__middle">
+                        <div className="date-picker__months__title">{showing.format("MMMM")}</div>
+                    </div>
+                    <button type="button" className="hor-counter__button hor-counter__button--up" onClick={this.onNextMonth}><div className="arrow-right"></div></button>
+                </div>
+
+                <table className="date-picker__calendar">
                     <thead>
                         <tr>
                             {
                                 days.map(day => (
-                                    <td key={"header_day_" + day}>{_moment(start).day(day).format("ddd")}</td>
+                                    <td key={"header_day_" + day} className="date-picker__calendar__header">{_moment(start).day(day).format("ddd")}</td>
                                 ))
                             }
                         </tr>
@@ -134,13 +194,19 @@ const DateTimePickerModal = React.createClass({
                                     {
                                         days.map(day => {
                                             var date = _moment(start).add(week, 'weeks').add(day, 'days');
+                                            var className = "date-picker__calendar__day"
+                                            if((date.week() === now.week() && date.day() == now.day() && date.year() === now.year() && date.month() === now.month())) {
+                                                className += " date-picker__calendar__day--active"
+                                            }
+                                            if((date.month() !== month)) {
+                                                className += " date-picker__calendar__day--another-month"
+                                            }
                                             return (
                                                 <td key={"week_"+week+"_day_" + day}
-                                                    onClick={(e) => this.onChange(date.year(), date.month(), date.week(), date.day())}>
+                                                    onClick={(e) => this.onChange(date.year(), date.month(), date.week(), date.day())}
+                                                    className={className}>
                                                     {
-                                                        (date.week() === now.week() && date.day() == now.day() && date.year() === now.year() && date.month() === now.month())
-                                                        ? "[" + date.format("D") + "]"
-                                                        : date.format("D")
+                                                        date.format("D")
                                                     }
                                                 </td>
                                             )
@@ -162,8 +228,15 @@ const DateTimePicker = React.createClass({
 
     getInitialState: function() {
         return {
+            timestamp: this.props.timestamp,
             visible: false
         }
+    },
+
+    onChange: function(timestamp) {
+        this.setState(update(this.state, {
+            timestamp: {$set: timestamp}
+        }))
     },
 
     onCancel: function() {
@@ -176,36 +249,30 @@ const DateTimePicker = React.createClass({
         this.setState(update(this.state, {
             visible: {$set: !this.state.visible}
         }))
-        let resetMoment = _moment(this.props.value.timestamp)
-        this.props.onChange(update(this.props.value, {
-            moment: {$set: resetMoment}
-        }))
     },
 
-    onChangeDate: function(moment) {
-        this.props.onChange(update(this.props.value, {
-            moment: {$set: moment}
-        }))
-    },
-
-    onSaveDate: function() {
-        const newTimestamp = this.props.value.moment.valueOf();
-        this.props.onChange(update(this.props.value, {
-            timestamp: {$set: newTimestamp}
-        }))
+    onSave: function() {
+        this.props.onChange(this.state.timestamp)
         this.setState(update(this.state, {
             visible: {$set: false}
         }))
     },
 
     render: function () {
-        const {timestamp, moment} = this.props.value
+        const {timestamp} = this.props
         return (
             <div className="date-time-picker">
                 <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
                 {  this.state.visible
                    ? <ModalContainer onCancel={this.onCancel}>
-                        <DateTimePickerModal timestamp={Date.now()}/>
+                        <div className="date-time-picker__modal-content">
+                            <DatePicker timestamp={this.state.timestamp} onChange={this.onChange}/>
+                            <TimePicker timestamp={this.state.timestamp} onChange={this.onChange}/>
+                            <div>
+                                <button type="button" onClick={this.onSave}>Save</button>
+                                <button type="button" onClick={this.onCancel}>Cancel</button>
+                            </div>
+                        </div>
                      </ModalContainer>
                    : <span/>  
                 }
@@ -216,13 +283,6 @@ const DateTimePicker = React.createClass({
 
 DateTimePicker.contextTypes = {
     store: React.PropTypes.object
-}
-
-DateTimePicker.wrapState = function(timestamp) {
-    return {
-        timestamp,
-        moment: _moment(timestamp)
-    }
 }
 
 DateTimePicker.unwrapState = function(value) {
