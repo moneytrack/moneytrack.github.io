@@ -5,6 +5,7 @@ import InputMoment from 'input-moment'
 import _moment from 'moment'
 
 import ModalContainer from './ModalContainer'
+import TabsContainer from './TabsContainer'
 import DropDownContainer from './DropDownContainer'
 
 
@@ -181,7 +182,7 @@ const DatePicker = React.createClass({
                         <tr>
                             {
                                 days.map(day => (
-                                    <td key={"header_day_" + day} className="date-picker__calendar__header">{_moment(start).day(day).format("ddd")}</td>
+                                    <td key={"header_day_" + day} className="date-picker__calendar__header date-picker__calendar__cell">{_moment(start).day(day).format("ddd")}</td>
                                 ))
                             }
                         </tr>
@@ -194,12 +195,12 @@ const DatePicker = React.createClass({
                                     {
                                         days.map(day => {
                                             var date = _moment(start).add(week, 'weeks').add(day, 'days');
-                                            var className = "date-picker__calendar__day"
+                                            var className = "date-picker__calendar__cell"
                                             if((date.week() === now.week() && date.day() == now.day() && date.year() === now.year() && date.month() === now.month())) {
-                                                className += " date-picker__calendar__day--active"
+                                                className += " date-picker__calendar__cell--active"
                                             }
                                             if((date.month() !== month)) {
-                                                className += " date-picker__calendar__day--another-month"
+                                                className += " date-picker__calendar__cell--another-month"
                                             }
                                             return (
                                                 <td key={"week_"+week+"_day_" + day}
@@ -262,13 +263,17 @@ const DateTimePicker = React.createClass({
         const {timestamp} = this.props
         return (
             <div className="date-time-picker">
-                <input onClick={this.onClick} value={_moment(timestamp).format("MM.DD HH:mm:ss")} readOnly={true} />
+                <input onClick={this.onClick} value={_moment(timestamp).format("HH:mm MM.DD.YYYY")} readOnly={true} />
                 {  this.state.visible
                    ? <ModalContainer onCancel={this.onCancel}>
                         <div className="date-time-picker__modal-content">
-                            <DatePicker timestamp={this.state.timestamp} onChange={this.onChange}/>
-                            <TimePicker timestamp={this.state.timestamp} onChange={this.onChange}/>
-                            <div>
+                            <div className="date-time-picker__modal-content__section">
+                                <TimePicker timestamp={this.state.timestamp} onChange={this.onChange}/>
+                            </div>
+                            <div className="date-time-picker__modal-content__section">
+                                <DatePicker timestamp={this.state.timestamp} onChange={this.onChange}/>
+                            </div>
+                            <div className="date-time-picker__modal-content__section date-time-picker__modal-content__controls">
                                 <button type="button" onClick={this.onSave}>Save</button>
                                 <button type="button" onClick={this.onCancel}>Cancel</button>
                             </div>
