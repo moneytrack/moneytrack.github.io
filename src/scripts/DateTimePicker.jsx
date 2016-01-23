@@ -246,7 +246,8 @@ const DateTimePicker = React.createClass({
         }))
     },
 
-    onClick: function() {
+    onClick: function(e) {
+        e.preventDefault();
         this.setState(update(this.state, {
             visible: {$set: !this.state.visible}
         }))
