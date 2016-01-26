@@ -932,7 +932,7 @@ input, textarea, .pseudo-input-text {
       color: #006DCE; }
     .history__filters .category-picker__category__empty {
       font-style: italic; }
-    .history__filters .category-picker__category--selected .category-picker__category__title__title {
+    .history__filters .category-picker__category--selected .category-picker__category__title {
       background: #EEEFAA;
       border-bottom: none;
       color: inherit; }
@@ -1103,16 +1103,9 @@ input, textarea, .pseudo-input-text {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center; }
-  .date-picker__years {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: center;
-        -ms-flex-align: center;
-            align-items: center; }
-    .date-picker__years__title {
-      font-weight: bold;
-      padding: 0 1rem; }
+  .date-picker__months__title {
+    font-weight: bold;
+    padding: 0 1rem; }
   .date-picker__calendar {
     margin: 0.75rem 0; }
     .date-picker__calendar__header {
