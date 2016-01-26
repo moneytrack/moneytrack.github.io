@@ -932,12 +932,10 @@ input, textarea, .pseudo-input-text {
       color: #006DCE; }
     .history__filters .category-picker__category__empty {
       font-style: italic; }
-    .history__filters .category-picker__category--selected .history__filters .category-picker__category__title {
+    .history__filters .category-picker__category--selected .category-picker__category__title__title {
       background: #EEEFAA;
       border-bottom: none;
       color: inherit; }
-    .history__filters .category-picker__category--selected .history__filters .category-picker__category__empty {
-      background: #EEEFAA; }
   .history__filters .category-picker__children {
     padding-left: 20px; }
 
@@ -1105,20 +1103,16 @@ input, textarea, .pseudo-input-text {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center; }
-  .date-picker__years, .date-picker__months {
+  .date-picker__years {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     -webkit-align-items: center;
         -ms-flex-align: center;
             align-items: center; }
-  .date-picker__years__title {
-    font-weight: bold;
-    font-style: italic;
-    padding: 0 1rem; }
-  .date-picker__months__title {
-    font-weight: bold;
-    padding: 0 1rem; }
+    .date-picker__years__title {
+      font-weight: bold;
+      padding: 0 1rem; }
   .date-picker__calendar {
     margin: 0.75rem 0; }
     .date-picker__calendar__header {
@@ -1145,7 +1139,7 @@ input, textarea, .pseudo-input-text {
     text-align: center;
     border: none; }
 
-.ver-counter {
+.v-counter {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1156,7 +1150,7 @@ input, textarea, .pseudo-input-text {
       -ms-flex-align: stretch;
           align-items: stretch;
   margin: 0.2rem; }
-  .ver-counter__middle {
+  .v-counter__middle {
     border-left: 1px solid #E8E8E8;
     border-right: 1px solid #E8E8E8;
     display: -webkit-flex;
@@ -1168,7 +1162,7 @@ input, textarea, .pseudo-input-text {
     -webkit-flex-direction: row;
         -ms-flex-direction: row;
             flex-direction: row; }
-  .ver-counter__button {
+  .v-counter__button {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
@@ -1177,12 +1171,12 @@ input, textarea, .pseudo-input-text {
             justify-content: center;
     margin: 0;
     outline: none; }
-    .ver-counter__button--up {
+    .v-counter__button--up {
       border-radius: 5px 5px 0 0; }
-    .ver-counter__button--down {
+    .v-counter__button--down {
       border-radius: 0 0 5px 5px; }
 
-.hor-counter {
+.h-counter {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1193,7 +1187,7 @@ input, textarea, .pseudo-input-text {
       -ms-flex-align: stretch;
           align-items: stretch;
   margin: 0.2rem; }
-  .hor-counter__middle {
+  .h-counter__middle {
     border-bottom: 1px solid #E8E8E8;
     border-top: 1px solid #E8E8E8;
     display: -webkit-flex;
@@ -1205,7 +1199,7 @@ input, textarea, .pseudo-input-text {
     -webkit-flex-direction: column;
         -ms-flex-direction: column;
             flex-direction: column; }
-  .hor-counter__button {
+  .h-counter__button {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
@@ -1214,7 +1208,9 @@ input, textarea, .pseudo-input-text {
             justify-content: center;
     margin: 0;
     outline: none; }
-    .hor-counter__button--up {
+    .h-counter__button--up {
       border-radius: 0 5px 5px 0; }
-    .hor-counter__button--down {
+    .h-counter__button--down {
       border-radius: 5px 0 0 5px; }
+    .h-counter__button--up, .h-counter__button--down {
+      padding: 6px 10px; }
