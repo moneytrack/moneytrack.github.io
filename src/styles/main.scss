@@ -417,11 +417,9 @@ input, textarea, .pseudo-input-text {
                 }
 
                 &--selected .category-picker__category__title {
-                    &__title {
-                        background: #EEEFAA;
-                        border-bottom: none;
-                        color: inherit;
-                    }
+                    background: #EEEFAA;
+                    border-bottom: none;
+                    color: inherit;
                 }
 
                 cursor: pointer;
@@ -673,10 +671,7 @@ input, textarea, .pseudo-input-text {
     flex-direction: column;
     align-items: center;
 
-    &__years {
-        display: flex;
-        align-items: center;
-
+    &__months {
         &__title {
             font-weight: bold;
             padding: 0 1rem;

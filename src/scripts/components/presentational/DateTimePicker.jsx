@@ -102,6 +102,13 @@ const DatePicker = React.createClass({
         m.week(week)
         m.day(day)
 
+        if(this.state.month !== month || this.state.year !== year) {
+            this.setState(update(this.state, {
+                month: {$set: month},
+                year: {$set: year}
+            }))
+        }
+
         this.props.onChange(m.valueOf())
     },
 
