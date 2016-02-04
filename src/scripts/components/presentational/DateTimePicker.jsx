@@ -40,22 +40,40 @@ const TimePicker = React.createClass({
     },
 
     onChangeHours: function(e) {
-        let hours = e.target.value.substring(1);
-        if(parseInt(hours) >= 24) {
-            hours = "0" + hours.substr(1)
+        var value = e.target.value;
+        if(value.length>2) {
+            value = value.substring(1)
         }
+
+        var hours = parseInt(value)
+        if(Number.isNaN(hours) || hours < 0) {
+            return
+        }
+        if(hours > 24) {
+            hours = 0
+        }
+
         const {timestamp} = this.props
         const m = _moment(timestamp)
-        m.hours(parseInt(hours))
+        m.hours(hours)
         this.props.onChange(m.valueOf())
     },
 
 
     onChangeMinutes: function(e) {
-        let minutes = e.target.value.substring(1);
-        if(parseInt(minutes) >= 60) {
-            minutes = "0" + minutes.substr(1)
+        var value = e.target.value;
+        if(value.length>2) {
+            value = value.substring(1)
         }
+
+        var minutes = parseInt(value)
+        if(Number.isNaN(minutes) || minutes < 0) {
+            return
+        }
+        if(minutes > 60) {
+            minutes = 0
+        }
+
         const {timestamp} = this.props
         const m = _moment(timestamp)
         m.minutes(parseInt(minutes))
