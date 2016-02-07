@@ -1,5 +1,16 @@
 @import 'mfglabs_iconset';
 
+$selectedBgColor: #EEEFAA;
+$linkColor: #006DCE;
+$warningColor: #C70000;
+$inputColor: #5F5F5F;
+$inputBgColor: #FBFBFB;
+$inputBorderColor: #E8E8E8;
+$inputDisabledColor: #5F5F5F;
+$inputWarningBorderColor: #8C0000;
+$inputWarningBgColor: #CA0000;
+$modalBgColor: rgba(0, 0, 0, 0.72);
+
 html {
     font-size: 12pt;
     font-family: 'PT Sans', Helvetica, Arial, sans-serif;
@@ -12,9 +23,9 @@ body {
 }
 
 a {
-    color: #006DCE;
+    color: $linkColor;
     text-decoration: none;
-    border-bottom: 1px solid #006DCE;
+    border-bottom: 1px solid $linkColor;
 }
 
 a.pseudo {
@@ -22,43 +33,43 @@ a.pseudo {
 }
 
 i.icon {
-    color: #006DCE;
+    color: $linkColor;
     cursor: pointer;
 }
 
 i.icon.warning {
-    color: #C70000;
+    color: $warningColor;
 }
 
 
 a.pseudo.warning {
-    color: #C70000;
-    border-bottom-color: #C70000;
+    color: $warningColor;
+    border-bottom-color: $warningColor;
 }
 
 button {
-    border: 1px solid #E8E8E8;
-    background: #FBFBFB;
+    border: 1px solid $inputBorderColor;
+    background: $inputBgColor;
     border-radius: 7px;
     padding: 10px 15px;
     margin: 5px;
     font-weight: bold;
-    color: #5F5F5F;
+    color: $inputColor;
 }
 
 button:disabled {
-    color: rgba(95, 95, 95, 0.25);
+    color: $inputDisabledColor;
 }
 
 button.warning {
-    border: 1px solid #8C0000;
-    background: #CA0000;
+    border: 1px solid $inputWarningBorderColor;
+    background: $inputWarningBgColor;
     color: white;
 }
 
 input, textarea, .pseudo-input-text {
     border-radius: 5px;
-    border: 1px solid #E8E8E8;
+    border: 1px solid $inputBorderColor;
     padding: 0.3rem 0.5rem;
     font-size: 1rem;
 }
@@ -104,6 +115,7 @@ input, textarea, .pseudo-input-text {
         &__span {
             padding: 1rem;
             letter-spacing: 0.75rem;
+            background: $selectedBgColor;
         }
     }
 }
@@ -127,11 +139,11 @@ input, textarea, .pseudo-input-text {
         }
 
         &--selected &__empty {
-            background: #EEEFAA;
+            background: $selectedBgColor;
         }
 
         &--selected {
-            background: #EEEFAA;
+            background: $selectedBgColor;
         }
     }
 
@@ -167,7 +179,7 @@ input, textarea, .pseudo-input-text {
 	}
 
     &__category-picker-wrapper {
-        border: 1px solid #D8D8D8;
+        border: 1px solid $inputBorderColor;
         border-radius: 5px;
         padding: 0;
 
@@ -197,7 +209,7 @@ input, textarea, .pseudo-input-text {
         }
 
         &--selected &__title {
-            background: #EEEFAA;
+            background: $selectedBgColor;
             border-bottom: none;
             color: inherit;
         }
@@ -214,7 +226,7 @@ input, textarea, .pseudo-input-text {
     }
 
     &__category:hover &__category__content {
-        background: #EEEFAA;
+        background: $selectedBgColor;
     }
 
     #{&}__category:hover #{&}__category__controls {
@@ -257,7 +269,7 @@ input, textarea, .pseudo-input-text {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.72);
+    background: $modalBgColor;
     display: flex;
     justify-content: center;
     z-index: 9999;
@@ -279,7 +291,7 @@ input, textarea, .pseudo-input-text {
     }
 
     &__msg.warning {
-        color: #C70000;
+        color: $warningColor;
     }
 
     &__controls {
@@ -320,8 +332,8 @@ input, textarea, .pseudo-input-text {
 .user-panel {
     position: fixed;
     top: 0;
-    right: 0;
-    background: #EEEFAA;
+    right: 20px;
+    background: $selectedBgColor;
     text-align: center;
     font-size: 0.70rem;
     color: white;
@@ -344,7 +356,7 @@ input, textarea, .pseudo-input-text {
         }
 
         &__label--active {
-            background: #EEEFAA;
+            background: $selectedBgColor;
         }
     }
 
@@ -386,7 +398,7 @@ input, textarea, .pseudo-input-text {
 
         &__item--active {
             span {
-                background: #EEEFAA;
+                background: $selectedBgColor;
             }
         }
 
@@ -408,8 +420,8 @@ input, textarea, .pseudo-input-text {
 
                 &__title {
                     display: inline;
-                    border-bottom: 1px dashed #006DCE;
-                    color: #006DCE;
+                    border-bottom: 1px dashed $linkColor;
+                    color: $linkColor;
                 }
 
                 &__empty {
@@ -417,7 +429,7 @@ input, textarea, .pseudo-input-text {
                 }
 
                 &--selected .category-picker__category__title {
-                    background: #EEEFAA;
+                    background: $selectedBgColor;
                     border-bottom: none;
                     color: inherit;
                 }
@@ -612,6 +624,10 @@ input, textarea, .pseudo-input-text {
             }
         }
     }
+
+    &__controls {
+        margin: 1rem 0;
+    }
 }
 
 
@@ -691,7 +707,7 @@ input, textarea, .pseudo-input-text {
             cursor: default;
 
             &--active {
-                background: #EEEFAA;
+                background: $selectedBgColor;
             }
 
             &--another-month {
@@ -725,8 +741,8 @@ input, textarea, .pseudo-input-text {
 
 
     &__middle {
-        border-left: 1px solid #E8E8E8;
-        border-right: 1px solid #E8E8E8;
+        border-left: 1px solid $inputBorderColor;
+        border-right: 1px solid $inputBorderColor;
         display: flex;
         justify-content: center;
         flex-direction: row;
@@ -760,8 +776,8 @@ input, textarea, .pseudo-input-text {
 
 
     &__middle {
-        border-bottom: 1px solid #E8E8E8;
-        border-top: 1px solid #E8E8E8;
+        border-bottom: 1px solid $inputBorderColor;
+        border-top: 1px solid $inputBorderColor;
         display: flex;
         justify-content: center;
         flex-direction: column;

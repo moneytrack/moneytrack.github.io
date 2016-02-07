@@ -250,7 +250,7 @@ const SumTableStatistics = React.createClass({
                         let data = calculateTable(yearMonthCategoryExpenseMap[year])
                         return (
                             <div key={year}>
-                                <div>
+                                <div className="sum-table-statistics__controls">
                                     <label><input type="checkbox" checked={this.state.showChild}
                                                   onChange={this.onChangeChild}/> show child categories</label>
                                     <label><input type="checkbox"  disabled={!this.state.showChild} checked={this.state.showAtRoot}
