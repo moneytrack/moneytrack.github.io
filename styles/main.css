@@ -655,7 +655,7 @@ button {
   color: #5F5F5F; }
 
 button:disabled {
-  color: rgba(95, 95, 95, 0.25); }
+  color: #5F5F5F; }
 
 button.warning {
   border: 1px solid #8C0000;
@@ -699,7 +699,8 @@ input, textarea, .pseudo-input-text {
   font-size: 1.5rem; }
   .logo__title__span {
     padding: 1rem;
-    letter-spacing: 0.75rem; }
+    letter-spacing: 0.75rem;
+    background: #EEEFAA; }
 
 .category-picker__category {
   cursor: pointer;
@@ -739,7 +740,7 @@ input, textarea, .pseudo-input-text {
   .edit-expense__field__input {
     padding-bottom: 1rem; }
   .edit-expense__category-picker-wrapper {
-    border: 1px solid #D8D8D8;
+    border: 1px solid #E8E8E8;
     border-radius: 5px;
     padding: 0; }
     .edit-expense__category-picker-wrapper > .category-picker > .category-picker__category:first-child {
@@ -862,7 +863,7 @@ input, textarea, .pseudo-input-text {
 .user-panel {
   position: fixed;
   top: 0;
-  right: 0;
+  right: 20px;
   background: #EEEFAA;
   text-align: center;
   font-size: 0.70rem;
@@ -1048,6 +1049,9 @@ input, textarea, .pseudo-input-text {
     color: red; }
   .sum-table-statistics__year__total__dif--minus {
     color: green; }
+
+.sum-table-statistics__controls {
+  margin: 1rem 0; }
 
 .unauthorized {
   margin: auto 0; }
