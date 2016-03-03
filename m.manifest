@@ -1,0 +1,10 @@
+CACHE MANIFEST
+# Version 1
+NETWORK:
+https://ru-koluch-moneytrack-backend.appspot.com/dispatch
+CACHE:
+/styles/mobile.css
+/scripts/context.js
+/scripts/vendor.js
+/scripts/mobile.js
+/images/select_bg.png
